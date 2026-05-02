@@ -3,7 +3,6 @@
 </p>
 
 <h1 align="center">Autonexa</h1>
-# 🚀 Autonexa — Sistem Manajemen Bengkel Motor
 
 Autonexa adalah platform berbasis web untuk mempermudah manajemen bengkel motor dan reservasi service secara online.
 Aplikasi ini dirancang untuk mendukung multi-cabang dengan kontrol terpusat serta pengalaman pengguna yang modern.
@@ -126,7 +125,3 @@ routes/
 Autonexa Team
 
 ---
-
-## 📄 Lisensi
-
-Project ini dibuat untuk keperluan pengembangan dan pembelajaran.

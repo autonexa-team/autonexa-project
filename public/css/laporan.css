@@ -1,0 +1,396 @@
+/* ================================================================
+   laporan.css — Halaman Laporan Admin Pusat
+   Komponen: filter bar · preview dokumen · tabel · watermark · print
+================================================================ */
+
+/* ── FILTER CARD ── */
+.laporan-filter-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+}
+
+.laporan-filter-card .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--foreground-t);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 5px;
+}
+
+.laporan-filter-card .form-control,
+.laporan-filter-card .form-select {
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    color: var(--foreground);
+    background: var(--white);
+    transition: var(--transition);
+    height: 38px;
+}
+
+.laporan-filter-card .form-control:focus,
+.laporan-filter-card .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.10);
+    outline: none;
+}
+
+.btn-filter-submit {
+    height: 38px;
+    padding: 0 18px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.btn-filter-submit:hover { background: var(--primary-dark, #d95c00); }
+
+.btn-export-pdf {
+    height: 38px;
+    padding: 0 16px;
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.btn-export-pdf:hover { background: #b91c1c; color: #fff; }
+
+/* ── DOCUMENT PREVIEW WRAPPER ── */
+.laporan-preview {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 40px 48px;
+    max-width: 960px;
+    margin: 0 auto;
+    overflow: hidden;
+
+    /* paper shadow */
+    box-shadow:
+        0 1px 3px rgba(0,0,0,0.06),
+        0 8px 24px rgba(0,0,0,0.06),
+        0 0 0 1px rgba(0,0,0,0.03);
+}
+
+/* ── WATERMARK ── */
+.laporan-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 96px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: rgba(255, 106, 0, 0.04);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    z-index: 0;
+}
+
+/* ── LAPORAN HEADER ── */
+.laporan-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.laporan-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary, #ff6a00);
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+}
+
+.laporan-logo i {
+    font-size: 28px;
+}
+
+.laporan-meta {
+    text-align: right;
+}
+
+.laporan-meta h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0 0 4px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.laporan-meta p {
+    font-size: 12.5px;
+    color: var(--foreground-t);
+    margin: 0 0 2px;
+}
+
+.laporan-meta-detail {
+    font-size: 11.5px !important;
+    color: var(--foreground-t) !important;
+    opacity: 0.8;
+}
+
+/* ── DIVIDER ── */
+.laporan-divider {
+    border: none;
+    border-top: 2px solid var(--border);
+    margin: 20px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.laporan-divider--thin {
+    border-width: 1px;
+    margin: 14px 0;
+}
+
+/* ── SUMMARY ROW ── */
+.laporan-summary-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 4px;
+}
+
+.laporan-summary-item {
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.laporan-summary-item:first-child {
+    border-left: 3px solid var(--primary, #ff6a00);
+}
+
+.laporan-summary-item:nth-child(2) {
+    border-left: 3px solid #22c55e;
+}
+
+.laporan-summary-item:nth-child(3) {
+    border-left: 3px solid #2563eb;
+}
+
+.ls-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--foreground-t);
+    margin-bottom: 6px;
+}
+
+.ls-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--foreground);
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+/* ── SECTION TITLE ── */
+.laporan-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--foreground-t);
+    margin: 20px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.laporan-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ── LAPORAN TABLE ── */
+.laporan-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    position: relative;
+    z-index: 1;
+}
+
+.laporan-table thead tr {
+    background: #f3f4f6;
+}
+
+.laporan-table thead th {
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--foreground-t);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.laporan-table tbody td {
+    padding: 9px 12px;
+    color: var(--foreground);
+    border: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.laporan-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.laporan-table tbody tr:hover {
+    background: #fff7ed;
+}
+
+.laporan-table tfoot td {
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    background: #f3f4f6;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+/* Status badge di dalam tabel laporan */
+.laporan-table .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ── LAPORAN FOOTER ── */
+.laporan-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.laporan-footer p {
+    font-size: 11px;
+    color: var(--foreground-t);
+    margin: 0 0 3px;
+    opacity: 0.7;
+}
+
+/* ── PRINT STYLES ── */
+@media print {
+    /* Sembunyikan elemen UI yang tidak perlu saat print */
+    .laporan-filter-card,
+    .sidebar,
+    .topbar,
+    .btn-export-pdf,
+    .btn-filter-submit {
+        display: none !important;
+    }
+
+    body { background: #fff !important; }
+
+    .laporan-preview {
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 20px !important;
+        max-width: 100% !important;
+    }
+
+    .laporan-watermark {
+        color: rgba(255, 106, 0, 0.07) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .laporan-summary-item {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .laporan-table thead tr {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Hindari page break di tengah baris tabel */
+    .laporan-table tr { page-break-inside: avoid; }
+
+    /* Force page break sebelum footer jika perlu */
+    .laporan-footer { page-break-before: auto; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .laporan-preview {
+        padding: 24px 20px;
+    }
+
+    .laporan-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .laporan-meta { text-align: left; }
+
+    .laporan-summary-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .laporan-watermark { font-size: 52px; }
+}
+
+@media (max-width: 480px) {
+    .laporan-table { font-size: 11px; }
+    .laporan-table thead th,
+    .laporan-table tbody td { padding: 7px 8px; }
+}

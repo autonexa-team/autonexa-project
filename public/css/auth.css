@@ -1,0 +1,504 @@
+/* ================================================================
+   auth.css — Login · Register · Lupa Password
+   Autonexa | Theme: --primary #ff6a00
+================================================================ */
+
+/* ── BODY ── */
+.auth-body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── CONTAINER UTAMA ── */
+.auth-container {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    min-height: 520px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+    margin: 24px auto;
+}
+
+/* ================================================================
+   PANEL KIRI (gelap, dekoratif)
+================================================================ */
+.auth-left {
+    width: 340px;
+    flex-shrink: 0;
+    background: #0f172a;
+    padding: 40px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Lingkaran dekorasi */
+.auth-left::before {
+    content: '';
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(255, 106, 0, 0.10);
+    top: -60px;
+    right: -60px;
+    pointer-events: none;
+}
+
+.auth-left::after {
+    content: '';
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 106, 0, 0.06);
+    bottom: -30px;
+    right: 60px;
+    pointer-events: none;
+}
+
+.auth-left-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Logo bulat */
+.auth-brand-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255, 106, 0, 0.18);
+    border: 1px solid rgba(255, 106, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #ff6a00;
+    margin-bottom: 4px;
+}
+
+.auth-left-content h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.auth-left-content p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Daftar fitur di panel kiri */
+.auth-features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.auth-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.auth-feature-item i {
+    font-size: 15px;
+    color: #ff6a00;
+    flex-shrink: 0;
+}
+
+/* ================================================================
+   PANEL KANAN (form)
+================================================================ */
+.auth-right {
+    flex: 1;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 40px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 380px;
+}
+
+/* Brand kecil di atas form */
+.auth-brand-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ff6a00;
+    text-decoration: none;
+    margin-bottom: 18px;
+}
+
+.auth-brand-sm i {
+    font-size: 16px;
+}
+
+/* ── HEADER FORM ── */
+.auth-header {
+    margin-bottom: 22px;
+}
+
+.auth-header h4 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px;
+}
+
+.auth-header p {
+    font-size: 13px;
+    color: rgba(15, 23, 42, 0.5);
+    margin: 0;
+}
+
+/* Ikon khusus halaman lupa password */
+.auth-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255, 106, 0, 0.1);
+    border: 1px solid rgba(255, 106, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #ff6a00;
+    margin-bottom: 14px;
+}
+
+/* ── INPUT GROUP ── */
+.input-group-text {
+    background: #fafafa;
+    border-color: #e5e7eb;
+    color: rgba(15, 23, 42, 0.4);
+}
+
+.form-control {
+    border-color: #e5e7eb;
+    font-size: 14px;
+    color: #0f172a;
+    padding: 9px 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control::placeholder {
+    color: #aaa;
+}
+
+.form-control:focus {
+    border-color: #ff6a00;
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.12);
+}
+
+.form-control.is-invalid {
+    border-color: #ef4444;
+}
+
+.form-control.is-invalid:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+/* ── LABEL ── */
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+/* ── TOMBOL SUBMIT ── */
+.btn-auth {
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary.btn-auth {
+    background: #ff6a00;
+    border-color: #ff6a00;
+    color: #ffffff;
+}
+
+.btn-primary.btn-auth:hover {
+    background: #ff8c42;
+    border-color: #ff8c42;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255, 106, 0, 0.3);
+}
+
+.btn-primary.btn-auth:active {
+    transform: translateY(0);
+}
+
+/* Tombol toggle password */
+.btn-outline-secondary {
+    border-color: #e5e7eb;
+    color: rgba(15, 23, 42, 0.4);
+    background: #fafafa;
+}
+
+.btn-outline-secondary:hover {
+    background: #f0f0f0;
+    color: #0f172a;
+    border-color: #e5e7eb;
+}
+
+/* ── DIVIDER ── */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    color: rgba(15, 23, 42, 0.35);
+    font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+/* ── CHECKBOX REMEMBER ── */
+.form-check-input:checked {
+    background-color: #ff6a00;
+    border-color: #ff6a00;
+}
+
+.form-check-input:focus {
+    border-color: #ff6a00;
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.12);
+}
+
+.form-check-label {
+    font-size: 13px;
+    color: rgba(15, 23, 42, 0.6);
+}
+
+/* ── LINK LUPA PASSWORD ── */
+.text-primary {
+    color: #ff6a00 !important;
+}
+
+.text-primary:hover {
+    color: #ff8c42 !important;
+}
+
+.small.text-primary {
+    font-size: 12px;
+}
+
+/* ── ALERT BOOTSTRAP OVERRIDE ── */
+.alert {
+    border-radius: 10px;
+    font-size: 13px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    border: none;
+}
+
+.alert-danger {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-left: 3px solid #ef4444;
+}
+
+/* ── CUSTOM ALERT (khusus lupa password) ── */
+.auth-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.auth-alert i {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.auth-alert-success {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.auth-alert-success i {
+    color: #16a34a;
+}
+
+.auth-alert-danger {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.auth-alert-danger i {
+    color: #ef4444;
+}
+
+/* ── INFO BOX (lupa password) ── */
+.auth-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255, 106, 0, 0.06);
+    border: 1px solid rgba(255, 106, 0, 0.18);
+    font-size: 12px;
+    color: #c2410c;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+.auth-info-box i {
+    font-size: 14px;
+    color: #ff6a00;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.auth-info-box strong {
+    color: #9a3412;
+}
+
+/* ── LINK KEMBALI (lupa password) ── */
+.auth-back-link {
+    text-align: center;
+    margin-top: 18px;
+}
+
+.auth-back-link a {
+    font-size: 13px;
+    color: rgba(15, 23, 42, 0.5);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+}
+
+.auth-back-link a:hover {
+    color: #ff6a00;
+}
+
+/* ── FOOTER LINK (daftar / masuk) ── */
+.fw-semibold.text-primary {
+    font-weight: 600;
+}
+
+
+/* ================================================================
+   LOGO
+================================================================ */
+/* LOGO SYSTEM */
+.logo-sm {
+    height: 32px;
+}
+
+.logo-md {
+    height: 100px;
+}
+
+.logo-lg {
+    height: 60px;
+}
+
+/* BRAND */
+.auth-brand-sm {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+/* CENTER HEADER */
+.auth-header {
+    text-align: center;
+}
+
+.auth-header img {
+    margin-bottom: 10px;
+}
+
+/* ================================================================
+   RESPONSIVE
+================================================================ */
+@media (max-width: 991px) {
+    .auth-container {
+        max-width: 480px;
+        border-radius: 16px;
+        flex-direction: column;
+    }
+
+    .auth-left {
+        width: 100%;
+        padding: 24px 28px;
+        border-radius: 0;
+    }
+
+    .auth-right {
+        padding: 28px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-body {
+        align-items: flex-start;
+        padding: 16px;
+    }
+
+    .auth-container {
+        margin: 0;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+    }
+
+    .auth-right {
+        padding: 24px 20px;
+    }
+
+    .auth-header h4 {
+        font-size: 19px;
+    }
+}

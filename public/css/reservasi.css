@@ -1,0 +1,604 @@
+/* ===== HERO HEADER ===== */
+.reservasi-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--foreground);
+    border-radius: var(--radius-lg);
+    padding: 28px 28px 24px;
+    margin-top: 100px;
+    margin-bottom: 0;
+    max-width: 1200px;
+    margin: 100px auto 0;
+    position: relative;
+    overflow: hidden;
+    flex-wrap: wrap;
+}
+
+/* Lingkaran dekorasi background */
+.reservasi-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(255, 106, 0, 0.10);
+    pointer-events: none;
+}
+
+.reservasi-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    right: 100px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: rgba(255, 106, 0, 0.05);
+    pointer-events: none;
+}
+
+.hero-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.hero-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--primary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.hero-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.25;
+    margin-bottom: 6px;
+}
+
+.hero-title span {
+    color: var(--primary);
+}
+
+.hero-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 360px;
+    line-height: 1.5;
+}
+
+/* Tombol Reservasi Saya */
+.btn-riwayat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 40px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.btn-riwayat:hover {
+    background: rgba(255, 106, 0, 0.18);
+    border-color: rgba(255, 106, 0, 0.4);
+    color: #ffffff;
+}
+
+.btn-riwayat-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
+}
+
+.btn-riwayat-badge {
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 20px;
+    padding: 1px 7px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Sesuaikan margin wrapper agar tidak double margin-top */
+.reservasi-wrapper {
+    margin-top: 12px; /* ganti dari 100px */
+}
+
+/* ===== RESPONSIVE HERO ===== */
+@media (max-width: 576px) {
+    .reservasi-hero {
+        flex-direction: column;
+        gap: 16px;
+        margin-left: 12px;
+        margin-right: 12px;
+        padding: 20px;
+    }
+
+    .btn-riwayat {
+        align-self: flex-start;
+    }
+
+    .hero-title {
+        font-size: 18px;
+    }
+}
+
+/* ===== WRAPPER ===== */
+.reservasi-wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.reservasi-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ===== BLOCK ===== */
+.reservasi-block {
+    background: var(--background);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    transition: var(--transition);
+}
+
+.reservasi-block:hover {
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+/* STICKY RINGKASAN */
+.reservasi-right .reservasi-block {
+    position: sticky;
+    top: 20px;
+}
+
+/* BLOCK HEADER */
+.block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.block-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.block-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+/* ===== SEARCH ===== */
+.search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.search-input-wrap {
+    position: relative;
+    flex: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--foreground-thin);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--foreground);
+    background: var(--background);
+    outline: none;
+    transition: var(--transition);
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+}
+
+/* BUTTON TERDEKAT */
+.btn-terdekat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 106, 0, 0.08);
+    color: var(--primary);
+    border: 1px solid rgba(255, 106, 0, 0.2);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.btn-terdekat:hover {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+}
+
+/* ===== BENGKEL LIST ===== */
+.bengkel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bengkel-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.bengkel-card:hover {
+    background: var(--foreground-soft);
+    border-color: #d1d5db;
+}
+
+.bengkel-card.active {
+    border-color: var(--primary);
+    background: rgba(255, 106, 0, 0.06);
+}
+
+.bengkel-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--bg-soft);
+}
+
+.bengkel-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.bengkel-nama {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bengkel-alamat {
+    font-size: 12px;
+    color: var(--foreground-thin);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bengkel-stars {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.bengkel-stars i {
+    font-size: 12px;
+}
+
+.star-on {
+    color: #f59e0b;
+}
+
+.star-off {
+    color: #d1d5db;
+}
+
+.rating-val {
+    font-size: 11px;
+    color: var(--foreground-thin);
+    margin-left: 4px;
+}
+
+.check-icon {
+    color: var(--primary);
+    font-size: 18px;
+    display: none;
+    flex-shrink: 0;
+}
+
+.bengkel-card.active .check-icon {
+    display: block;
+}
+
+/* ===== PREVIEW BENGKEL TERPILIH ===== */
+.bengkel-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--primary);
+    background: rgba(255, 106, 0, 0.06);
+    margin-bottom: 12px;
+}
+
+.preview-foto {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.preview-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.preview-nama {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 2px;
+}
+
+.preview-alamat {
+    font-size: 12px;
+    color: var(--foreground-thin);
+}
+
+.preview-rating {
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.btn-ganti {
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--background);
+    font-size: 12px;
+    color: var(--foreground-thin);
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-ganti:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* ===== FORM ===== */
+.form-row-2 {
+    display: flex;
+    gap: 12px;
+}
+
+.form-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.field-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.field-input {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--foreground);
+    background: var(--background);
+    outline: none;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.field-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+}
+
+.field-textarea {
+    resize: none;
+}
+
+.field-error {
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 2px;
+}
+
+/* BUTTON SUBMIT */
+.btn-reservasi {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-reservasi:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-orange);
+}
+
+.btn-reservasi:active {
+    transform: translateY(0);
+}
+
+/* ===== RINGKASAN ===== */
+.ringkasan-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 24px 0;
+    color: var(--foreground-thin);
+    text-align: center;
+}
+
+.ringkasan-empty i {
+    font-size: 32px;
+    color: var(--border);
+}
+
+.ringkasan-empty p {
+    font-size: 13px;
+}
+
+.ringkasan-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.ringkasan-row:last-of-type {
+    border-bottom: none;
+}
+
+.ringkasan-label {
+    font-size: 13px;
+    color: var(--foreground-thin);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ringkasan-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--foreground);
+    text-align: right;
+    max-width: 55%;
+}
+
+/* STATUS BADGE */
+.status-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.status-pending {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+/* ===== MINI MAP ===== */
+.mini-map {
+    margin-top: 16px;
+    height: 180px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .reservasi-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .reservasi-right .reservasi-block {
+        position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .form-row-2 {
+        flex-direction: column;
+    }
+
+    .search-row {
+        flex-direction: column;
+    }
+
+    .btn-terdekat {
+        justify-content: center;
+    }
+}

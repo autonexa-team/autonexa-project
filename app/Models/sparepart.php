@@ -1,6 +1,3 @@
-<!-- app/Models/Sparepart.php -->
-
-
 <?php
 namespace App\Models;
 
@@ -8,7 +5,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sparepart extends Model
 {
-    protected $fillable = ['reservasi_id', 'nama', 'qty', 'harga', 'total'];
+    protected $fillable = ['nama', 'harga', 'deskripsi'];    
 
-    public function reservasi() { return $this->belongsTo(Reservasi::class); }
+    // satu sparepart bisa ada di banyak bengkel, dan satu bengkel bisa punya banyak sparepart
+    public function bengkels()
+    {
+        return $this->belongsToMany(Bengkel::class, 'bengkel_spareparts')
+                    ->withPivot('stok');
+    }    
 }

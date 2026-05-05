@@ -1,396 +1,571 @@
 /* ================================================================
    laporan.css — Halaman Laporan Admin Pusat
-   Komponen: filter bar · preview dokumen · tabel · watermark · print
+   Konsisten dengan admin-dashboard.css & admin-sidebar.css
 ================================================================ */
 
-/* ── FILTER CARD ── */
-.laporan-filter-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 18px 20px;
-    margin-bottom: 16px;
-}
-
-.laporan-filter-card .form-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--foreground-t);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 5px;
-}
-
-.laporan-filter-card .form-control,
-.laporan-filter-card .form-select {
-    font-size: 13px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 8px 12px;
-    color: var(--foreground);
-    background: var(--white);
-    transition: var(--transition);
-    height: 38px;
-}
-
-.laporan-filter-card .form-control:focus,
-.laporan-filter-card .form-select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.10);
-    outline: none;
-}
-
-.btn-filter-submit {
-    height: 38px;
-    padding: 0 18px;
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: var(--transition);
-    white-space: nowrap;
-}
-
-.btn-filter-submit:hover { background: var(--primary-dark, #d95c00); }
-
-.btn-export-pdf {
-    height: 38px;
-    padding: 0 16px;
-    background: #dc2626;
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: var(--transition);
-    white-space: nowrap;
-}
-
-.btn-export-pdf:hover { background: #b91c1c; color: #fff; }
-
-/* ── DOCUMENT PREVIEW WRAPPER ── */
-.laporan-preview {
-    position: relative;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 40px 48px;
-    max-width: 960px;
-    margin: 0 auto;
-    overflow: hidden;
-
-    /* paper shadow */
-    box-shadow:
-        0 1px 3px rgba(0,0,0,0.06),
-        0 8px 24px rgba(0,0,0,0.06),
-        0 0 0 1px rgba(0,0,0,0.03);
-}
-
-/* ── WATERMARK ── */
-.laporan-watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-35deg);
-    font-size: 96px;
-    font-weight: 900;
-    letter-spacing: 6px;
-    color: rgba(255, 106, 0, 0.04);
-    pointer-events: none;
-    user-select: none;
-    white-space: nowrap;
-    z-index: 0;
-}
-
-/* ── LAPORAN HEADER ── */
-.laporan-header {
+/* ── PAGE HEADER ─────────────────────────────────────────────── */
+.lp-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 24px;
-    position: relative;
-    z-index: 1;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.laporan-logo {
+.lp-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--foreground);
+    margin: 0 0 4px;
+    letter-spacing: -0.3px;
+}
+
+.lp-sub {
+    font-size: 12px;
+    color: var(--foreground-t);
+    margin: 0;
+}
+
+.lp-sub strong { color: var(--foreground); }
+
+.lp-header-actions {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--primary, #ff6a00);
-    letter-spacing: -0.5px;
     flex-shrink: 0;
 }
 
-.laporan-logo i {
-    font-size: 28px;
-}
-
-.laporan-meta {
-    text-align: right;
-}
-
-.laporan-meta h4 {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--foreground);
-    margin: 0 0 4px;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-}
-
-.laporan-meta p {
-    font-size: 12.5px;
-    color: var(--foreground-t);
-    margin: 0 0 2px;
-}
-
-.laporan-meta-detail {
-    font-size: 11.5px !important;
-    color: var(--foreground-t) !important;
-    opacity: 0.8;
-}
-
-/* ── DIVIDER ── */
-.laporan-divider {
-    border: none;
-    border-top: 2px solid var(--border);
-    margin: 20px 0;
-    position: relative;
-    z-index: 1;
-}
-
-.laporan-divider--thin {
-    border-width: 1px;
-    margin: 14px 0;
-}
-
-/* ── SUMMARY ROW ── */
-.laporan-summary-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    position: relative;
-    z-index: 1;
-    margin-bottom: 4px;
-}
-
-.laporan-summary-item {
-    background: #f9fafb;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 18px;
-    text-align: center;
-    transition: var(--transition);
-}
-
-.laporan-summary-item:first-child {
-    border-left: 3px solid var(--primary, #ff6a00);
-}
-
-.laporan-summary-item:nth-child(2) {
-    border-left: 3px solid #22c55e;
-}
-
-.laporan-summary-item:nth-child(3) {
-    border-left: 3px solid #2563eb;
-}
-
-.ls-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--foreground-t);
-    margin-bottom: 6px;
-}
-
-.ls-value {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--foreground);
-    letter-spacing: -0.5px;
-    line-height: 1.2;
-}
-
-/* ── SECTION TITLE ── */
-.laporan-section-title {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--foreground-t);
-    margin: 20px 0 10px;
-    display: flex;
+/* ── EXPORT PDF BUTTON ───────────────────────────────────────── */
+.btn-export-pdf {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    position: relative;
-    z-index: 1;
-}
-
-.laporan-section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-}
-
-/* ── LAPORAN TABLE ── */
-.laporan-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12.5px;
-    position: relative;
-    z-index: 1;
-}
-
-.laporan-table thead tr {
-    background: #f3f4f6;
-}
-
-.laporan-table thead th {
-    padding: 9px 12px;
-    text-align: left;
-    font-size: 11px;
+    gap: 7px;
+    padding: 9px 18px;
+    background: #dc2626;
+    color: #fff;
+    font-size: 13px;
     font-weight: 700;
-    color: var(--foreground-t);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border: 1px solid #e5e7eb;
+    border-radius: var(--radius-sm, 8px);
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(220,38,38,0.28);
+    transition: opacity 0.15s, transform 0.15s;
     white-space: nowrap;
 }
 
-.laporan-table tbody td {
-    padding: 9px 12px;
-    color: var(--foreground);
-    border: 1px solid #e5e7eb;
-    vertical-align: middle;
+.btn-export-pdf:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+    color: #fff;
 }
 
-.laporan-table tbody tr:nth-child(even) {
+/* ── FILTER CARD ─────────────────────────────────────────────── */
+.lp-filter-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md, 14px);
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.lp-filter-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.lp-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 140px;
+}
+
+.lp-filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.lp-select,
+.lp-input-date {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 13px;
+    color: var(--foreground);
+    background: #f9fafb;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+}
+
+.lp-select:focus,
+.lp-input-date:focus {
+    border-color: var(--primary, #ff6a00);
+    box-shadow: 0 0 0 3px rgba(255,106,0,0.10);
+    background: var(--white);
+}
+
+.lp-filter-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: var(--primary, #ff6a00);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255,106,0,0.28);
+    transition: opacity 0.15s;
+    white-space: nowrap;
+}
+
+.btn-filter:hover { opacity: 0.88; }
+
+.btn-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    background: var(--white);
+    color: var(--foreground-t);
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 8px);
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.btn-reset:hover {
+    border-color: #9ca3af;
+    color: var(--foreground);
+}
+
+/* ── SUMMARY GRID ────────────────────────────────────────────── */
+.lp-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.lp-summary-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md, 14px);
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: box-shadow 0.18s, transform 0.18s;
+    position: relative;
+    overflow: hidden;
+}
+
+.lp-summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: transparent;
+    transition: background 0.18s;
+}
+
+.lp-summary-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+    transform: translateY(-2px);
+}
+
+.lp-summary-card:hover::before { background: var(--primary, #ff6a00); }
+
+.lp-summary-card-highlight {
+    background: linear-gradient(135deg, #fff7f0 0%, #fff 60%);
+    border-color: rgba(255,106,0,0.2);
+}
+
+.lp-sc-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+/* reuse dari dashboard */
+.si-orange { background: rgba(255,106,0,0.10); color: #ff6a00; }
+.si-blue   { background: #eff6ff;              color: #2563eb; }
+.si-green  { background: #f0fdf4;              color: #16a34a; }
+.si-amber  { background: #fffbeb;              color: #d97706; }
+.si-purple { background: #f5f3ff;              color: #7c3aed; }
+
+.lp-sc-body { flex: 1; min-width: 0; }
+
+.lp-sc-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--foreground-t);
+    margin-bottom: 4px;
+    white-space: nowrap;
+}
+
+.lp-sc-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--foreground);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+}
+
+.lp-sc-value-sm { font-size: 16px; }
+
+.lp-sc-sub {
+    font-size: 11px;
+    color: var(--foreground-t);
+}
+
+.lp-stars { color: #f59e0b; font-size: 12px; }
+
+/* ── SECTION CARD ────────────────────────────────────────────── */
+.lp-section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md, 14px);
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    animation: sectionIn 0.3s ease both;
+}
+
+@keyframes sectionIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.lp-section-card:nth-child(1) { animation-delay: 0.05s; }
+.lp-section-card:nth-child(2) { animation-delay: 0.10s; }
+.lp-section-card:nth-child(3) { animation-delay: 0.15s; }
+.lp-section-card:nth-child(4) { animation-delay: 0.20s; }
+
+.lp-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
     background: #fafafa;
 }
 
-.laporan-table tbody tr:hover {
-    background: #fff7ed;
+.lp-section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
 }
 
-.laporan-table tfoot td {
-    padding: 10px 12px;
-    border: 1px solid #e5e7eb;
-    background: #f3f4f6;
-    font-size: 12.5px;
+.lp-section-title {
+    font-size: 14px;
     font-weight: 700;
     color: var(--foreground);
+    margin: 0 0 2px;
 }
 
-/* Status badge di dalam tabel laporan */
-.laporan-table .status-badge {
+.lp-section-sub {
+    font-size: 11px;
+    color: var(--foreground-t);
+    margin: 0;
+}
+
+.lp-count-badge {
+    margin-left: auto;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #eff6ff;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.lp-badge-green  { background: #dcfce7; color: #15803d; }
+.lp-badge-orange { background: rgba(255,106,0,0.12); color: #ff6a00; }
+.lp-badge-amber  { background: #fffbeb; color: #d97706; }
+
+/* ── TABLE ───────────────────────────────────────────────────── */
+.lp-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.lp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.lp-table thead tr { background: #f9fafb; }
+
+.lp-table th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--foreground-t);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+}
+
+.th-right  { text-align: right; }
+.th-center { text-align: center; }
+
+.lp-table td {
+    padding: 12px 16px;
+    color: var(--foreground);
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.lp-table tbody tr:last-child td { border-bottom: none; }
+.lp-table tbody tr:hover td { background: #fffaf6; }
+
+/* ── TABLE CELL VARIANTS ─────────────────────────────────────── */
+.td-num {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--foreground-t);
+    font-weight: 600;
+    text-align: center;
+}
+
+.td-date  { font-size: 12px; color: var(--foreground-t); white-space: nowrap; }
+.td-center { text-align: center; }
+.td-bengkel { font-weight: 600; }
+
+.td-nominal {
+    font-weight: 700;
+    color: #16a34a;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.td-empty {
+    text-align: center;
+    padding: 32px 16px !important;
+    color: var(--foreground-t);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* ── USER CELL ───────────────────────────────────────────────── */
+.td-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.td-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,106,0,0.12);
+    color: #ff6a00;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ── STATUS BADGES (reuse dari dashboard) ────────────────────── */
+.status-badge {
     display: inline-flex;
     align-items: center;
-    padding: 2px 8px;
+    padding: 3px 9px;
     border-radius: 20px;
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
 }
 
-/* ── LAPORAN FOOTER ── */
-.laporan-footer {
-    margin-top: 32px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-    text-align: center;
-    position: relative;
-    z-index: 1;
+.badge-pending   { background: #fef9c3; color: #854d0e; }
+.badge-confirmed { background: #dbeafe; color: #1d4ed8; }
+.badge-progress  { background: #fff7ed; color: #c2410c; }
+.badge-done      { background: #dcfce7; color: #15803d; }
+.badge-cancel    { background: #fee2e2; color: #b91c1c; }
+
+/* ── TABLE FOOTER ────────────────────────────────────────────── */
+.lp-tfoot td {
+    background: #fff7f0;
+    border-top: 2px solid rgba(255,106,0,0.2);
+    padding: 11px 16px;
+    font-size: 12px;
 }
 
-.laporan-footer p {
+.lp-tfoot-label {
+    text-align: right;
     font-size: 11px;
+    font-weight: 600;
     color: var(--foreground-t);
-    margin: 0 0 3px;
-    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
-/* ── PRINT STYLES ── */
-@media print {
-    /* Sembunyikan elemen UI yang tidak perlu saat print */
-    .laporan-filter-card,
-    .sidebar,
-    .topbar,
-    .btn-export-pdf,
-    .btn-filter-submit {
-        display: none !important;
-    }
-
-    body { background: #fff !important; }
-
-    .laporan-preview {
-        box-shadow: none !important;
-        border: none !important;
-        border-radius: 0 !important;
-        padding: 20px !important;
-        max-width: 100% !important;
-    }
-
-    .laporan-watermark {
-        color: rgba(255, 106, 0, 0.07) !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .laporan-summary-item {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .laporan-table thead tr {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    /* Hindari page break di tengah baris tabel */
-    .laporan-table tr { page-break-inside: avoid; }
-
-    /* Force page break sebelum footer jika perlu */
-    .laporan-footer { page-break-before: auto; }
+.lp-tfoot-value {
+    font-weight: 800;
+    color: var(--foreground);
+    text-align: right;
+    white-space: nowrap;
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-    .laporan-preview {
-        padding: 24px 20px;
-    }
+/* ── TRX BADGE ───────────────────────────────────────────────── */
+.lp-trx-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
 
-    .laporan-header {
-        flex-direction: column;
-        gap: 12px;
-    }
+/* ── PERFORMANCE BAR ─────────────────────────────────────────── */
+.lp-bengkel-name { font-weight: 600; font-size: 13px; }
 
-    .laporan-meta { text-align: left; }
+.lp-perf-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
 
-    .laporan-summary-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
+.lp-perf-bar {
+    width: 70px;
+    height: 6px;
+    background: #f3f4f6;
+    border-radius: 3px;
+    overflow: hidden;
+}
 
-    .laporan-watermark { font-size: 52px; }
+.lp-perf-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6a00, #ff9a44);
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+.lp-perf-pct {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--foreground-t);
+    min-width: 28px;
+}
+
+.lp-rank { font-size: 16px; }
+
+.lp-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+/* ── REVIEW STARS ────────────────────────────────────────────── */
+.lp-rating-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.lp-rating-num {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--foreground);
+    line-height: 1;
+}
+
+.lp-stars-sm {
+    font-size: 11px;
+    color: #f59e0b;
+}
+
+.lp-review-count {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--foreground);
+}
+
+.lp-star-bar-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.lp-star-bar {
+    width: 70px;
+    height: 6px;
+    background: #f3f4f6;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.lp-star-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    border-radius: 3px;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .lp-summary-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+    .lp-summary-grid  { grid-template-columns: repeat(2, 1fr); }
+    .lp-filter-form   { flex-direction: column; }
+    .lp-filter-group  { min-width: 0; }
+    .lp-filter-actions { width: 100%; }
+    .btn-filter, .btn-reset { flex: 1; justify-content: center; }
+    .lp-header { flex-direction: column; }
+    .lp-header-actions { width: 100%; }
+    .btn-export-pdf { width: 100%; justify-content: center; }
+    .lp-sc-value { font-size: 20px; }
+    .lp-sc-value-sm { font-size: 14px; }
 }
 
 @media (max-width: 480px) {
-    .laporan-table { font-size: 11px; }
-    .laporan-table thead th,
-    .laporan-table tbody td { padding: 7px 8px; }
+    .lp-summary-grid { grid-template-columns: 1fr 1fr; }
 }

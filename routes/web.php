@@ -5,6 +5,9 @@ use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\BengkelController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\SparepartController;
+use App\Http\Controllers\LayananController;
+use App\Http\Controllers\AdminCabangController;
 use App\Models\Review;
 use App\Models\Bengkel;
 use Illuminate\Http\Request;
@@ -105,7 +108,7 @@ Route::post('/logout', function (Request $request) {
 Route::get('/reservasi', [ReservasiController::class, 'index'])
     ->name('reservasi.public');  
 
-Route::get('/bengkel', [BengkelController::class, 'index'])
+Route::get('/bengkel', [BengkelController::class, 'pelangganIndex'])
     ->name('pelanggan.bengkel');    
 
 
@@ -142,52 +145,106 @@ Route::middleware(['auth', 'role:admin_pusat'])
         return view('admin-pusat.dashboard');
     })->name('dashboard');    
 
-    Route::get('/laporan', function () {
-        return view('admin-pusat.laporan');
-    })->name('laporan');    
-    
-    Route::get('/bengkel', function () {
-        return view('admin-pusat.bengkel');
-    })->name('bengkel');
-
     Route::get('/sparepart', function () {
         return view('admin-pusat.sparepart');
     })->name('sparepart');    
 
-    Route::get('/layanan', function () {
-        return view('admin-pusat.layanan');
-    })->name('layanan');        
+    Route::get('/layanan', [LayananController::class, 'index'])
+        ->name('layanan');    
 
-    Route::get('/user', function () {
-        return view('admin-pusat.user');
-    })->name('user');          
+    Route::patch(
+        'layanan/{id}/toggle',
+        [LayananController::class, 'toggleStatus']
+    )->name('layanan.toggle');    
 
+    Route::delete('layanan/{id}', [LayananController::class, 'destroy'])
+        ->name('layanan.destroy');    
+
+    Route::get('/user', [AdminCabangController::class, 'index'])
+        ->name('user');
+
+    // masih dummy jadi dibuat seperti ini 
     Route::get('/review', function () {
-        return view('admin-pusat.review');
-    })->name('review');              
+
+        $totalReview = 128;
+        $avgRating = 4.5;
+        $reviewHariIni = 12;
+
+        $reviews = collect([
+            (object)[
+                'user' => (object)['name' => 'Budi'],
+                'bengkel' => (object)['nama' => 'Bengkel Jaya Motor'],
+                'rating' => 5,
+                'komentar' => 'Pelayanan sangat bagus dan cepat!',
+                'created_at' => now()
+            ],
+            (object)[
+                'user' => (object)['name' => 'Andi'],
+                'bengkel' => (object)['nama' => 'Bengkel Makmur'],
+                'rating' => 3,
+                'komentar' => 'Lumayan, tapi agak lama.',
+                'created_at' => now()->subDays(1)
+            ],
+            (object)[
+                'user' => (object)['name' => 'Siti'],
+                'bengkel' => (object)['nama' => 'Bengkel Sejahtera'],
+                'rating' => 4,
+                'komentar' => 'Cukup puas dengan hasilnya.',
+                'created_at' => now()->subDays(2)
+            ],
+        ]);
+
+        $bengkels = collect([
+            (object)['id' => 1, 'nama' => 'Bengkel Jaya Motor'],
+            (object)['id' => 2, 'nama' => 'Bengkel Makmur'],
+            (object)['id' => 3, 'nama' => 'Bengkel Sejahtera'],
+        ]);        
+
+        return view('admin-pusat.review', compact(
+            'totalReview',
+            'avgRating',
+            'reviewHariIni',
+            'reviews',
+            'bengkels'
+        ));
+    }) -> name('review');
+
+    // kalo database riviewnya udah siap, pake ini 
+    // $reviews = Review::with(['user','bengkel'])->paginate(10);
+    // $totalReview = Review::count();
 
     Route::get('/reservasi', function () {
         return view('admin-pusat.reservasi');
     })->name('reservasi');      
 
-    Route::get('/laporan/pdf', [LaporanController::class, 'pdf'])
-        ->name('laporan.pdf');
+    Route::get('/laporan', [LaporanController::class, 'index'])
+        ->name('laporan');
 
-
-    // Route::get('/bengkel', function () {
-    //     $bengkels = \App\Models\Bengkel::paginate(10);
-
-    //     return view('admin-pusat.bengkel', compact('bengkels'));
-    // });
+    Route::get('/laporan-pdf', [LaporanController::class, 'exportPdf'])
+        ->name('laporan-pdf');
 
     Route::get('/bengkel/export', function () {
         return 'Export bengkel (dummy dulu)';
     })->name('bengkel.export');        
+
     Route::resource('bengkel', BengkelController::class);
     
+    Route::post('/sparepart', [SparepartController::class, 'store'])
+    ->name('sparepart.store');
 
-    
-    
+    Route::put('/sparepart/{id}', [SparepartController::class, 'update'])
+        ->name('admin-pusat.sparepart.update');    
+
+    Route::patch('bengkel/{bengkel}/toggle-status', [BengkelController::class, 'toggleStatus'])
+        ->name('bengkel.toggle-status');    
+
+    Route::post('/user', [AdminCabangController::class, 'store']);            
+
+    Route::delete('/user/{user}', [AdminCabangController::class, 'destroy'])
+    ->name('user.destroy');
+
+    Route::put('/user/{user}', [AdminCabangController::class, 'update'])
+        ->name('user.update');    
         
 });
 
@@ -198,14 +255,18 @@ Route::middleware(['auth', 'role:admin_cabang'])
     ->name('admin-cabang.')
     ->group(function () {
 
-});
+    Route::get('/dashboard', function () {
+        return view('admin-cabang.dashboard');
+    })->name('dashboard');
 
+    Route::get('/sparepart', function () {
+        return view('admin-cabang.sparepart');
+    })->name('sparepart');
 
-// ── MEKANIK ───────────────────────────
-Route::middleware(['auth', 'role:mekanik'])
-    ->prefix('mekanik')
-    ->name('mekanik.')
-    ->group(function () {
+    Route::get('/reservasi', function () {
+        return view('admin-cabang.reservasi');
+    })->name('reservasi');
+
 
 
 });

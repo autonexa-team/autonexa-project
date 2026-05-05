@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('reservasi_id')->nullable()->constrained()->cascadeOnDelete();
             $table->integer('rating');
             $table->text('komentar')->nullable();
+            $table->string('foto')->nullable();
             $table->string('type')->default('bengkel'); 
             $table->timestamps();
         });

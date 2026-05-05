@@ -77,14 +77,14 @@
 
     <div class="stat-card">
         <div class="stat-icon-wrap si-purple">
-            <i class="bi bi-person-gear"></i>
+            <i class="bi bi-star"></i>
         </div>
         <div class="stat-body">
-            <div class="stat-label">Total Mekanik</div>
-            <div class="stat-value">{{ $totalMekanik ?? 0 }}</div>
+            <div class="stat-label">Total Review</div>
+            <div class="stat-value">{{ $totalReview ?? 0 }}</div>
             <div class="stat-trend trend-neutral">
-                <i class="bi bi-circle-fill" style="font-size:7px;"></i>
-                Aktif: {{ $mekanikAktif ?? 0 }}
+                <i class="bi bi-star-fill"></i>
+                {{ $avgRating ?? 0 }} rating
             </div>
         </div>
     </div>
@@ -94,11 +94,11 @@
             <i class="bi bi-box-seam"></i>
         </div>
         <div class="stat-body">
-            <div class="stat-label">Spare Part SKU</div>
-            <div class="stat-value">{{ number_format($totalSparepart ?? 0) }}</div>
-            <div class="stat-trend {{ ($sparepartKritis ?? 0) > 0 ? 'trend-down' : 'trend-up' }}">
-                <i class="bi bi-exclamation-triangle{{ ($sparepartKritis ?? 0) > 0 ? '-fill' : '' }}"></i>
-                {{ $sparepartKritis ?? 0 }} stok kritis
+            <div class="stat-label">Bengkel Bermasalah</div>
+            <div class="stat-value">{{ $bengkelBermasalah ?? 0 }}</div>
+            <div class="stat-trend trend-down">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Rating rendah / nonaktif
             </div>
         </div>
     </div>

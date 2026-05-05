@@ -772,3 +772,589 @@
         padding: 5px 10px;
     }
 }
+
+/* halaaman detail */
+/* ================================================================
+   DETAIL BENGKEL — Append ke admin-bengkel.css
+================================================================ */
+
+/* ── TITLE ROW ── */
+.detail-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 6px;
+    flex-wrap: wrap;
+}
+
+.status-badge-lg {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.badge-aktif-lg    { background: #dcfce7; color: #15803d; }
+.badge-nonaktif-lg { background: #fee2e2; color: #b91c1c; }
+
+.status-dot-lg { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.sd-aktif      { background: #16a34a; }
+.sd-nonaktif   { background: #dc2626; }
+
+.detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--foreground-t);
+}
+
+/* ── DANGER & SUCCESS OUTLINE BTN ── */
+.btn-danger-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fff5f5;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-danger-outline:hover { background: #fee2e2; border-color: #dc2626; }
+
+.btn-success-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #15803d;
+    background: #f0fdf4;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-success-outline:hover { background: #dcfce7; border-color: #16a34a; }
+
+/* ── STAT GRID 4 COL ── */
+.stat-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 14px;
+}
+
+/* ── DETAIL TWO COL ── */
+.detail-two-col {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+/* ── FCARD HEADER ── */
+.fcard-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.fcard-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255,106,0,0.1);
+    color: var(--primary, #ff6a00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.fcard-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 1px;
+}
+
+.fcard-sub {
+    font-size: 11px;
+    color: var(--foreground-t);
+}
+
+/* ── ADMIN PROFILE ── */
+.info-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--foreground-t);
+    margin-bottom: 6px;
+}
+
+.admin-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f9fafb;
+    margin-bottom: 12px;
+}
+
+.admin-profile-av {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,106,0,0.12);
+    color: var(--primary, #ff6a00);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.admin-profile-name  { font-size: 13px; font-weight: 700; color: var(--foreground); }
+.admin-profile-email { font-size: 11px; color: var(--foreground-t); margin-top: 1px; }
+
+.info-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.info-detail-item {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f9fafb;
+}
+
+.info-detail-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--foreground-t);
+    margin-bottom: 4px;
+}
+
+.info-detail-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--foreground);
+    line-height: 1.2;
+}
+
+.info-detail-mono { font-family: 'Courier New', monospace; font-size: 13px; }
+.info-detail-sub  { font-size: 11px; color: var(--foreground-t); margin-top: 2px; }
+
+/* ── SECTION CARD ── */
+.section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+}
+
+.section-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.section-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+}
+
+.badge-kritis {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+/* ── LAYANAN GRID ── */
+.layanan-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.layanan-card {
+    padding: 13px 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f9fafb;
+    transition: border-color 0.15s;
+}
+
+.layanan-card:hover { border-color: rgba(255,106,0,0.3); }
+
+.layanan-name  { font-size: 13px; font-weight: 700; color: var(--foreground); margin-bottom: 5px; }
+.layanan-price { font-size: 15px; font-weight: 800; color: var(--primary, #ff6a00); margin-bottom: 3px; }
+
+.layanan-dur {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--foreground-t);
+    margin-bottom: 6px;
+}
+
+.layanan-desc {
+    font-size: 11px;
+    color: var(--foreground-t);
+    line-height: 1.5;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+}
+
+/* ── STOK BAR ── */
+.stok-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stok-bar-track {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.stok-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.stok-pct {
+    font-size: 11px;
+    color: var(--foreground-t);
+    min-width: 30px;
+    text-align: right;
+}
+
+/* ── STOK PILL ── */
+.stok-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.stok-pill::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.pill-ok   { background: #dcfce7; color: #15803d; }
+.pill-ok::before   { background: #16a34a; }
+.pill-warn { background: #fef9c3; color: #854d0e; }
+.pill-warn::before { background: #ca8a04; }
+.pill-crit { background: #fee2e2; color: #b91c1c; }
+.pill-crit::before { background: #dc2626; }
+
+.td-sparepart-name { font-weight: 600; font-size: 13px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+    .detail-two-col  { grid-template-columns: 1fr; }
+    .stat-grid-4     { grid-template-columns: repeat(2, 1fr); }
+    .layanan-grid    { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+    .stat-grid-4     { grid-template-columns: 1fr 1fr; }
+    .layanan-grid    { grid-template-columns: 1fr; }
+    .info-detail-grid{ grid-template-columns: 1fr; }
+    .detail-title-row{ flex-direction: column; align-items: flex-start; }
+}
+
+/* ================================================================
+   EDIT BENGKEL — Append ke admin-bengkel.css
+================================================================ */
+
+/* ── ALERT ERROR (validasi) ── */
+.alert-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #b91c1c;
+    margin-bottom: 16px;
+}
+
+/* ── INPUT WITH SUFFIX (kapasitas) ── */
+.input-with-suffix {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-suffix .finput {
+    padding-right: 80px;
+}
+
+.input-suffix {
+    position: absolute;
+    right: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--foreground-t);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* ── FOTO EXISTING ── */
+.foto-existing {
+    margin-bottom: 10px;
+}
+
+.foto-existing-wrap {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.foto-existing-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.foto-existing-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.foto-existing-wrap:hover .foto-existing-overlay {
+    background: rgba(0,0,0,0.35);
+}
+
+.btn-ganti-foto {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--foreground);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.foto-existing-wrap:hover .btn-ganti-foto {
+    opacity: 1;
+}
+
+.foto-existing-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.foto-existing-label {
+    font-size: 11px;
+    color: var(--foreground-t);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-hapus-foto {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fff5f5;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-hapus-foto:hover { background: #fee2e2; }
+
+/* ── FOTO NEW BADGE ── */
+.foto-new-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 3px 9px;
+    background: rgba(255,106,0,0.9);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.fcard .foto-existing-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.foto-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* GANTI FOTO */
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    background: #fff;
+    color: #333;
+
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    border-color: #ff6a00;
+    color: #ff6a00;
+    background: #fff7ed;
+}
+
+/* HAPUS FOTO */
+.btn-danger-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    background: #fff;
+    color: #b91c1c;
+
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger-outline:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+
+.foto-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.foto-btn-edit {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: #333;
+}
+
+.foto-btn-edit:hover {
+    border-color: #ff6a00;
+    color: #ff6a00;
+    background: #fff7ed;
+}
+
+.foto-btn-delete {
+    border: 1px solid #fecaca;
+    background: #fff;
+    color: #b91c1c;
+}
+
+.foto-btn-delete:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+}

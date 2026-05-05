@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin_pusat', 'admin_cabang', 'mekanik', 'pelanggan'])->index();            
+            $table->enum('role', ['admin_pusat', 'admin_cabang', 'pelanggan'])->index();            
+            $table->boolean('is_active')->default(true);
             $table->string('foto_profil')->nullable();            
             $table->rememberToken();
             $table->timestamps();

@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('bengkels', function (Blueprint $table) {
             $table->id();
+            $table->string('nama');
+            $table->text('alamat')->nullable();
+
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif'); 
+            
+            $table->foreignId('admin_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
             $table->timestamps();
         });
     }

@@ -9,9 +9,9 @@ use App\Models\Layanan;
 
 class Bengkel extends Model
 {
-    protected $fillable = ['nama', 'alamat', 'latitude', 'longitude', 'telepon', 'foto', 'deskripsi', 'aktif', 'admin_id'];
+    protected $fillable = ['nama', 'alamat', 'latitude', 'longitude', 'telepon', 'foto', 'deskripsi', 'status', 'kota', 'admin_id'];
 
-    public function admin(): BelongsTo
+    public function admin()
     {
         return $this->belongsTo(User::class, 'admin_id');
     }
@@ -19,11 +19,6 @@ class Bengkel extends Model
     public function reservasis(): HasMany
     {
         return $this->hasMany(Reservasi::class);
-    }
-
-    public function mekaniks(): HasMany
-    {
-        return $this->hasMany(Mekanik::class);
     }
 
     public function review(): HasMany
@@ -40,4 +35,13 @@ class Bengkel extends Model
     {
         return $this->belongsToMany(Layanan::class, 'bengkel_layanan');
     }
+
+    // satu bengkel bisa punya banyak sparepart, dan satu sparepart bisa ada di banyak bengkel
+    public function spareparts()
+    {
+        return $this->belongsToMany(Sparepart::class, 'bengkel_spareparts')
+                    ->withPivot('stok');
+    }    
+
+    public function reviews() { return $this->hasMany(Review::class); }    
 }

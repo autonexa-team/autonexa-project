@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-    protected $fillable = ['user_id', 'bengkel_id', 'reservasi_id', 'rating', 'komentar'];
+    protected $fillable = ['user_id', 'bengkel_id', 'reservasi_id', 'rating', 'komentar', 'foto'];
 
     public function user() { return $this->belongsTo(User::class); }
     public function bengkel() { return $this->belongsTo(Bengkel::class); }

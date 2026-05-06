@@ -81,6 +81,12 @@
                 <span>User</span>
             </a>
 
+            <a href="{{ route('admin-pusat.user') }}"
+               class="nav-item {{ request()->routeIs('admin-pusat.user') ? 'active' : '' }}">
+                <i class="bi bi-people"></i>
+                <span>Reservasi</span>
+            </a>            
+
             <div class="nav-section-label">Analitik</div>
 
             <a href="{{ route('admin-pusat.review') }}"
@@ -94,69 +100,6 @@
                 <i class="bi bi-bar-chart-line"></i>
                 <span>Laporan</span>
             </a>
-
-            {{-- ===== ADMIN CABANG ===== --}}
-            @elseif(auth()->user()->role === 'admin_cabang')
-
-            <div class="nav-section-label">Utama</div>
-
-            <a href="{{ route('admin-cabang.dashboard') }}"
-               class="nav-item {{ request()->routeIs('admin-cabang.dashboard') ? 'active' : '' }}">
-                <i class="bi bi-grid-1x2"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <div class="nav-section-label">Operasional</div>
-
-            <a href="{{ route('admin-cabang.reservasi.index') }}"
-               class="nav-item {{ request()->routeIs('admin-cabang.reservasi.*') ? 'active' : '' }}">
-                <i class="bi bi-calendar-check"></i>
-                <span>Reservasi</span>
-                @if(($reservasiPending ?? 0) > 0)
-                    <span class="nav-badge">{{ $reservasiPending }}</span>
-                @endif
-            </a>
-
-            <a href="{{ route('admin-cabang.mekanik') }}"
-               class="nav-item {{ request()->routeIs('admin-cabang.mekanik') ? 'active' : '' }}">
-                <i class="bi bi-person-gear"></i>
-                <span>Mekanik</span>
-            </a>
-
-            <a href="{{ route('admin-cabang.review') }}"
-               class="nav-item {{ request()->routeIs('admin-cabang.review.*') ? 'active' : '' }}">
-                <i class="bi bi-star-half"></i>
-                <span>Review</span>
-            </a>
-
-            {{-- ===== MEKANIK ===== --}}
-            @else
-
-            <div class="nav-section-label">Utama</div>
-
-            <a href="{{ route('mekanik.dashboard') }}"
-               class="nav-item {{ request()->routeIs('mekanik.dashboard') ? 'active' : '' }}">
-                <i class="bi bi-grid-1x2"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <div class="nav-section-label">Pekerjaan</div>
-
-            <a href="{{ route('mekanik.pekerjaan') }}"
-               class="nav-item {{ request()->routeIs('mekanik.pekerjaan') ? 'active' : '' }}">
-                <i class="bi bi-wrench-adjustable"></i>
-                <span>Pekerjaan</span>
-                @if(($pekerjaanAktif ?? 0) > 0)
-                    <span class="nav-badge">{{ $pekerjaanAktif }}</span>
-                @endif
-            </a>
-
-            <a href="{{ route('mekanik.riwayat') }}"
-               class="nav-item {{ request()->routeIs('mekanik.riwayat') ? 'active' : '' }}">
-                <i class="bi bi-clock-history"></i>
-                <span>Riwayat</span>
-            </a>
-
             @endif
 
         </nav>

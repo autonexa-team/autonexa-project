@@ -8,9 +8,11 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\SparepartController;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\AdminCabangController;
+use App\Http\Controllers\ReviewController;
 use App\Models\Review;
 use App\Models\Bengkel;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +27,8 @@ Route::get('/', function () {
 })->name('landing');
 
 Route::get('/about', function () {
-    return view('landing.about');
+    $bengkels = Bengkel::all();
+    return view('landing.about', compact('bengkels'));
 })->name('about');
 
 Route::get('/register', function () {
@@ -245,6 +248,10 @@ Route::middleware(['auth', 'role:admin_pusat'])
 
     Route::put('/user/{user}', [AdminCabangController::class, 'update'])
         ->name('user.update');    
+
+    // web.php
+    Route::get('/admin-pusat/review/{id}', [ReviewController::class, 'show'])
+        ->name('admin-pusat.review.show');        
         
 });
 
@@ -267,6 +274,51 @@ Route::middleware(['auth', 'role:admin_cabang'])
         return view('admin-cabang.reservasi');
     })->name('reservasi');
 
+    // TAMBAH RESERVASI
+    Route::get('/reservasi/create', function () {
+        return view('admin-cabang.reservasi-create');
+    })->name('reservasi-create');
+
+    // DETAIL RESERVASI
+    Route::get('/reservasi/{id}', function ($id) {
+        return view('admin-cabang.reservasi-detail', compact('id'));
+    })->name('reservasi-detail');
+
+
+    // LAYANAN
+    Route::get('/layanan', function () {
+        return view('admin-cabang.layanan');
+    })->name('layanan');
+
+    // REVIEW LIST
+    Route::get('/review', function () {
+        return view('admin-cabang.review');
+    })->name('review');
+
+    // DETAIL REVIEW
+    Route::get('/review/{id}', function ($id) {
+        return view('admin-cabang.review-detail', compact('id'));
+    })->name('review.detail');
+
+    // PELANGGAN
+    Route::get('/pelanggan', function () {
+        return view('admin-cabang.pelanggan-cabang');
+    })->name('pelanggan-cabang');
+
+    // LAPORAN
+    Route::get('/laporan', function () {
+        return view('admin-cabang.laporan');
+    })->name('laporan');    
+
+    // notifikasi
+    Route::get('/notifikasi', function () {
+        return view('admin-cabang.notifikasi');
+    })->name('notifikasi');
+
+    // profile    
+    Route::get('/profile', function () {
+        return view('admin-cabang.profile');
+    })->name('profile');
 
 
 });

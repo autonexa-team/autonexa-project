@@ -90,21 +90,40 @@ class BengkelController extends Controller
     }    
 
     //untuk tampilan ke pelanggan 
+    // public function pelangganIndex()
+    // {
+    //     $bengkels = Bengkel::where('status', 'aktif') // ✅ hanya tampilkan aktif
+    //         ->withAvg(['review as reviews_avg_rating' => function($q){
+    //             $q->where('type','bengkel');
+    //         }], 'rating')
+    //         ->withCount(['review as reviews_count' => function($q){
+    //             $q->where('type','bengkel');
+    //         }])
+    //         ->with('layanan')
+    //         ->get();
+
+    //     $totalBengkel = $bengkels->count();
+    //     $avgRating    = $bengkels->avg('reviews_avg_rating') ?? 0;
+    //     $totalReview  = $bengkels->sum('reviews_count');
+
+    //     return view('pelanggan.bengkel', [
+    //         'bengkels'     => $bengkels,
+    //         'totalBengkel' => $totalBengkel,
+    //         'avgRating'    => round($avgRating, 1),
+    //         'totalReview'  => $totalReview,
+    //     ]);
+    // }  
+
+    // dummy untuk pelanggan
     public function pelangganIndex()
     {
-        $bengkels = Bengkel::where('status', 'aktif') // ✅ hanya tampilkan aktif
-            ->withAvg(['review as reviews_avg_rating' => function($q){
-                $q->where('type','bengkel');
-            }], 'rating')
-            ->withCount(['review as reviews_count' => function($q){
-                $q->where('type','bengkel');
-            }])
+        $bengkels = Bengkel::where('status', 'aktif')
             ->with('layanan')
             ->get();
 
         $totalBengkel = $bengkels->count();
-        $avgRating    = $bengkels->avg('reviews_avg_rating') ?? 0;
-        $totalReview  = $bengkels->sum('reviews_count');
+        $avgRating = 4.8;
+        $totalReview = 128;
 
         return view('pelanggan.bengkel', [
             'bengkels'     => $bengkels,

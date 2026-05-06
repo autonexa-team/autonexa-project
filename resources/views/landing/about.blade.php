@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layout.app')
 @section('title', 'Tentang Autonexa')
 
 @section('content')
@@ -83,7 +83,7 @@
             <h2 class="section-title">Bengkel Terotorisasi</h2>
         </div>
         <div class="row g-4">
-            @foreach($bengkel as $bengkel)
+            @foreach($bengkels as $bengkel)
             <div class="col-md-6 col-lg-4">
                 <div class="partner-card">
                     <img src="{{ $bengkel->foto ? asset('storage/'.$bengkel->foto) : asset('images/bengkel-default.jpg') }}"

@@ -17,7 +17,6 @@ class Reservasi extends Model
 
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function bengkel(): BelongsTo { return $this->belongsTo(Bengkel::class); }
-    public function mekanik(): BelongsTo { return $this->belongsTo(Mekanik::class); }
     public function spareparts(): HasMany { return $this->hasMany(Sparepart::class); }
     public function review() { return $this->hasOne(Review::class); }
 

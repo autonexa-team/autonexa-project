@@ -23,5 +23,10 @@ class ReservasiController extends Controller
     {
         return view('pelanggan.riwayat');
     }
+
+    public function profile()
+    {
+        return view('pelanggan.profile');
+    }
     
 }

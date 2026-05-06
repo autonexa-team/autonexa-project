@@ -432,7 +432,7 @@ body.admin-body {
 ================================================================ */
 @media (max-width: 768px) {
     .admin-shell {
-        grid-template-columns: 0 1fr;
+        grid-template-columns: 1fr;
     }
 
     .sidebar {
@@ -440,6 +440,7 @@ body.admin-body {
         left: -100%;
         width: var(--sidebar-w);
         transition: left 0.25s ease;
+        z-index: 999;
     }
 
     .admin-shell.sidebar-open .sidebar {
@@ -453,4 +454,5 @@ body.admin-body {
     .admin-content {
         padding: 14px;
     }
+    
 }

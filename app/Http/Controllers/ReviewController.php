@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\AdminPusat;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\Bengkel;
 use Illuminate\Http\Request;
@@ -51,6 +50,16 @@ class ReviewController extends Controller
             'bengkelTerbaik'=> Bengkel::withAvg('reviews', 'rating')
                                       ->orderByDesc('reviews_avg_rating')
                                       ->first(),
-        ]);
+        ]);        
     }
+
+    // ReviewController
+    public function show($id) {
+        $review = Review::with(['user', 'bengkel', 'reservasi.mekanik'])->findOrFail($id);
+        $riwayatReview = Review::with('bengkel')
+            ->where('user_id', $review->user_id)
+            ->where('id', '!=', $review->id)
+            ->latest()->take(3)->get();
+        return view('admin-pusat.review-detail', compact('review', 'riwayatReview'));
+    }    
 }

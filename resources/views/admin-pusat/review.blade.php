@@ -9,6 +9,9 @@
 
 @section('content')
 
+{{-- Base URL untuk navigasi ke detail (jangan hapus) --}}
+<input type="hidden" id="reviewBaseUrl" value="{{ url('admin-pusat/review') }}">
+
 {{-- ===== HEADER ===== --}}
 <div class="page-header">
     <div>
@@ -144,6 +147,7 @@
         $initials   = strtoupper(substr($review->user->name ?? 'U', 0, 1))
                     . strtoupper(substr(explode(' ', $review->user->name ?? 'U ')[1] ?? '', 0, 1));
     @endphp
+    <!-- masih dummy -->
     <div class="review-card {{ $ratingClass }}-card">
 
         {{-- Avatar --}}

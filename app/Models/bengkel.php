@@ -9,9 +9,14 @@ use App\Models\Layanan;
 
 class Bengkel extends Model
 {
-    protected $fillable = ['nama', 'alamat', 'latitude', 'longitude', 'telepon', 'foto', 'deskripsi', 'status', 'kota', 'admin_id'];
+    protected $fillable = ['nama', 'alamat', 'latitude', 'longitude', 'kota', 'foto', 'deskripsi', 'status', 'admin_id', 'telepon'];
 
     public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
+
+    public function adminCabang()
     {
         return $this->belongsTo(User::class, 'admin_id');
     }

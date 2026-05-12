@@ -12,27 +12,6 @@
 {{-- Base URL untuk admin-sparepart.js (jangan hapus) --}}
 <input type="hidden" id="sparepartBaseUrl" value="{{ url('admin-pusat/sparepart') }}">
 
-{{-- ───────────────────────────────── DUMMY DATA (hapus saat pakai model nyata) --}}
-@php
-    $spareparts = collect([
-        ['id' => 1,  'nama' => 'Oli Mesin 10W-40',        'harga' => 85000,   'deskripsi' => 'Oli mesin mineral untuk kendaraan bermotor roda dua',         'bengkel' => 14],
-        ['id' => 2,  'nama' => 'Filter Udara Universal',  'harga' => 45000,   'deskripsi' => 'Filter udara karbu standar, cocok berbagai merek motor',        'bengkel' => 9],
-        ['id' => 3,  'nama' => 'Busi NGK CR7HSA',         'harga' => 28000,   'deskripsi' => 'Busi standar NGK untuk motor bebek dan matic',                  'bengkel' => 21],
-        ['id' => 4,  'nama' => 'Kampas Rem Depan',        'harga' => 55000,   'deskripsi' => 'Kampas rem cakram depan, material semi-metallic',               'bengkel' => 7],
-        ['id' => 5,  'nama' => 'Rantai Motor 428H',       'harga' => 120000,  'deskripsi' => 'Rantai motor ukuran 428H, 112 mata, standar pabrikan',          'bengkel' => 11],
-        ['id' => 6,  'nama' => 'V-Belt Matic',            'harga' => 95000,   'deskripsi' => 'V-Belt untuk motor matic, tahan lama dan anti selip',           'bengkel' => 18],
-        ['id' => 7,  'nama' => 'Aki Kering 5Ah',          'harga' => 185000,  'deskripsi' => 'Aki kering MF maintenance-free kapasitas 5Ah 12V',              'bengkel' => 6],
-        ['id' => 8,  'nama' => 'Kampas Kopling Set',      'harga' => 75000,   'deskripsi' => 'Set kampas kopling 4 pcs untuk motor bebek manual',             'bengkel' => 13],
-        ['id' => 9,  'nama' => 'Shock Absorber Belakang', 'harga' => 320000,  'deskripsi' => 'Shockbreaker belakang standar, gas pressure',                   'bengkel' => 5],
-        ['id' => 10, 'nama' => 'Lampu Depan H4 35/35W',  'harga' => 38000,   'deskripsi' => 'Lampu halogen H4 dua filamen standar motor bebek',              'bengkel' => 16],
-        ['id' => 11, 'nama' => 'Minyak Rem DOT3',         'harga' => 22000,   'deskripsi' => 'Cairan rem DOT3 untuk sistem rem hidrolik cakram',              'bengkel' => 20],
-        ['id' => 12, 'nama' => 'Gear Set 428H 14-42T',   'harga' => 145000,  'deskripsi' => 'Gear depan & belakang paket, bahan steel hardened',             'bengkel' => 8],
-    ]);
-    $totalSparepart = $spareparts->count();
-    $avgHarga       = $spareparts->avg('harga');
-    $maxBengkel     = $spareparts->max('bengkel');
-@endphp
-
 {{-- ───────────────────────────────── HEADER --}}
 <div class="sp-header">
     <div class="sp-header-left">
@@ -130,7 +109,7 @@
             </thead>
             <tbody id="sparepartBody">
                 @foreach($spareparts as $i => $sp)
-                <tr class="sp-row" data-name="{{ strtolower($sp['nama']) }}" data-desc="{{ strtolower($sp['deskripsi']) }}">
+                <tr class="sp-row" data-name="{{ strtolower($sp->nama) }}" data-desc="{{ strtolower($sp->deskripsi ?? '') }}">
 
                     {{-- No --}}
                     <td class="td-mono">{{ $i + 1 }}</td>
@@ -142,29 +121,29 @@
                                 <i class="bi bi-gear-fill"></i>
                             </div>
                             <div>
-                                <div class="sp-name-text">{{ $sp['nama'] }}</div>
-                                <div class="sp-name-id">SP-{{ str_pad($sp['id'], 4, '0', STR_PAD_LEFT) }}</div>
+                                <div class="sp-name-text">{{ $sp->nama }}</div>
+                                <div class="sp-name-id">SP-{{ str_pad($sp->id, 4, '0', STR_PAD_LEFT) }}</div>
                             </div>
                         </div>
                     </td>
 
                     {{-- Harga --}}
                     <td>
-                        <span class="td-harga">Rp {{ number_format($sp['harga'], 0, ',', '.') }}</span>
+                        <span class="td-harga">Rp {{ number_format($sp->harga, 0, ',', '.') }}</span>
                     </td>
 
                     {{-- Deskripsi --}}
                     <td>
-                        <span class="td-desc">{{ $sp['deskripsi'] }}</span>
+                        <span class="td-desc">{{ $sp->deskripsi ?? '-' }}</span>
                     </td>
 
                     {{-- Bengkel usage --}}
                     <td style="text-align:center;">
                         <div class="td-bengkel-usage">
-                            <span class="usage-num">{{ $sp['bengkel'] }}</span>
+                            <span class="usage-num">{{ $sp->bengkels_count ?? 0 }}</span>
                             <div class="usage-bar-track">
                                 <div class="usage-bar-fill"
-                                     style="width: {{ round(($sp['bengkel'] / $maxBengkel) * 100) }}%">
+                                     style="width: {{ $maxBengkel > 0 ? round(($sp->bengkels_count ?? 0) / $maxBengkel) * 100 : 0 }}%">
                                 </div>
                             </div>
                         </div>
@@ -176,16 +155,17 @@
                             <a href="#"
                                class="btn-edit"
                                title="Edit"
-                               data-id="{{ $sp['id'] }}"
-                               data-nama="{{ $sp['nama'] }}"
-                               data-harga="{{ $sp['harga'] }}"
-                               data-deskripsi="{{ $sp['deskripsi'] }}">
+                               data-id="{{ $sp->id }}"
+                               data-nama="{{ $sp->nama }}"
+                               data-harga="{{ $sp->harga }}"
+                               data-deskripsi="{{ $sp->deskripsi ?? '' }}">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <button class="btn-hapus"
+                                    type="button"
                                     title="Hapus"
-                                    data-id="{{ $sp['id'] }}"
-                                    data-nama="{{ $sp['nama'] }}">
+                                    data-id="{{ $sp->id }}"
+                                    data-nama="{{ $sp->nama }}">
                                 <i class="bi bi-trash3"></i>
                             </button>
                         </div>
@@ -219,7 +199,7 @@
             </button>
         </div>
         <div class="sp-modal-body">
-            <form action="{{ route('admin-pusat.sparepart') }}" method="POST" id="formTambah">
+            <form action="{{ route('admin-pusat.sparepart.store') }}" method="POST" id="formTambah">
                 @csrf
                 <div class="sp-form-group">
                     <label class="sp-label">Nama Sparepart <span class="required">*</span></label>
@@ -401,6 +381,13 @@ document.querySelectorAll('.btn-edit').forEach(btn => {
             this.dataset.harga,
             this.dataset.deskripsi
         );
+    });
+});
+
+// ── MODAL HAPUS ──────────────────────────────────────────
+document.querySelectorAll('.btn-hapus').forEach(btn => {
+    btn.addEventListener('click', function () {
+        confirmDelete(this.dataset.id, this.dataset.nama);
     });
 });
 

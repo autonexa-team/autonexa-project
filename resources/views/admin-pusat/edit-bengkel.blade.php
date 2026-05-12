@@ -23,14 +23,6 @@
             <span class="bc-current">Edit</span>
         </nav>
     </div>
-    <div class="ph-actions">
-        <a href="{{ route('admin-pusat.bengkel.show', $bengkel->id) }}" class="btn-secondary">
-            <i class="bi bi-x-lg"></i> Batal
-        </a>
-        <button type="submit" form="formEditBengkel" class="btn-primary">
-            <i class="bi bi-floppy"></i> Simpan Perubahan
-        </button>
-    </div>
 </div>
 
 {{-- Flash error --}}

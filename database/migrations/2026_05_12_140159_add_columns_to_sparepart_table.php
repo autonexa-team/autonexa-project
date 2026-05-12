@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_active')->default(true);
+        Schema::table('sparepart', function (Blueprint $table) {
+            // Kolom sudah ditambahkan di create_sparepart_table.php
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('is_active');
+        Schema::table('sparepart', function (Blueprint $table) {
+            // Tidak ada yang di-reverse
         });
     }
 };

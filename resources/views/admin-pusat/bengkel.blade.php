@@ -143,7 +143,7 @@
                 <i class="bi bi-pencil"></i>
             </a>
             <form action="{{ route('admin-pusat.bengkel.destroy', $b->id) }}" method="POST"
-                  onsubmit="return confirm('Hapus bengkel {{ $b->nama }}?')">
+                    onsubmit="return confirm('Hapus bengkel {{ $b->nama }}?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn-card-del" title="Hapus">
                     <i class="bi bi-trash"></i>

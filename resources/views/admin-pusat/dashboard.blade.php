@@ -37,14 +37,7 @@
         <div class="stat-icon-wrap si-orange">
             <i class="bi bi-calendar-check"></i>
         </div>
-        <div class="stat-body">
-            <div class="stat-label">Total Reservasi</div>
-            <div class="stat-value">{{ number_format($totalReservasi ?? 0) }}</div>
-            <div class="stat-trend {{ ($trendReservasi ?? 0) >= 0 ? 'trend-up' : 'trend-down' }}">
-                <i class="bi bi-arrow-{{ ($trendReservasi ?? 0) >= 0 ? 'up' : 'down' }}-short"></i>
-                {{ abs($trendReservasi ?? 0) }}% vs bulan lalu
-            </div>
-        </div>
+
     </div>
 
     <div class="stat-card">
@@ -150,64 +143,15 @@
         </div>
     </div>
 
-    {{-- Donut Status Reservasi --}}
-    <div class="chart-card">
-        <div class="chart-card-header">
-            <div>
-                <h3 class="chart-title">Status Reservasi</h3>
-                <p class="chart-subtitle">Distribusi bulan ini · semua bengkel</p>
-            </div>
-        </div>
-        <div class="donut-center-wrap">
-            <div class="chart-wrap" style="height:190px;">
-                <canvas id="chartStatus"></canvas>
-            </div>
-            <div class="donut-center-label">
-                <span class="donut-total-num" id="donutTotalNum">0</span>
-                <span class="donut-total-lbl">Total</span>
-            </div>
-        </div>
-        <div class="chart-legend chart-legend-col" id="legendStatus"></div>
-    </div>
 
 </div>
-
-{{-- ===== GRAFIK ROW 2: Tren Reservasi + Performa Bengkel ===== --}}
-<div class="charts-row-secondary">
-
-    {{-- Tren Reservasi Bar --}}
-    <div class="chart-card">
-        <div class="chart-card-header">
-            <div>
-                <h3 class="chart-title">Tren Reservasi</h3>
-                <p class="chart-subtitle">6 bulan terakhir · semua cabang</p>
-            </div>
-            <select class="chart-select" id="periodSelect">
-                <option value="6">6 Bulan</option>
-                <option value="12">12 Bulan</option>
-            </select>
-        </div>
-        <div class="chart-legend">
-            <span class="legend-item">
-                <span class="legend-dot" style="background:#ff6a00;"></span>
-                Masuk
-            </span>
-            <span class="legend-item">
-                <span class="legend-dot" style="background:#d1d5db;"></span>
-                Selesai
-            </span>
-        </div>
-        <div class="chart-wrap" style="height:210px;">
-            <canvas id="chartTren"></canvas>
-        </div>
-    </div>
 
     {{-- Performa Bengkel --}}
     <div class="chart-card">
         <div class="chart-card-header">
             <div>
                 <h3 class="chart-title">Performa Bengkel</h3>
-                <p class="chart-subtitle">Reservasi selesai · bulan ini</p>
+
             </div>
             <a href="{{ route('admin-pusat.laporan') }}" class="btn-chart-link">
                 Laporan <i class="bi bi-arrow-right"></i>
@@ -223,74 +167,6 @@
 {{-- ===== TABEL SECTION ===== --}}
 <div class="tables-grid">
 
-    {{-- Tabel 1: Reservasi Terbaru --}}
-    <div class="admin-table-card table-span-2">
-        <div class="table-card-header">
-            <div class="table-card-title-wrap">
-                <h3 class="table-card-title">Reservasi Terbaru</h3>
-                <span class="table-badge">Live</span>
-            </div>
-            <div class="table-card-actions">
-                <a href="{{ route('admin-pusat.laporan') }}" class="btn-export-sm">
-                    <i class="bi bi-file-earmark-arrow-down"></i> Export
-                </a>
-                <a href="{{ route('admin-pusat.reservasi') }}" class="btn-table-link">
-                    Lihat Semua <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Pelanggan</th>
-                        <th>Bengkel</th>
-                        <th>Layanan</th>
-                        <th>Tanggal</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($reservasiTerbaru ?? [] as $r)
-                    <tr>
-                        <td class="td-mono">#R-{{ str_pad($r->id, 4, '0', STR_PAD_LEFT) }}</td>
-                        <td>
-                            <div class="td-user">
-                                <div class="td-avatar">{{ strtoupper(substr($r->user->name ?? 'U', 0, 1)) }}</div>
-                                {{ $r->user->name ?? '-' }}
-                            </div>
-                        </td>
-                        <td>{{ $r->bengkel->nama ?? '-' }}</td>
-                        <td class="td-truncate">{{ $r->keluhan ?? '-' }}</td>
-                        <td class="td-date">{{ \Carbon\Carbon::parse($r->tanggal)->format('d M Y') }}</td>
-                        <td>
-                            @php
-                                $statusMap = [
-                                    'pending'     => ['label' => 'Menunggu',     'class' => 'badge-pending'],
-                                    'confirmed'   => ['label' => 'Dikonfirmasi', 'class' => 'badge-confirmed'],
-                                    'in_progress' => ['label' => 'Dikerjakan',   'class' => 'badge-progress'],
-                                    'done'        => ['label' => 'Selesai',      'class' => 'badge-done'],
-                                    'cancelled'   => ['label' => 'Dibatalkan',   'class' => 'badge-cancel'],
-                                ];
-                                $s = $statusMap[$r->status] ?? ['label' => $r->status, 'class' => 'badge-pending'];
-                            @endphp
-                            <span class="status-badge {{ $s['class'] }}">{{ $s['label'] }}</span>
-                        </td>
-                        <td>
-                            <a href="{{ route('admin-pusat.reservasi.show', $r->id) }}" class="btn-aksi-detail">
-                                <i class="bi bi-eye"></i> Detail
-                            </a>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="7" class="td-empty">Belum ada data reservasi</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
 
     {{-- Tabel 2: Transaksi/Pembayaran Terbaru --}}
     <div class="admin-table-card">
@@ -353,7 +229,6 @@
                     <tr>
                         <th>Rank</th>
                         <th>Bengkel</th>
-                        <th>Reservasi</th>
                         <th>Rating</th>
                         <th>Aksi</th>
                     </tr>
@@ -369,12 +244,6 @@
                         <td>
                             <div class="td-bengkel-name">{{ $b->nama ?? '-' }}</div>
                             <div class="td-bengkel-loc">{{ $b->kota ?? '-' }}</div>
-                        </td>
-                        <td>
-                            <div class="td-bar-wrap">
-                                <div class="td-bar" style="width:{{ min(100, (($b->total_reservasi ?? 0) / ($rankingBengkel->first()->total_reservasi ?? 1)) * 100) }}%"></div>
-                                <span>{{ $b->total_reservasi ?? 0 }}</span>
-                            </div>
                         </td>
                         <td>
                             <span class="rating-star">★</span>
@@ -402,10 +271,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 window.dashboardData = {!! json_encode([
-    // Tren reservasi
-    'trenLabels'        => $trenLabels        ?? ['Nov','Des','Jan','Feb','Mar','Apr'],
-    'trenMasuk'         => $trenMasuk         ?? [92, 110, 98, 145, 162, 184],
-    'trenSelesai'       => $trenSelesai       ?? [80, 95, 88, 130, 148, 170],
     // Status donut
     'statusLabels'      => $statusLabels      ?? ['Selesai','Dikonfirmasi','Dikerjakan','Dibatalkan'],
     'statusData'        => $statusData        ?? [40, 25, 22, 13],

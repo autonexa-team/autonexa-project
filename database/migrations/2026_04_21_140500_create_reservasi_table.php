@@ -16,8 +16,8 @@ return new class extends Migration
 
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('bengkel_id')->constrained()->cascadeOnDelete();
-            $table->unsignedBigInteger('mekanik_id')->nullable();
 
+            
             $table->date('tanggal'); // 🔥 INI YANG KURANG
             $table->time('waktu');   // 🔥 ini juga penting
 

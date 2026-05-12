@@ -576,7 +576,7 @@
     ================================================================ */
     document.getElementById('formEditBengkel')?.addEventListener('submit', function (e) {
         let valid = true;
-        ['nama', 'admin_id', 'alamat', 'kapasitas'].forEach(name => {
+        ['nama', 'admin_id', 'alamat'].forEach(name => {
             const el = this.elements[name];
             if (!el || !el.value.toString().trim()) {
                 el?.classList.add('finput-error');

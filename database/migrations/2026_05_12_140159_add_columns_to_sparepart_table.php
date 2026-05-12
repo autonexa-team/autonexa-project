@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sparepart', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama');
-            $table->decimal('harga', 12, 2);
-            $table->text('deskripsi')->nullable();
-            $table->timestamps();
+        Schema::table('sparepart', function (Blueprint $table) {
+            // Kolom sudah ditambahkan di create_sparepart_table.php
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sparepart');
+        Schema::table('sparepart', function (Blueprint $table) {
+            // Tidak ada yang di-reverse
+        });
     }
 };

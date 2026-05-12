@@ -143,15 +143,12 @@
         </div>
     </div>
 
-
-</div>
-
     {{-- Performa Bengkel --}}
     <div class="chart-card">
         <div class="chart-card-header">
             <div>
                 <h3 class="chart-title">Performa Bengkel</h3>
-
+                <p class="chart-subtitle">Rating & reservasi bulan ini</p>
             </div>
             <a href="{{ route('admin-pusat.laporan') }}" class="btn-chart-link">
                 Laporan <i class="bi bi-arrow-right"></i>

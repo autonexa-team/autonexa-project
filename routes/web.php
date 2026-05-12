@@ -55,7 +55,7 @@ Route::post('/lupa-password', function (Request $request) {
     ]);
 
     // cek user ada atau tidak (opsional tapi bagus)
-    $user = \App\Models\User::where('email', $request->email)->first();
+    $user = \App\Models\User::query()->where('email', $request->email)->first();
     if (!$user) {
         return back()->with('error', 'Email tidak ditemukan');
     }
@@ -84,7 +84,7 @@ Route::post('/reset-password', function (\Illuminate\Http\Request $request) {
         'password' => 'required|min:6|confirmed'
     ]);
 
-    $user = \App\Models\User::where('email', $request->email)->first();
+    $user = \App\Models\User::query()->where('email', $request->email)->first();
 
     if (!$user) {
         return back()->with('error', 'Email tidak ditemukan');
@@ -148,9 +148,8 @@ Route::middleware(['auth', 'role:admin_pusat'])
         return view('admin-pusat.dashboard');
     })->name('dashboard');    
 
-    Route::get('/sparepart', function () {
-        return view('admin-pusat.sparepart');
-    })->name('sparepart');    
+    Route::get('/sparepart', [SparepartController::class, 'index'])
+        ->name('sparepart');    
 
     Route::get('/layanan', [LayananController::class, 'index'])
         ->name('layanan');    
@@ -216,9 +215,10 @@ Route::middleware(['auth', 'role:admin_pusat'])
     // $reviews = Review::with(['user','bengkel'])->paginate(10);
     // $totalReview = Review::count();
 
-    Route::get('/reservasi', function () {
-        return view('admin-pusat.reservasi');
-    })->name('reservasi');      
+    // Route untuk reservasi (view belum ada)
+    // Route::get('/reservasi', function () {
+    //     return view('admin-pusat.reservasi');
+    // })->name('reservasi');      
 
     Route::get('/laporan', [LaporanController::class, 'index'])
         ->name('laporan');
@@ -233,10 +233,13 @@ Route::middleware(['auth', 'role:admin_pusat'])
     Route::resource('bengkel', BengkelController::class);
     
     Route::post('/sparepart', [SparepartController::class, 'store'])
-    ->name('sparepart.store');
+        ->name('sparepart.store');
 
     Route::put('/sparepart/{id}', [SparepartController::class, 'update'])
-        ->name('admin-pusat.sparepart.update');    
+        ->name('sparepart.update');
+
+    Route::delete('/sparepart/{id}', [SparepartController::class, 'destroy'])
+        ->name('sparepart.destroy');    
 
     Route::patch('bengkel/{bengkel}/toggle-status', [BengkelController::class, 'toggleStatus'])
         ->name('bengkel.toggle-status');    

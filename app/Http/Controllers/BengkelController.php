@@ -42,8 +42,9 @@ class BengkelController extends Controller
 
     public function pelangganIndex()
     {
-        $bengkels = Bengkel::where('status', 'aktif') // ✅ hanya tampilkan aktif
-            ->withAvg(['review as reviews_avg_rating' => function($q){
+        $bengkels = Bengkel::query()
+            ->where('status', 'aktif') // ✅ hanya tampilkan aktif
+            ->withAvg(['review' => function($q){
                 $q->where('type','bengkel');
             }], 'rating')
             ->withCount(['review as reviews_count' => function($q){
@@ -53,7 +54,7 @@ class BengkelController extends Controller
             ->get();
 
         $totalBengkel = $bengkels->count();
-        $avgRating    = $bengkels->avg('reviews_avg_rating') ?? 0;
+        $avgRating    = $bengkels->avg('review') ?? 0;
         $totalReview  = $bengkels->sum('reviews_count');
 
         return view('pelanggan.bengkel', [
@@ -73,9 +74,10 @@ class BengkelController extends Controller
         }
 
         // Ambil admin cabang yang belum memiliki bengkel
-        $adminCabang = \App\Models\User::where('role', 'admin_cabang')
+        $adminCabang = \App\Models\User::query()
+            ->where('role', 'admin_cabang')
             ->where('is_active', true)
-            ->whereDoesntHave('bengkel')
+            // ->whereDoesntHave('bengkel')
             ->get();
 
         return view('admin-pusat.tambah-bengkel', [
@@ -125,7 +127,7 @@ class BengkelController extends Controller
                         ->with('success', 'Bengkel berhasil ditambahkan');
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $bengkel = Bengkel::withCount(['reservasis', 'layanan', 'review'])
                         ->withAvg('review', 'rating')
@@ -146,7 +148,7 @@ class BengkelController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         // 🔒 proteksi role
         if (Auth::user()->role !== 'admin_pusat') {
@@ -170,7 +172,7 @@ class BengkelController extends Controller
                         ->with('success', 'Bengkel berhasil dihapus');
     }
 
-    public function edit($id)
+    public function edit(int $id)
     {
         // 🔒 proteksi role
         if (Auth::user()->role !== 'admin_pusat') {
@@ -180,11 +182,12 @@ class BengkelController extends Controller
         $bengkel = Bengkel::findOrFail($id);
 
         // Ambil admin cabang: yang sekarang + yang belum memiliki bengkel
-        $adminCabang = \App\Models\User::where('role', 'admin_cabang')
+        $adminCabang = \App\Models\User::query()
+            ->where('role', 'admin_cabang')
             ->where('is_active', true)
             ->where(function($query) use ($bengkel) {
-                $query->whereDoesntHave('bengkel')
-                      ->orWhere('id', $bengkel->admin_id);
+                // $query->whereDoesntHave('bengkel')
+                $query->orWhere('id', $bengkel->admin_id);
             })
             ->get();
 
@@ -194,7 +197,7 @@ class BengkelController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         // 🔒 proteksi role
         if (Auth::user()->role !== 'admin_pusat') {

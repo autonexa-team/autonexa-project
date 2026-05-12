@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sparepart', function (Blueprint $table) {
+        Schema::create('bengkel_spareparts', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->decimal('harga', 12, 2);
-            $table->text('deskripsi')->nullable();
+            $table->foreignId('bengkel_id')->constrained('bengkels')->onDelete('cascade');
+            $table->foreignId('sparepart_id')->constrained('sparepart')->onDelete('cascade');
+            $table->integer('stok')->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sparepart');
+        Schema::dropIfExists('bengkel_spareparts');
     }
 };

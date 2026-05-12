@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sparepart extends Model
 {
+    protected $table = 'sparepart';
     protected $fillable = ['nama', 'harga', 'deskripsi'];    
 
     // satu sparepart bisa ada di banyak bengkel, dan satu bengkel bisa punya banyak sparepart

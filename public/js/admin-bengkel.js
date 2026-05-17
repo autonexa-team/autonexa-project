@@ -124,23 +124,26 @@
         btnGeocode.disabled = true;
 
         try {
-            const res  = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&q=${encodeURIComponent(query)}`,
                 { headers: { 'Accept-Language': 'id' } }
             );
+
             const data = await res.json();
 
             if (!data.length) throw new Error('not_found');
 
-            const { lat, lon, display_name } = data[0];
+            const { lat, lon, display_name, address } = data[0];
 
-            /* Update inputs */
-            latInput.value  = parseFloat(lat).toFixed(6);
-            lngInput.value  = parseFloat(lon).toFixed(6);
+            latInput.value = parseFloat(lat).toFixed(6);
+            lngInput.value = parseFloat(lon).toFixed(6);
 
-            /* Ekstrak kota dari display_name */
-            const parts = display_name.split(',');
-            kotaInput.value = parts.length >= 3 ? parts[parts.length - 3].trim() : parts[0].trim();
+            kotaInput.value =
+                address.city ||
+                address.town ||
+                address.county ||
+                address.state ||    
+                '';
 
             /* Tampilkan peta */
             showMap(parseFloat(lat), parseFloat(lon));
@@ -148,7 +151,7 @@
             geoLoading.style.display = 'none';
             geoSuccess.style.display = 'flex';
             document.getElementById('geoSuccessText').textContent =
-                `Ditemukan: ${parts.slice(0, 2).join(', ')}`;
+                `Ditemukan: ${display_name}`;
 
         } catch (e) {
             geoLoading.style.display = 'none';
@@ -472,10 +475,14 @@
             latInput.value = parseFloat(lat).toFixed(6);
             lngInput.value = parseFloat(lon).toFixed(6);
 
-            const parts = display_name.split(',');
-            kotaInput.value = parts.length >= 3
-                ? parts[parts.length - 3].trim()
-                : parts[0].trim();
+            const address = data[0].address;
+
+            kotaInput.value =
+                address.city ||
+                address.town ||
+                address.county ||
+                address.state ||
+                '';
 
             initMap(parseFloat(lat), parseFloat(lon));
 

@@ -106,6 +106,11 @@
                 <span>{{ $b->alamat }}, {{ $b->kota }}</span>
             </div>
 
+            <div class="card-phone">
+                <i class="bi bi-telephone"></i>
+                <span>{{ $b->no_telepon }}</span>
+            </div>            
+
             {{-- Layanan tags --}}
             @if($b->layanan && count($b->layanan) > 0)
             <div class="card-meta">

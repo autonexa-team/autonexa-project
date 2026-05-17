@@ -82,9 +82,9 @@
                         id="admin_id"
                         name="admin_id"
                         class="finput @error('admin_id') finput-error @enderror"
-                        required
                     >
-                        <option value="">Pilih admin cabang...</option>
+                        <option value="">Belum ditentukan</option>
+
                         @foreach($adminCabang ?? [] as $admin)
                             <option value="{{ $admin->id }}"
                                 {{ old('admin_id') == $admin->id ? 'selected' : '' }}>
@@ -100,6 +100,27 @@
                         <p class="ferror">{{ $message }}</p>
                     @enderror
                 </div>
+
+                {{-- Nomor Telepon --}}
+                <div class="fgroup">
+                    <label class="flabel" for="telepon">
+                        Nomor Telepon <span class="freq">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="telepon"
+                        name="telepon"
+                        class="finput @error('telepon') finput-error @enderror"
+                        placeholder="cth: 08123456789"
+                        value="{{ old('telepon') }}"
+                        required
+                    >
+
+                    @error('telepon')
+                        <p class="ferror">{{ $message }}</p>
+                    @enderror
+                </div>                
 
                 {{-- Status --}}
                 <div class="fgroup">

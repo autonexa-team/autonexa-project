@@ -134,6 +134,30 @@
                     @enderror
                 </div>
 
+                {{-- Nomor Telepon --}}
+                <div class="fgroup">
+                    <label class="flabel" for="telepon">
+                        Nomor Telepon <span class="freq">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="telepon"
+                        name="telepon"
+                        class="finput @error('telepon') finput-error @enderror"
+                        placeholder="cth: 08123456789"
+                        value="{{ old('telepon', $bengkel->telepon) }}"
+                        required
+                    >
+
+                    @error('telepon')
+                        <p class="ferror">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>                
+
                 <!-- {{-- Kapasitas Antrian --}}
                 <div class="fgroup">
                     <label class="flabel" for="kapasitas">

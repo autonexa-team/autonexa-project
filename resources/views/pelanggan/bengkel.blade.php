@@ -203,11 +203,11 @@
                     </div>
 
                     <div class="card-footer">
-                        <a href="{{ route('pelanggan.bengkel.show', $bengkel->id) }}" class="btn-card-detail">
+                        <a href="{{ route('pelanggan.bengkel-detail', $bengkel->id) }}" class="btn-card-detail">
                             <i class="bi bi-info-circle"></i> Detail
                         </a>
                         <a
-                            href="{{ $isOpen ? route('pelanggan.booking.create', ['bengkel_id' => $bengkel->id]) : '#' }}"
+                            href="{{ $isOpen ? route('pelanggan.reservasi', ['bengkel_id' => $bengkel->id]) : '#' }}"
                             class="btn-card-booking {{ !$isOpen ? 'disabled' : '' }}"
                             {{ !$isOpen ? 'tabindex=-1 aria-disabled=true' : '' }}>
                             <i class="bi bi-calendar-plus"></i>
@@ -280,8 +280,8 @@ $bengkelData = $bengkels->map(function ($b) {
         'layanan' => $b->layanan->isNotEmpty()
             ? strtolower($b->layanan->pluck('nama')->implode(','))
             : '',
-        'url' => route('pelanggan.bengkel.show', $b->id),
-        'booking_url' => route('pelanggan.booking.create', ['bengkel_id' => $b->id]),
+        'url' => route('pelanggan.bengkel-detail', $b->id),
+        'booking_url' => route('pelanggan.reservasi', ['bengkel_id' => $b->id]),
     ];
 })->values();
 @endphp

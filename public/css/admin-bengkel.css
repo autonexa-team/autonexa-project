@@ -1488,3 +1488,31 @@ textarea.finput { resize: vertical; min-height: 76px; line-height: 1.5; }
     .info-detail-grid{ grid-template-columns: 1fr; }
     .detail-title-row{ flex-direction: column; align-items: flex-start; }
 }
+
+/* FOTO EXISTING */
+
+.foto-existing {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.foto-existing-wrap {
+    width: 100%;
+    height: 220px; /* batas tinggi */
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* GAMBAR */
+.foto-existing-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* bikin rapi */
+    display: block;
+}

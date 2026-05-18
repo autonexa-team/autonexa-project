@@ -12,7 +12,8 @@ class Layanan extends Model
         'nama',
         'deskripsi',
         'durasi',
-        'harga'
+        'harga',
+        'status'
     ];
 
     public function bengkels()

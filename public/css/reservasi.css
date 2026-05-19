@@ -602,3 +602,371 @@
         justify-content: center;
     }
 }
+
+/* ── KENDARAAN GRID ── */
+.kendaraan-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+/* Label optional */
+.label-optional {
+    font-size: 11px;
+    color: var(--foreground-thin);
+    font-weight: 400;
+    margin-left: 4px;
+}
+
+/* Foto upload area */
+.foto-upload-area {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--foreground-thin);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.foto-upload-area:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(255, 106, 0, 0.03);
+}
+
+.foto-upload-area i { font-size: 22px; }
+.foto-upload-area p { font-size: 13px; font-weight: 500; }
+.foto-upload-area small { font-size: 11px; }
+
+.foto-preview-img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    margin-top: 8px;
+    border: 1px solid var(--border);
+}
+
+.btn-hapus-foto {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 4px 10px;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    background: #fff5f5;
+    color: #dc2626;
+    font-size: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-hapus-foto:hover { background: #fee2e2; }
+
+/* Plat input uppercase */
+.plat-input { text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ── SLOT WAKTU (JAM GRID) ── */
+.jam-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.jam-btn {
+    padding: 8px 4px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    background: var(--background);
+    color: var(--foreground);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    line-height: 1.2;
+}
+
+.jam-btn:hover:not(.penuh):not(.disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.jam-btn.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+.jam-btn.penuh,
+.jam-btn.disabled {
+    background: #f9fafb;
+    color: #d1d5db;
+    cursor: not-allowed;
+    border-color: #f3f4f6;
+    text-decoration: line-through;
+}
+
+.jam-sub {
+    font-size: 9px;
+    font-weight: 400;
+    opacity: 0.75;
+}
+
+.field-helper {
+    font-size: 11px;
+    color: var(--foreground-thin);
+    margin-top: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    line-height: 1.4;
+}
+
+/* ── SLOT INFO DI BENGKEL CARD ── */
+.slot-info {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.slot-aman   { color: #16a34a; }
+.slot-sedikit{ color: #d97706; }
+.slot-penuh  { color: #dc2626; }
+
+.bengkel-card.bengkel-penuh {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.bengkel-card.bengkel-penuh::after {
+    content: 'Penuh';
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+
+/* ── LAYANAN CARDS (radio style) ── */
+.layanan-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.layanan-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.layanan-card:hover { border-color: #d1d5db; }
+
+.layanan-card.selected {
+    border-color: var(--primary);
+    background: rgba(255, 106, 0, 0.04);
+}
+
+.layanan-radio {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.layanan-card.selected .layanan-radio {
+    border-color: var(--primary);
+    background: var(--primary);
+}
+
+.layanan-radio-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    display: none;
+}
+
+.layanan-card.selected .layanan-radio-dot { display: block; }
+
+.layanan-detail { flex: 1; min-width: 0; }
+
+.layanan-nama {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 3px;
+}
+
+.layanan-desc {
+    font-size: 12px;
+    color: var(--foreground-thin);
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.layanan-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.badge-durasi {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.badge-harga {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+/* ── ESTIMASI BOX ── */
+.estimasi-box {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+.estimasi-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #c2410c;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.estimasi-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    padding: 4px 0;
+    color: var(--foreground-thin);
+}
+
+.estimasi-row span:last-child {
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+.estimasi-divider {
+    border: none;
+    border-top: 1px solid #fed7aa;
+    margin: 8px 0;
+}
+
+.estimasi-total {
+    font-weight: 700;
+    color: var(--primary) !important;
+}
+
+.estimasi-total span:first-child { color: #c2410c; font-weight: 700; }
+.estimasi-total span:last-child  { color: var(--primary); font-size: 15px; }
+
+.estimasi-note {
+    font-size: 10px;
+    color: #9ca3af;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* ── RINGKASAN ESTIMASI ── */
+.ringkasan-estimasi {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-top: 10px;
+}
+
+.re-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #15803d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.re-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 3px 0;
+    color: var(--foreground-thin);
+}
+
+.re-row span:last-child { font-weight: 700; color: var(--foreground); }
+.re-harga { color: var(--primary) !important; }
+
+.ringkasan-note {
+    font-size: 10px;
+    color: var(--foreground-thin);
+    font-style: italic;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 576px) {
+    .kendaraan-grid { grid-template-columns: 1fr; }
+    .jam-grid       { grid-template-columns: repeat(4, 1fr); }
+}

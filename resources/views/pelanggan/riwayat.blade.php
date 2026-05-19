@@ -1,324 +1,758 @@
-{{-- views/pelanggan/riwayat.blade.php --}}
-
 @extends('layout.app')
-@section('title', 'Riwayat Reservasi')
 
-@push('styles')
-    <!-- Mempertahankan CSS reservasi jika ada styling global yang digunakan (seperti font atau layout dasar) -->
-    <link rel="stylesheet" href="{{ asset('css/reservasi.css') }}">
-    <style>
-        /* Animasi Progress Bar saat Halaman Load */
-        @keyframes fillProgress {
-            from {
-                width: 0%;
-            }
-        }
-
-        .progress-line-animate {
-            animation: fillProgress 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Animasi Fade In Card */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-card {
-            opacity: 0;
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-    </style>
-@endpush
-
-@php
-    // DUMMY DATA RESERVASI
-    $riwayats = [
-        [
-            'id' => 'RSV-002',
-            'bengkel' => 'AutoNexa Cabang Kebon Jeruk',
-            'tanggal' => '20 Mei 2026, 10:00 WIB',
-            'layanan' => 'Ganti Oli Reguler',
-            'kendaraan' => 'Toyota Avanza - B 5678 DEF',
-            'status' => 'diproses',
-            'step' => 3,
-        ],
-        [
-            'id' => 'RSV-003',
-            'bengkel' => 'AutoNexa Cabang Kelapa Gading',
-            'tanggal' => '22 Mei 2026, 13:30 WIB',
-            'layanan' => 'Pengecekan Kaki-kaki',
-            'kendaraan' => 'Mitsubishi Xpander - B 9012 GHI',
-            'status' => 'menunggu',
-            'step' => 2,
-        ],
-        [
-            'id' => 'RSV-001',
-            'bengkel' => 'AutoNexa Cabang Sudirman',
-            'tanggal' => '18 Mei 2026, 09:00 WIB',
-            'layanan' => 'Servis Berkala 10.000 KM',
-            'kendaraan' => 'Honda Brio - B 1234 ABC',
-            'status' => 'selesai',
-            'step' => 4,
-        ],
-        [
-            'id' => 'RSV-004',
-            'bengkel' => 'AutoNexa Cabang Sudirman',
-            'tanggal' => '05 Mei 2026, 14:00 WIB',
-            'layanan' => 'Ganti Aki',
-            'kendaraan' => 'Honda Brio - B 1234 ABC',
-            'status' => 'dibatalkan',
-            'step' => 0,
-        ],
-    ];
-@endphp
+@section('title', 'Riwayat Reservasi — AutoNexa')
 
 @section('content')
 
-    <div class="bg-slate-50 min-h-screen pb-20">
-        <!-- Header Section (Hero-like) -->
-        <div class="bg-white border-b border-slate-200 pt-10 pb-16 px-6 lg:px-20 relative overflow-hidden">
-            <div
-                class="absolute right-0 top-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl opacity-50 pointer-events-none -translate-y-1/2 translate-x-1/3">
-            </div>
-            <div class="max-w-5xl mx-auto relative z-10">
-                <a href="{{ url('/reservasi') }}"
-                    class="inline-flex items-center gap-2 text-slate-400 hover:text-brand font-bold text-sm mb-6 transition-colors">
-                    <i class="fas fa-arrow-left"></i> Kembali ke Beranda
-                </a>
-                <h1 class="text-4xl font-black text-slate-800 tracking-tight mb-3">Riwayat <span
-                        class="text-brand">Reservasi</span></h1>
-                <p class="text-slate-500 font-medium max-w-lg">Pantau status servis kendaraan Anda dan lihat riwayat
-                    pelayanan dari bengkel kami sebelumnya.</p>
-            </div>
+{{-- ── Stylesheet ── --}}
+<link rel="stylesheet" href="{{ asset('css/riwayat.css') }}">
+
+<div class="rw-page">
+
+    {{-- ════════════════════════════════════════
+         PAGE HEADER
+    ════════════════════════════════════════ --}}
+    <div class="rw-header anim-up">
+        {{-- Breadcrumb --}}
+        <div class="rw-header__breadcrumb">
+            <a href="{{ route('pelanggan.dashboard') }}"><i class="fas fa-home"></i> Beranda</a>
+            <span class="sep"><i class="fas fa-chevron-right"></i></span>
+            <span class="cur">Riwayat Reservasi</span>
         </div>
 
-        <!-- Main Content Container -->
-        <div class="max-w-5xl mx-auto px-6 lg:px-0 -mt-8 relative z-20">
-
-            <!-- Filter & Search Bar -->
-            <div
-                class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-4 justify-between items-center mb-8">
-                <!-- Search -->
-                <div
-                    class="w-full md:w-1/2 flex items-center bg-slate-50 rounded-xl px-4 py-3 border border-slate-200 focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/20 transition-all">
-                    <i class="fas fa-search text-slate-400"></i>
-                    <input type="text" placeholder="Cari nomor resi atau nama bengkel..."
-                        class="bg-transparent border-none outline-none ml-3 w-full text-sm font-medium text-slate-700">
-                </div>
-
-                <!-- Filters -->
-                <div class="w-full md:w-auto flex gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
-                    <button
-                        class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap shadow-sm hover:bg-slate-900 transition-colors">Semua</button>
-                    <button
-                        class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-brand hover:border-brand/30 px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-colors">Menunggu</button>
-                    <button
-                        class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-brand hover:border-brand/30 px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-colors">Diproses</button>
-                    <button
-                        class="bg-white border border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-colors">Selesai</button>
-                </div>
+        <div class="rw-header__top">
+            <div>
+                <p class="rw-header__kicker">AutoNexa</p>
+                <h1 class="rw-header__title">Riwayat <em>Reservasi</em></h1>
+                <p class="rw-header__subtitle">Pantau semua servis kendaraan Anda dalam satu tempat.</p>
             </div>
-
-            @if (count($riwayats) > 0)
-                <!-- List Riwayat (Cards) -->
-                <div class="space-y-6">
-                    @foreach ($riwayats as $index => $item)
-                        <!-- Individual Card -->
-                        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-slate-100 overflow-hidden animate-card"
-                            style="animation-delay: {{ $index * 150 }}ms;">
-
-                            <!-- Card Header -->
-                            <div
-                                class="px-6 py-4 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-10 h-10 rounded-xl bg-orange-50 text-brand flex items-center justify-center font-black">
-                                        <i class="fas fa-wrench"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-bold text-slate-800 text-lg">{{ $item['bengkel'] }}</h3>
-                                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">
-                                            {{ $item['id'] }} <span class="mx-2 normal-case text-slate-300">•</span>
-                                            {{ $item['tanggal'] }}</p>
-                                    </div>
-                                </div>
-
-                                <!-- Status Badge Dinamis -->
-                                @if ($item['status'] == 'selesai')
-                                    <span
-                                        class="bg-emerald-100 border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                                        <i class="fas fa-check-circle"></i> Reservasi Selesai
-                                    </span>
-                                @elseif($item['status'] == 'menunggu')
-                                    <span
-                                        class="bg-amber-100 border border-amber-200 text-amber-700 px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                                        <i class="fas fa-clock"></i> Menunggu Konfirmasi
-                                    </span>
-                                @elseif($item['status'] == 'diproses')
-                                    <span
-                                        class="bg-blue-100 border border-blue-200 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                                        <i class="fas fa-cog fa-spin"></i> Sedang Dikerjakan
-                                    </span>
-                                @else
-                                    <span
-                                        class="bg-red-100 border border-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                                        <i class="fas fa-times-circle"></i> Dibatalkan
-                                    </span>
-                                @endif
-                            </div>
-
-                            <!-- Card Body (Progress Bar & Info) -->
-                            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-
-                                <!-- Service Details -->
-                                <div class="md:col-span-1 space-y-4">
-                                    <div>
-                                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Kendaraan
-                                        </p>
-                                        <p class="text-slate-800 font-bold flex items-center gap-2">
-                                            <i class="fas fa-car text-slate-300"></i> {{ $item['kendaraan'] }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Layanan
-                                            Utama</p>
-                                        <p class="text-slate-800 font-bold flex items-start gap-2">
-                                            <i class="fas fa-tools text-slate-300 mt-1"></i> {{ $item['layanan'] }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Progress Bar Tracker -->
-                                <div class="md:col-span-2 pt-2 pb-6 md:pb-2">
-                                    <p
-                                        class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-8 text-center md:text-left">
-                                        Status Progres</p>
-
-                                    <div class="relative flex justify-between items-center w-full px-4 sm:px-8">
-                                        <!-- Background Line -->
-                                        <div
-                                            class="absolute left-4 right-4 sm:left-8 sm:right-8 top-1/2 transform -translate-y-1/2 h-1 bg-slate-100 rounded-full z-0">
-                                        </div>
-
-                                        <!-- Animated Progress Line -->
-                                        @php
-                                            // Calculate width percentage based on step (4 steps total, so 3 intervals of 33.33%)
-                                            $progressWidth = 0;
-                                            if ($item['step'] > 1) {
-                                                $progressWidth = ($item['step'] - 1) * 33.33;
-                                            }
-                                            $barColor = $item['status'] == 'dibatalkan' ? 'bg-red-500' : 'bg-[#ff6a00]';
-                                        @endphp
-                                        <div class="absolute left-4 sm:left-8 top-1/2 transform -translate-y-1/2 h-1 {{ $barColor }} rounded-full z-0 progress-line-animate"
-                                            style="width: {{ $progressWidth }}%; max-width: calc(100% - 2rem);"></div>
-
-                                        <!-- Step 1: Dibuat -->
-                                        <div class="relative z-10 flex flex-col items-center group">
-                                            <div
-                                                class="w-8 h-8 rounded-full flex items-center justify-center {{ $item['step'] >= 1 ? ($item['status'] == 'dibatalkan' ? 'bg-red-500 text-white' : 'bg-[#ff6a00] text-white') : 'bg-slate-200 text-slate-400' }} border-4 border-white shadow-sm transition-all duration-500">
-                                                @if ($item['step'] > 1 && $item['status'] != 'dibatalkan')
-                                                    <i class="fas fa-check text-xs"></i>
-                                                @else
-                                                    <i class="fas fa-file-signature text-xs"></i>
-                                                @endif
-                                            </div>
-                                            <span
-                                                class="text-[10px] sm:text-xs font-bold {{ $item['step'] >= 1 ? 'text-slate-700' : 'text-slate-400' }} mt-3 text-center absolute top-8 whitespace-nowrap">Dibuat</span>
-                                        </div>
-
-                                        <!-- Step 2: Dikonfirmasi -->
-                                        <div class="relative z-10 flex flex-col items-center group">
-                                            <div
-                                                class="w-8 h-8 rounded-full flex items-center justify-center {{ $item['step'] >= 2 ? ($item['status'] == 'dibatalkan' ? 'bg-red-500 text-white' : 'bg-[#ff6a00] text-white') : 'bg-slate-200 text-slate-400' }} border-4 border-white shadow-sm transition-all duration-500 delay-100">
-                                                @if ($item['step'] > 2 && $item['status'] != 'dibatalkan')
-                                                    <i class="fas fa-check text-xs"></i>
-                                                @else
-                                                    <i class="fas fa-calendar-check text-xs"></i>
-                                                @endif
-                                            </div>
-                                            <span
-                                                class="text-[10px] sm:text-xs font-bold {{ $item['step'] >= 2 ? 'text-slate-700' : 'text-slate-400' }} mt-3 text-center absolute top-8 whitespace-nowrap">Dikonfirmasi</span>
-                                        </div>
-
-                                        <!-- Step 3: Dikerjakan -->
-                                        <div class="relative z-10 flex flex-col items-center group">
-                                            <div
-                                                class="w-8 h-8 rounded-full flex items-center justify-center {{ $item['step'] >= 3 ? ($item['status'] == 'dibatalkan' ? 'bg-red-500 text-white' : 'bg-[#ff6a00] text-white') : 'bg-slate-200 text-slate-400' }} border-4 border-white shadow-sm transition-all duration-500 delay-200">
-                                                @if ($item['step'] > 3 && $item['status'] != 'dibatalkan')
-                                                    <i class="fas fa-check text-xs"></i>
-                                                @else
-                                                    <i class="fas fa-cogs text-xs"></i>
-                                                @endif
-                                            </div>
-                                            <span
-                                                class="text-[10px] sm:text-xs font-bold {{ $item['step'] >= 3 ? 'text-slate-700' : 'text-slate-400' }} mt-3 text-center absolute top-8 whitespace-nowrap">Dikerjakan</span>
-                                        </div>
-
-                                        <!-- Step 4: Selesai -->
-                                        <div class="relative z-10 flex flex-col items-center group">
-                                            <div
-                                                class="w-8 h-8 rounded-full flex items-center justify-center {{ $item['step'] >= 4 ? ($item['status'] == 'dibatalkan' ? 'bg-red-500 text-white' : 'bg-[#ff6a00] text-white') : 'bg-slate-200 text-slate-400' }} border-4 border-white shadow-sm transition-all duration-500 delay-300">
-                                                @if ($item['step'] >= 4 && $item['status'] != 'dibatalkan')
-                                                    <i class="fas fa-flag-checkered text-xs"></i>
-                                                @else
-                                                    <i class="fas fa-flag text-xs"></i>
-                                                @endif
-                                            </div>
-                                            <span
-                                                class="text-[10px] sm:text-xs font-bold {{ $item['step'] >= 4 ? 'text-slate-700' : 'text-slate-400' }} mt-3 text-center absolute top-8 whitespace-nowrap">Selesai</span>
-                                        </div>
-                                    </div>
-
-                                    @if ($item['status'] == 'dibatalkan')
-                                        <p class="text-center text-xs font-bold text-red-500 mt-10"><i
-                                                class="fas fa-exclamation-triangle"></i> Reservasi dibatalkan oleh pengguna
-                                            / admin.</p>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <!-- Card Footer & Actions -->
-                            <div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 border-t border-slate-100">
-                                <button
-                                    class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-700 font-bold rounded-xl text-sm transition-all shadow-sm">
-                                    Lihat Detail
-                                </button>
-
-                                @if ($item['status'] == 'selesai')
-                                    <button
-                                        class="px-4 py-2 bg-[#ff6a00] hover:bg-[#e65c00] text-white font-bold rounded-xl text-sm transition-all shadow-md shadow-orange-500/20 flex items-center gap-2">
-                                        <i class="fas fa-star text-amber-200"></i> Beri Review
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <!-- EMPTY STATE -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 py-16 px-6 text-center animate-card">
-                    <div class="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-clipboard-list text-5xl text-slate-300"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-800 mb-2">Belum Ada Riwayat Reservasi</h3>
-                    <p class="text-slate-500 text-sm max-w-md mx-auto mb-8">Anda belum pernah melakukan pemesanan servis di
-                        AutoNexa. Segera jadwalkan perawatan kendaraan Anda sekarang juga.</p>
-                    <a href="{{ url('/reservasi') }}"
-                        class="inline-flex bg-[#ff6a00] hover:bg-[#e65c00] text-white px-6 py-3 rounded-xl font-bold shadow-md shadow-orange-500/20 transition-transform hover:-translate-y-1">
-                        Buat Reservasi Baru
-                    </a>
-                </div>
-            @endif
-
+            <div class="rw-header__actions">
+                <a href="{{ route('pelanggan.reservasi') }}" class="btn btn--primary">
+                    <i class="fas fa-plus"></i> Reservasi Baru
+                </a>
+            </div>
         </div>
     </div>
+
+    {{-- ════════════════════════════════════════
+         STAT STRIP
+    ════════════════════════════════════════ --}}
+    <div class="stat-strip">
+        {{-- Total --}}
+        <div class="stat-tile"
+             style="--c-accent:#f97316; --c-blob:rgba(249,115,22,.07);
+                    --c-icon-bg:rgba(249,115,22,.08); --c-icon-border:rgba(249,115,22,.18); --c-icon:#f97316;">
+            <div class="stat-tile__blob"></div>
+            <div class="stat-tile__icon"><i class="fas fa-calendar-alt"></i></div>
+            <div class="stat-tile__num counter" data-target="12">0</div>
+            <div class="stat-tile__label">Total Reservasi</div>
+        </div>
+
+        {{-- Aktif --}}
+        <div class="stat-tile"
+             style="--c-accent:#3b82f6; --c-blob:rgba(59,130,246,.07);
+                    --c-icon-bg:rgba(59,130,246,.08); --c-icon-border:rgba(59,130,246,.18); --c-icon:#2563eb;">
+            <div class="stat-tile__blob"></div>
+            <div class="stat-tile__icon"><i class="fas fa-wrench"></i></div>
+            <div class="stat-tile__num counter" data-target="2">0</div>
+            <div class="stat-tile__label">Sedang Aktif</div>
+        </div>
+
+        {{-- Selesai --}}
+        <div class="stat-tile"
+             style="--c-accent:#10b981; --c-blob:rgba(16,185,129,.07);
+                    --c-icon-bg:rgba(16,185,129,.08); --c-icon-border:rgba(16,185,129,.18); --c-icon:#059669;">
+            <div class="stat-tile__blob"></div>
+            <div class="stat-tile__icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-tile__num counter" data-target="8">0</div>
+            <div class="stat-tile__label">Selesai</div>
+        </div>
+
+        {{-- Dibatalkan --}}
+        <div class="stat-tile"
+             style="--c-accent:#ef4444; --c-blob:rgba(239,68,68,.07);
+                    --c-icon-bg:rgba(239,68,68,.08); --c-icon-border:rgba(239,68,68,.18); --c-icon:#dc2626;">
+            <div class="stat-tile__blob"></div>
+            <div class="stat-tile__icon"><i class="fas fa-times-circle"></i></div>
+            <div class="stat-tile__num counter" data-target="2">0</div>
+            <div class="stat-tile__label">Dibatalkan</div>
+        </div>
+    </div>
+
+    {{-- ════════════════════════════════════════
+         TOOLBAR — Search & Date Filter
+    ════════════════════════════════════════ --}}
+    <div class="toolbar">
+        <div class="search-box">
+            <i class="fas fa-search search-box__icon"></i>
+            <input type="text" id="searchInput"
+                   placeholder="Cari layanan, kendaraan, atau nomor reservasi..."
+                   autocomplete="off">
+        </div>
+        <input type="date" id="dateFilter" class="date-input" title="Filter tanggal">
+        <button class="btn btn--outline btn--sm" id="clearFilter">
+            <i class="fas fa-times"></i> Reset
+        </button>
+    </div>
+
+    {{-- ════════════════════════════════════════
+         TABS
+    ════════════════════════════════════════ --}}
+    <div class="tabs" id="tabBar">
+        <button class="tab-btn active" data-tab="all">
+            Semua <span class="tab-count">12</span>
+        </button>
+        <button class="tab-btn" data-tab="process">
+            <i class="fas fa-wrench" style="font-size:.7rem;"></i> Diproses <span class="tab-count">1</span>
+        </button>
+        <button class="tab-btn" data-tab="waiting">
+            <i class="fas fa-clock" style="font-size:.7rem;"></i> Menunggu <span class="tab-count">1</span>
+        </button>
+        <button class="tab-btn" data-tab="done">
+            <i class="fas fa-check" style="font-size:.7rem;"></i> Selesai <span class="tab-count">8</span>
+        </button>
+        <button class="tab-btn" data-tab="cancel">
+            <i class="fas fa-ban" style="font-size:.7rem;"></i> Dibatalkan <span class="tab-count">2</span>
+        </button>
+    </div>
+
+    {{-- ════════════════════════════════════════
+         SKELETON LOADING (tampil sementara)
+    ════════════════════════════════════════ --}}
+    <div id="skeletonWrap" class="card-list">
+        @for ($i = 0; $i < 3; $i++)
+        <div class="skeleton-card">
+            <div class="skeleton-card__top">
+                <div class="skel" style="width:46px;height:46px;border-radius:14px;flex-shrink:0;"></div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:.5rem;">
+                    <div class="skel" style="height:14px; width:55%;"></div>
+                    <div class="skel" style="height:11px; width:35%;"></div>
+                </div>
+                <div class="skel" style="height:26px; width:90px; border-radius:40px;"></div>
+            </div>
+            <div class="skeleton-card__meta">
+                @for ($j = 0; $j < 3; $j++)
+                <div class="skeleton-cell">
+                    <div class="skel" style="height:10px; width:50%; margin-bottom:.5rem;"></div>
+                    <div class="skel" style="height:13px; width:70%;"></div>
+                </div>
+                @endfor
+            </div>
+            <div class="skeleton-card__foot">
+                <div class="skel" style="height:13px; width:40%;"></div>
+                <div class="skel" style="height:32px; width:110px; border-radius:12px;"></div>
+            </div>
+        </div>
+        @endfor
+    </div>
+
+    {{-- ════════════════════════════════════════
+         CARD LIST (dirender oleh JS)
+    ════════════════════════════════════════ --}}
+    <div id="cardList" class="card-list" style="display:none;"></div>
+
+    {{-- ════════════════════════════════════════
+         EMPTY STATE
+    ════════════════════════════════════════ --}}
+    <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="empty-state__illus">🔍</div>
+        <h3 class="empty-state__title">Tidak Ada Reservasi</h3>
+        <p class="empty-state__sub">Belum ada riwayat reservasi yang cocok dengan filter yang kamu pilih.</p>
+        <a href="{{ route('pelanggan.reservasi') }}" class="btn btn--primary">
+            <i class="fas fa-plus"></i> Buat Reservasi Sekarang
+        </a>
+    </div>
+
+    {{-- ════════════════════════════════════════
+         PAGINATION
+    ════════════════════════════════════════ --}}
+    <div id="pagination" class="pagination" style="display:none;"></div>
+
+</div>{{-- /rw-page --}}
+
+{{-- ── FAB ── --}}
+<a href="{{ route('pelanggan.reservasi') }}" class="fab">
+    <i class="fas fa-plus"></i> Reservasi Baru
+</a>
+
+{{-- ── Scripts ── --}}
+<script>
+(function () {
+    'use strict';
+
+    /* ══════════════════════════════════════
+       DUMMY DATA
+    ══════════════════════════════════════ */
+    const RESERVATIONS = [
+        {
+            id: 'RV-2025-001',
+            status: 'process',
+            bengkel: 'AutoNexa Cabang Bandung',
+            alamat: 'Jl. Soekarno-Hatta No. 88',
+            kendaraan: 'Honda Brio',
+            plat: 'B 1234 XYZ',
+            layanan: 'Servis Berkala 10.000 KM',
+            tanggal: '2025-07-10',
+            jam: '10:00 WIB',
+            keluhan: 'Mesin terasa kasar, oli sudah lama tidak ganti',
+            biaya: null,
+            step: 3, // 0-5
+            timeline: [
+                { time: '10 Jul, 09:15', title: 'Reservasi Dibuat', desc: 'Kamu berhasil membuat reservasi online.', state: 'done' },
+                { time: '10 Jul, 09:45', title: 'Reservasi Dikonfirmasi', desc: 'Admin bengkel telah mengkonfirmasi reservasi kamu.', state: 'done' },
+                { time: '10 Jul, 10:10', title: 'Kendaraan Diterima', desc: 'Kendaraan sudah tiba dan sedang diperiksa mekanik.', state: 'done' },
+                { time: 'Sedang berlangsung', title: 'Proses Servis', desc: 'Mekanik sedang mengerjakan kendaraan kamu.', state: 'active' },
+                { time: '—', title: 'Quality Check', desc: 'Pengecekan akhir kualitas hasil servis.', state: 'idle' },
+                { time: '—', title: 'Selesai', desc: 'Kendaraan siap diambil.', state: 'idle' },
+            ]
+        },
+        {
+            id: 'RV-2025-002',
+            status: 'waiting',
+            bengkel: 'AutoNexa Cabang Jakarta Selatan',
+            alamat: 'Jl. TB Simatupang No. 12',
+            kendaraan: 'Toyota Avanza',
+            plat: 'D 5678 ABC',
+            layanan: 'Tune Up Mesin',
+            tanggal: '2025-07-14',
+            jam: '13:00 WIB',
+            keluhan: 'Konsumsi BBM boros, akselerasi kurang responsif',
+            biaya: null,
+            step: 0,
+            timeline: [
+                { time: '12 Jul, 14:30', title: 'Reservasi Dibuat', desc: 'Kamu berhasil membuat reservasi untuk 14 Juli.', state: 'done' },
+                { time: '—', title: 'Menunggu Konfirmasi Admin', desc: 'Admin akan segera mengkonfirmasi reservasimu.', state: 'active' },
+                { time: '—', title: 'Kendaraan Diterima', desc: '', state: 'idle' },
+                { time: '—', title: 'Proses Servis', desc: '', state: 'idle' },
+                { time: '—', title: 'Quality Check', desc: '', state: 'idle' },
+                { time: '—', title: 'Selesai', desc: '', state: 'idle' },
+            ]
+        },
+        {
+            id: 'RV-2025-003',
+            status: 'done',
+            bengkel: 'AutoNexa Cabang Bandung',
+            alamat: 'Jl. Soekarno-Hatta No. 88',
+            kendaraan: 'Honda Brio',
+            plat: 'B 1234 XYZ',
+            layanan: 'Ganti Oli & Filter',
+            tanggal: '2025-06-20',
+            jam: '09:00 WIB',
+            keluhan: 'Ganti oli rutin',
+            biaya: 'Rp 185.000',
+            step: 5,
+            timeline: [
+                { time: '20 Jun, 08:30', title: 'Reservasi Dibuat',       desc: 'Reservasi online berhasil dibuat.', state: 'done' },
+                { time: '20 Jun, 08:50', title: 'Reservasi Dikonfirmasi', desc: 'Admin telah mengkonfirmasi.', state: 'done' },
+                { time: '20 Jun, 09:05', title: 'Kendaraan Diterima',     desc: 'Kendaraan sudah di bengkel.', state: 'done' },
+                { time: '20 Jun, 09:20', title: 'Proses Servis',          desc: 'Mekanik mengerjakan ganti oli.', state: 'done' },
+                { time: '20 Jun, 09:45', title: 'Quality Check',          desc: 'Pengecekan kebocoran & tekanan oli.', state: 'done' },
+                { time: '20 Jun, 10:00', title: 'Selesai',                desc: 'Kendaraan siap diambil. Terima kasih!', state: 'done' },
+            ]
+        },
+        {
+            id: 'RV-2025-004',
+            status: 'done',
+            bengkel: 'AutoNexa Cabang Surabaya',
+            alamat: 'Jl. Ahmad Yani No. 45',
+            kendaraan: 'Toyota Avanza',
+            plat: 'D 5678 ABC',
+            layanan: 'Pengecekan & Servis Rem',
+            tanggal: '2025-05-15',
+            jam: '11:00 WIB',
+            keluhan: 'Rem terasa blong saat pengereman mendadak',
+            biaya: 'Rp 420.000',
+            step: 5,
+            timeline: [
+                { time: '15 Mei, 10:30', title: 'Reservasi Dibuat',       desc: '', state: 'done' },
+                { time: '15 Mei, 10:45', title: 'Reservasi Dikonfirmasi', desc: '', state: 'done' },
+                { time: '15 Mei, 11:05', title: 'Kendaraan Diterima',     desc: '', state: 'done' },
+                { time: '15 Mei, 11:30', title: 'Proses Servis',          desc: 'Penggantian kampas rem depan & belakang.', state: 'done' },
+                { time: '15 Mei, 13:00', title: 'Quality Check',          desc: '', state: 'done' },
+                { time: '15 Mei, 13:30', title: 'Selesai',                desc: 'Kendaraan telah selesai diservis.', state: 'done' },
+            ]
+        },
+        {
+            id: 'RV-2025-005',
+            status: 'done',
+            bengkel: 'AutoNexa Cabang Bandung',
+            alamat: 'Jl. Soekarno-Hatta No. 88',
+            kendaraan: 'Honda Brio',
+            plat: 'B 1234 XYZ',
+            layanan: 'Servis AC Mobil',
+            tanggal: '2025-04-08',
+            jam: '10:30 WIB',
+            keluhan: 'AC tidak dingin, ada suara berisik dari blower',
+            biaya: 'Rp 650.000',
+            step: 5,
+            timeline: [
+                { time: '08 Apr, 10:00', title: 'Reservasi Dibuat',       desc: '', state: 'done' },
+                { time: '08 Apr, 10:15', title: 'Reservasi Dikonfirmasi', desc: '', state: 'done' },
+                { time: '08 Apr, 10:35', title: 'Kendaraan Diterima',     desc: '', state: 'done' },
+                { time: '08 Apr, 11:00', title: 'Proses Servis',          desc: 'Pembersihan evaporator & isi freon.', state: 'done' },
+                { time: '08 Apr, 13:30', title: 'Quality Check',          desc: '', state: 'done' },
+                { time: '08 Apr, 14:00', title: 'Selesai',                desc: '', state: 'done' },
+            ]
+        },
+        {
+            id: 'RV-2025-006',
+            status: 'done',
+            bengkel: 'AutoNexa Cabang Jakarta Selatan',
+            alamat: 'Jl. TB Simatupang No. 12',
+            kendaraan: 'Toyota Avanza',
+            plat: 'D 5678 ABC',
+            layanan: 'Balancing & Rotasi Ban',
+            tanggal: '2025-03-22',
+            jam: '14:00 WIB',
+            keluhan: 'Setir goyang di kecepatan tinggi',
+            biaya: 'Rp 150.000',
+            step: 5,
+            timeline: [
+                { time: '22 Mar', title: 'Reservasi Dibuat',       desc: '', state: 'done' },
+                { time: '22 Mar', title: 'Reservasi Dikonfirmasi', desc: '', state: 'done' },
+                { time: '22 Mar', title: 'Kendaraan Diterima',     desc: '', state: 'done' },
+                { time: '22 Mar', title: 'Proses Servis',          desc: '', state: 'done' },
+                { time: '22 Mar', title: 'Quality Check',          desc: '', state: 'done' },
+                { time: '22 Mar', title: 'Selesai',                desc: '', state: 'done' },
+            ]
+        },
+        {
+            id: 'RV-2025-007',
+            status: 'done',
+            bengkel: 'AutoNexa Cabang Bandung',
+            alamat: 'Jl. Soekarno-Hatta No. 88',
+            kendaraan: 'Honda Brio',
+            plat: 'B 1234 XYZ',
+            layanan: 'Servis Berkala 20.000 KM',
+            tanggal: '2025-02-14',
+            jam: '09:30 WIB',
+            keluhan: 'Servis berkala rutin 20.000 KM',
+            biaya: 'Rp 490.000',
+            step: 5,
+            timeline: [
+                { time: '14 Feb', title: 'Selesai', desc: '', state: 'done' },
+            ]
+        },
+        {
+            id: 'RV-2025-008',
+            status: 'done',
+            bengkel: 'AutoNexa Cabang Surabaya',
+            alamat: 'Jl. Ahmad Yani No. 45',
+            kendaraan: 'Toyota Avanza',
+            plat: 'D 5678 ABC',
+            layanan: 'Ganti Oli & Filter',
+            tanggal: '2025-01-05',
+            jam: '11:30 WIB',
+            keluhan: 'Ganti oli awal tahun',
+            biaya: 'Rp 175.000',
+            step: 5,
+            timeline: []
+        },
+        {
+            id: 'RV-2024-011',
+            status: 'done',
+            bengkel: 'AutoNexa Cabang Bandung',
+            alamat: 'Jl. Soekarno-Hatta No. 88',
+            kendaraan: 'Honda Brio',
+            plat: 'B 1234 XYZ',
+            layanan: 'Tune Up Mesin',
+            tanggal: '2024-11-30',
+            jam: '10:00 WIB',
+            keluhan: 'Mesin sering brebet pagi hari',
+            biaya: 'Rp 780.000',
+            step: 5,
+            timeline: []
+        },
+        {
+            id: 'RV-2024-009',
+            status: 'done',
+            bengkel: 'AutoNexa Cabang Jakarta Selatan',
+            alamat: 'Jl. TB Simatupang No. 12',
+            kendaraan: 'Toyota Avanza',
+            plat: 'D 5678 ABC',
+            layanan: 'Servis AC Mobil',
+            tanggal: '2024-09-18',
+            jam: '13:30 WIB',
+            keluhan: 'AC kurang dingin saat macet',
+            biaya: 'Rp 520.000',
+            step: 5,
+            timeline: []
+        },
+        {
+            id: 'RV-2024-007',
+            status: 'cancel',
+            bengkel: 'AutoNexa Cabang Bandung',
+            alamat: 'Jl. Soekarno-Hatta No. 88',
+            kendaraan: 'Honda Brio',
+            plat: 'B 1234 XYZ',
+            layanan: 'Servis Berkala 10.000 KM',
+            tanggal: '2024-08-03',
+            jam: '09:00 WIB',
+            keluhan: 'Servis rutin',
+            biaya: null,
+            step: 0,
+            timeline: [
+                { time: '01 Agu, 10:00', title: 'Reservasi Dibuat', desc: '', state: 'done' },
+                { time: '02 Agu, 14:00', title: 'Dibatalkan', desc: 'Reservasi dibatalkan oleh pelanggan.', state: 'active' },
+            ]
+        },
+        {
+            id: 'RV-2024-005',
+            status: 'cancel',
+            bengkel: 'AutoNexa Cabang Surabaya',
+            alamat: 'Jl. Ahmad Yani No. 45',
+            kendaraan: 'Toyota Avanza',
+            plat: 'D 5678 ABC',
+            layanan: 'Pengecekan Rem',
+            tanggal: '2024-06-20',
+            jam: '14:30 WIB',
+            keluhan: 'Rem sedikit blong',
+            biaya: null,
+            step: 0,
+            timeline: [
+                { time: '18 Jun', title: 'Reservasi Dibuat', desc: '', state: 'done' },
+                { time: '19 Jun', title: 'Dibatalkan', desc: 'Reservasi dibatalkan oleh admin (slot penuh).', state: 'active' },
+            ]
+        },
+    ];
+
+    /* step labels & icons */
+    const STEPS = [
+        { icon: 'fa-hourglass-start', label: 'Menunggu Konfirmasi' },
+        { icon: 'fa-check',           label: 'Reservasi Diterima'  },
+        { icon: 'fa-car',             label: 'Kendaraan Diperiksa' },
+        { icon: 'fa-wrench',          label: 'Proses Servis'       },
+        { icon: 'fa-shield-alt',      label: 'Quality Check'       },
+        { icon: 'fa-flag-checkered',  label: 'Selesai'             },
+    ];
+
+    const STATUS_MAP = {
+        waiting: { label: 'Menunggu',     cls: 'status-badge--waiting', stripe: '#f59e0b' },
+        process: { label: 'Diproses',     cls: 'status-badge--process', stripe: '#3b82f6' },
+        done:    { label: 'Selesai',      cls: 'status-badge--done',    stripe: '#10b981' },
+        cancel:  { label: 'Dibatalkan',   cls: 'status-badge--cancel',  stripe: '#ef4444' },
+    };
+
+    /* ══════════════════════════════════════
+       STATE
+    ══════════════════════════════════════ */
+    const PER_PAGE = 5;
+    let currentTab  = 'all';
+    let currentPage = 1;
+    let searchQuery = '';
+    let dateFilter  = '';
+
+    /* ══════════════════════════════════════
+       RENDER HELPERS
+    ══════════════════════════════════════ */
+    function formatDate(str) {
+        const d = new Date(str + 'T00:00:00');
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function buildStepTracker(activeStep) {
+        const pct = activeStep === 0 ? 0 : Math.round((activeStep / (STEPS.length - 1)) * 100);
+        const stepsHtml = STEPS.map((s, i) => {
+            let cls = 'idle';
+            if (i < activeStep) cls = 'done';
+            if (i === activeStep) cls = 'active';
+            const icon = cls === 'done' ? 'fa-check' : s.icon;
+            return `
+                <div class="step ${cls}">
+                    <div class="step__node"><i class="fas ${icon}"></i></div>
+                    <div class="step__label">${s.label}</div>
+                </div>`;
+        }).join('');
+
+        return `
+            <div class="progress-section">
+                <div class="progress-section__title"><i class="fas fa-route" style="margin-right:.4rem;color:var(--brand);"></i>Progress Servis</div>
+                <div class="steps-track">
+                    <div class="steps-track__fill" style="--prog-w:${pct}%;"></div>
+                    ${stepsHtml}
+                </div>
+            </div>`;
+    }
+
+    function buildTimeline(items) {
+        if (!items.length) return '';
+        const id = 'tl-' + Math.random().toString(36).slice(2);
+        const rows = items.map(t => `
+            <div class="tl-item ${t.state}">
+                <div class="tl-item__dot"></div>
+                <div class="tl-item__time">${t.time}</div>
+                <div class="tl-item__title">${t.title}</div>
+                ${t.desc ? `<div class="tl-item__desc">${t.desc}</div>` : ''}
+            </div>`).join('');
+
+        return `
+            <div class="timeline-section">
+                <button class="timeline-toggle" onclick="toggleTimeline(this,'${id}')">
+                    <i class="fas fa-history" style="margin-right:.3rem;color:var(--brand);"></i>
+                    Aktivitas Reservasi
+                    <i class="fas fa-chevron-down chevron"></i>
+                </button>
+                <div class="timeline-body" id="${id}">
+                    <div class="timeline">${rows}</div>
+                </div>
+            </div>`;
+    }
+
+    function buildCard(r, delay) {
+        const st   = STATUS_MAP[r.status];
+        const isActive  = r.status === 'process' || r.status === 'waiting';
+        const isCancelled = r.status === 'cancel';
+
+        const progressHtml = isActive ? buildStepTracker(r.step) : '';
+        const timelineHtml = buildTimeline(r.timeline);
+
+        const biayaHtml = r.biaya
+            ? `<div class="cost-chip"><i class="fas fa-receipt"></i>${r.biaya}</div>`
+            : '';
+
+        return `
+        <div class="resv-card"
+             data-status="${r.status}"
+             data-search="${(r.layanan + r.kendaraan + r.plat + r.id + r.bengkel).toLowerCase()}"
+             data-date="${r.tanggal}"
+             style="--c-stripe:${st.stripe}; animation-delay:${delay}ms;">
+
+            {{-- Head --}}
+            <div class="resv-card__head">
+                <div class="resv-card__head-left">
+                    <div class="bengkel-icon">
+                        <i class="fas fa-store-alt"></i>
+                    </div>
+                    <div>
+                        <div class="bengkel-name">${r.bengkel}</div>
+                        <div class="bengkel-name branch">
+                            <i class="fas fa-map-marker-alt" style="margin-right:.25rem;color:var(--brand);"></i>${r.alamat}
+                            &nbsp;·&nbsp;
+                            <span style="font-family:monospace; letter-spacing:.04em;">#${r.id}</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="status-badge ${st.cls}">
+                    <span class="status-dot"></span>
+                    ${st.label}
+                </span>
+            </div>
+
+            {{-- Meta --}}
+            <div class="resv-card__meta">
+                <div class="meta-cell">
+                    <div class="meta-cell__label">Kendaraan</div>
+                    <div class="meta-cell__val">
+                        <i class="fas fa-car"></i>
+                        <span>${r.kendaraan}</span>
+                        <span class="plate-chip">${r.plat}</span>
+                    </div>
+                </div>
+                <div class="meta-cell">
+                    <div class="meta-cell__label">Tanggal Reservasi</div>
+                    <div class="meta-cell__val">
+                        <i class="fas fa-calendar"></i> ${formatDate(r.tanggal)}
+                    </div>
+                </div>
+                <div class="meta-cell">
+                    <div class="meta-cell__label">Jam Reservasi</div>
+                    <div class="meta-cell__val">
+                        <i class="fas fa-clock"></i> ${r.jam}
+                    </div>
+                </div>
+            </div>
+
+            ${progressHtml}
+            ${timelineHtml}
+
+            {{-- Footer --}}
+            <div class="resv-card__foot">
+                <div>
+                    <div class="foot-service">
+                        <i class="fas fa-tools"></i> ${r.layanan}
+                    </div>
+                    ${r.keluhan ? `<div class="foot-complaint">"${r.keluhan}"</div>` : ''}
+                </div>
+                <div class="foot-right">
+                    ${biayaHtml}
+                    <a href="{{ url('pelanggan/riwayat') }}/${r.id}" class="btn btn--ghost btn--sm">
+                        <i class="fas fa-eye"></i> Lihat Detail
+                    </a>
+                    ${isCancelled ? '' : `<a href="#" class="btn btn--outline btn--sm">
+                        <i class="fas fa-redo"></i> Pesan Ulang
+                    </a>`}
+                </div>
+            </div>
+        </div>`;
+    }
+
+    /* ══════════════════════════════════════
+       FILTER & RENDER
+    ══════════════════════════════════════ */
+    function getFiltered() {
+        return RESERVATIONS.filter(r => {
+            const tabOk    = currentTab === 'all' || r.status === currentTab;
+            const searchOk = !searchQuery || r.id.toLowerCase().includes(searchQuery)
+                || r.layanan.toLowerCase().includes(searchQuery)
+                || r.kendaraan.toLowerCase().includes(searchQuery)
+                || r.plat.toLowerCase().includes(searchQuery)
+                || r.bengkel.toLowerCase().includes(searchQuery);
+            const dateOk   = !dateFilter || r.tanggal === dateFilter;
+            return tabOk && searchOk && dateOk;
+        });
+    }
+
+    function render() {
+        const filtered  = getFiltered();
+        const total     = filtered.length;
+        const totalPages = Math.ceil(total / PER_PAGE);
+        const start     = (currentPage - 1) * PER_PAGE;
+        const slice     = filtered.slice(start, start + PER_PAGE);
+
+        const cardList   = document.getElementById('cardList');
+        const emptyState = document.getElementById('emptyState');
+        const pagination = document.getElementById('pagination');
+
+        if (!slice.length) {
+            cardList.style.display   = 'none';
+            emptyState.style.display = 'block';
+            pagination.style.display = 'none';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        cardList.style.display   = 'flex';
+
+        cardList.innerHTML = slice
+            .map((r, i) => buildCard(r, i * 60))
+            .join('');
+
+        // Progress bar animate
+        requestAnimationFrame(() => {
+            cardList.querySelectorAll('.steps-track__fill').forEach(el => {
+                const w = el.style.getPropertyValue('--prog-w');
+                el.style.transition = 'width .9s cubic-bezier(0.16,1,0.3,1)';
+            });
+        });
+
+        // Pagination
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+        } else {
+            pagination.style.display = 'flex';
+            renderPagination(totalPages);
+        }
+    }
+
+    function renderPagination(totalPages) {
+        const pg = document.getElementById('pagination');
+        let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                        <i class="fas fa-chevron-left" style="font-size:.65rem;"></i>
+                    </button>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+            } else if (Math.abs(i - currentPage) === 2) {
+                html += `<span class="page-sep">…</span>`;
+            }
+        }
+
+        html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                     <i class="fas fa-chevron-right" style="font-size:.65rem;"></i>
+                 </button>`;
+        pg.innerHTML = html;
+    }
+
+    /* ══════════════════════════════════════
+       GLOBAL HANDLERS (called from HTML)
+    ══════════════════════════════════════ */
+    window.goPage = function(p) {
+        const filtered = getFiltered();
+        const max = Math.ceil(filtered.length / PER_PAGE);
+        if (p < 1 || p > max) return;
+        currentPage = p;
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.toggleTimeline = function(btn, id) {
+        btn.classList.toggle('open');
+        const body = document.getElementById(id);
+        body && body.classList.toggle('open');
+    };
+
+    /* ══════════════════════════════════════
+       TABS
+    ══════════════════════════════════════ */
+    document.getElementById('tabBar').addEventListener('click', function(e) {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab  = btn.dataset.tab;
+        currentPage = 1;
+        render();
+    });
+
+    /* ══════════════════════════════════════
+       SEARCH & DATE
+    ══════════════════════════════════════ */
+    let searchTimer;
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            searchQuery = this.value.trim().toLowerCase();
+            currentPage = 1;
+            render();
+        }, 280);
+    });
+
+    document.getElementById('dateFilter').addEventListener('change', function() {
+        dateFilter  = this.value;
+        currentPage = 1;
+        render();
+    });
+
+    document.getElementById('clearFilter').addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('dateFilter').value  = '';
+        searchQuery = '';
+        dateFilter  = '';
+        currentPage = 1;
+        render();
+    });
+
+    /* ══════════════════════════════════════
+       COUNTER ANIMATION
+    ══════════════════════════════════════ */
+    function animateCounters() {
+        document.querySelectorAll('.counter').forEach(el => {
+            const target = parseInt(el.dataset.target);
+            let start    = null;
+            const dur    = 1200;
+            const tick   = ts => {
+                if (!start) start = ts;
+                const p = Math.min((ts - start) / dur, 1);
+                const ease = 1 - Math.pow(2, -10 * p);
+                el.textContent = Math.round(ease * target);
+                if (p < 1) requestAnimationFrame(tick);
+                else el.textContent = target;
+            };
+            requestAnimationFrame(tick);
+        });
+    }
+
+    /* ══════════════════════════════════════
+       INIT — simulate loading delay
+    ══════════════════════════════════════ */
+    setTimeout(() => {
+        document.getElementById('skeletonWrap').style.display = 'none';
+        render();
+        animateCounters();
+    }, 900);
+
+})();
+</script>
 
 @endsection

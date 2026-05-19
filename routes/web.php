@@ -114,7 +114,8 @@ Route::get('/reservasi', [ReservasiController::class, 'index'])
 Route::get('/bengkel', [BengkelController::class, 'pelangganIndex'])
     ->name('pelanggan.bengkel');    
 
-
+Route::get('/bengkel/{id}', [BengkelController::class, 'showPelanggan'])
+    ->name('pelanggan.bengkel-detail');    
 
 // ── AUTH (kalau pakai Breeze) ─────────
 // require __DIR__.'/auth.php';
@@ -129,11 +130,21 @@ Route::middleware(['auth', 'role:pelanggan'])
     Route::post('/booking', [ReservasiController::class, 'store'])
     ->name('booking.store');  
 
+    Route::get('/reservasi', [ReservasiController::class, 'create'])
+        ->name('reservasi');    
+
     Route::get('/riwayat', [ReservasiController::class, 'riwayat'])
         ->name('riwayat');
 
+    Route::get('/riwayat/{id}', [ReservasiController::class, 'riwayatDetail'])
+        ->name('riwayat-detail');        
+
     Route::get('/profile', [ReservasiController::class, 'profile'])
-        ->name('profile');        
+        ->name('profile');   
+        
+    Route::get('/dashboard', function () {
+        return view('pelanggan.dashboard');
+    })->name('dashboard');        
 
 });
 

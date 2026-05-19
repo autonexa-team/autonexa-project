@@ -53,9 +53,9 @@ class BengkelController extends Controller
             ->with('layanan')
             ->get();
 
-        $totalBengkel = $bengkels->count();
-        $avgRating    = $bengkels->avg('review') ?? 0;
-        $totalReview  = $bengkels->sum('reviews_count');
+            $totalBengkel = $bengkels->count();
+            $avgRating    = $bengkels->avg('review_avg_rating') ?? 0;
+            $totalReview  = $bengkels->sum('reviews_count');
 
         return view('pelanggan.bengkel', [
             'bengkels'     => $bengkels,
@@ -95,7 +95,8 @@ class BengkelController extends Controller
         // ✅ Validasi
         $validated = $request->validate([
             'nama'      => 'required|string|max:255',
-            'admin_id'  => 'required|exists:users,id',
+            'admin_id'  => 'nullable|exists:users,id',
+            'telepon'   => 'required|string|max:20',
             'alamat'    => 'required|string',
             'latitude'  => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
@@ -150,14 +151,14 @@ class BengkelController extends Controller
 
     public function destroy(int $id)
     {
-        // 🔒 proteksi role
+        // proteksi role
         if (Auth::user()->role !== 'admin_pusat') {
             abort(403);
         }
 
         $bengkel = Bengkel::findOrFail($id);
 
-        // 📸 Hapus foto jika ada
+        // Hapus foto jika ada
         if ($bengkel->foto) {
             $fotoPath = public_path('assets/' . $bengkel->foto);
             if (file_exists($fotoPath)) {
@@ -165,7 +166,7 @@ class BengkelController extends Controller
             }
         }
 
-        // 💾 Hapus bengkel dari database
+        // Hapus bengkel dari database
         $bengkel->delete();
 
         return redirect()->route('admin-pusat.bengkel.index')
@@ -174,7 +175,7 @@ class BengkelController extends Controller
 
     public function edit(int $id)
     {
-        // 🔒 proteksi role
+        //proteksi role
         if (Auth::user()->role !== 'admin_pusat') {
             abort(403);
         }
@@ -199,17 +200,18 @@ class BengkelController extends Controller
 
     public function update(Request $request, int $id)
     {
-        // 🔒 proteksi role
+        //proteksi role
         if (Auth::user()->role !== 'admin_pusat') {
             abort(403);
         }
 
         $bengkel = Bengkel::findOrFail($id);
 
-        // ✅ Validasi
+        //Validasi
         $validated = $request->validate([
             'nama'      => 'required|string|max:255',
-            'admin_id'  => 'required|exists:users,id',
+            'admin_id'  => 'nullable|exists:users,id',
+            'telepon'   => 'required|string|max:20',
             'alamat'    => 'required|string',
             'latitude'  => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
@@ -253,10 +255,25 @@ class BengkelController extends Controller
             $validated['foto'] = 'bengkels/' . $filename;
         }
 
-        // 💾 Update ke database
+        // update ke database
         $bengkel->update($validated);
 
         return redirect()->route('admin-pusat.bengkel.index')
                         ->with('success', 'Bengkel berhasil diperbarui');
     }
+
+    // menampilkan detail bengkel untuk pelanggan
+    public function showPelanggan(int $id)
+    {
+        $bengkel = Bengkel::with([
+            'layanan',
+            'reviews.user'
+        ])
+        ->withAvg('reviews', 'rating')
+        ->findOrFail($id);
+
+        return view('pelanggan.detail-bengkel', [
+            'bengkel' => $bengkel
+        ]);
+    }    
 }

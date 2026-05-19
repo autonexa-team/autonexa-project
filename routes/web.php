@@ -165,6 +165,18 @@ Route::middleware(['auth', 'role:admin_pusat'])
     Route::get('/layanan', [LayananController::class, 'index'])
         ->name('layanan');    
 
+    Route::get('/layanan/create', [LayananController::class, 'create'])
+        ->name('layanan.create');
+
+    Route::post('/layanan', [LayananController::class, 'store'])
+        ->name('layanan.store');
+
+    Route::get('/layanan/{id}/edit', [LayananController::class, 'edit'])
+        ->name('layanan.edit');
+
+    Route::put('/layanan/{id}', [LayananController::class, 'update'])
+        ->name('layanan.update');
+
     Route::patch(
         'layanan/{id}/toggle',
         [LayananController::class, 'toggleStatus']
@@ -225,10 +237,10 @@ Route::middleware(['auth', 'role:admin_pusat'])
     // kalo database riviewnya udah siap, pake ini 
     // $reviews = Review::with(['user','bengkel'])->paginate(10);
     // $totalReview = Review::count();
-    
-    Route::get('/reservasi', function () {
-        return view('admin-pusat.reservasi');
-    })->name('reservasi');      
+
+    // Route untuk reservasi
+    Route::get('/reservasi', [ReservasiController::class, 'indexAdminPusat'])
+        ->name('reservasi');      
 
     Route::get('/laporan', [LaporanController::class, 'index'])
         ->name('laporan');

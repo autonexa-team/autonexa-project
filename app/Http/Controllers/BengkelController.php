@@ -220,7 +220,18 @@ class BengkelController extends Controller
             'foto'      => 'nullable|image|mimes:jpeg,png,webp|max:2048',
         ]);
 
-        //Handle foto upload
+        // 📸 Handle hapus foto jika flag dikirim
+        if ($request->input('hapus_foto') === '1' || $request->input('hapus_foto') == 1) {
+            if ($bengkel->foto) {
+                $oldFotoPath = public_path('assets/' . $bengkel->foto);
+                if (file_exists($oldFotoPath)) {
+                    unlink($oldFotoPath);
+                }
+                $validated['foto'] = null;
+            }
+        }
+
+        // 📸 Handle foto upload
         if ($request->hasFile('foto')) {
             // Hapus foto lama jika ada
             if ($bengkel->foto) {

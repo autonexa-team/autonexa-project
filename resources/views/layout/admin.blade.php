@@ -81,8 +81,8 @@
                 <span>User</span>
             </a>
 
-            <a href="{{ route('admin-pusat.user') }}"
-               class="nav-item {{ request()->routeIs('admin-pusat.user') ? 'active' : '' }}">
+            <a href="{{ route('admin-pusat.reservasi') }}"
+               class="nav-item {{ request()->routeIs('admin-pusat.reservasi') ? 'active' : '' }}">
                 <i class="bi bi-people"></i>
                 <span>Reservasi</span>
             </a>            

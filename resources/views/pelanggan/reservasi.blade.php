@@ -261,7 +261,7 @@
                                 data-id="{{ $layanan->id }}"
                                 data-nama="{{ $layanan->nama }}"
                                 data-durasi="{{ $layanan->durasi }}"
-                                data-harga="{{ $layanan->harga_dasar }}">
+                                data-harga="{{ $layanan->harga }}">
                                 <div class="layanan-radio">
                                     <div class="layanan-radio-dot"></div>
                                 </div>
@@ -277,7 +277,7 @@
                                         </span>
                                         <span class="badge-harga">
                                             <i class="bi bi-cash"></i>
-                                            Mulai Rp {{ number_format($layanan->harga_dasar, 0, ',', '.') }}
+                                            Mulai Rp {{ number_format($layanan->harga, 0, ',', '.') }}
                                         </span>
                                     </div>
                                 </div>

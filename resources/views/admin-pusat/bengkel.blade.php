@@ -108,7 +108,7 @@
 
             <div class="card-phone">
                 <i class="bi bi-telephone"></i>
-                <span>{{ $b->no_telepon }}</span>
+                <span>{{ $b->telepon }}</span>
             </div>            
 
             {{-- Layanan tags --}}

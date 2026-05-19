@@ -136,6 +136,9 @@ Route::middleware(['auth', 'role:pelanggan'])
     Route::get('/riwayat', [ReservasiController::class, 'riwayat'])
         ->name('riwayat');
 
+    Route::get('/riwayat/{id}', [ReservasiController::class, 'riwayatDetail'])
+        ->name('riwayat-detail');        
+
     Route::get('/profile', [ReservasiController::class, 'profile'])
         ->name('profile');   
         

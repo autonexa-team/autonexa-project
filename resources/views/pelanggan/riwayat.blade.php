@@ -575,7 +575,7 @@
                 </div>
                 <div class="foot-right">
                     ${biayaHtml}
-                    <a href="#" class="btn btn--ghost btn--sm">
+                    <a href="{{ url('pelanggan/riwayat') }}/${r.id}" class="btn btn--ghost btn--sm">
                         <i class="fas fa-eye"></i> Lihat Detail
                     </a>
                     ${isCancelled ? '' : `<a href="#" class="btn btn--outline btn--sm">

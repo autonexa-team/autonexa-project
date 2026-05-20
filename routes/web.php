@@ -342,7 +342,10 @@ Route::middleware(['auth', 'role:admin_cabang'])
 
     // profile    
     Route::get('/profile', function () {
-        return view('admin-cabang.profile');
+        $bengkel = auth()->user()->bengkel()->with('layanan')->first();
+        return view('admin-cabang.profile', [
+            'bengkel' => $bengkel
+        ]);
     })->name('profile');
 
 

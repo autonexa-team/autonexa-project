@@ -20,7 +20,12 @@ use App\Models\Layanan;
  */
 class Bengkel extends Model
 {
-    protected $fillable = ['nama', 'alamat', 'latitude', 'longitude', 'kota', 'foto', 'deskripsi', 'status', 'admin_id', 'telepon'];
+    protected $fillable = ['nama', 'alamat', 'latitude', 'longitude', 'kota', 'foto', 'deskripsi', 'status', 'admin_id', 'telepon', 'jam_buka', 'jam_tutup', 'hari_operasional', 'kuota_slot'];
+
+    protected $casts = [
+        'hari_operasional' => 'json',
+        'kuota_slot' => 'json',
+    ];
 
     public function admin(): BelongsTo
     {

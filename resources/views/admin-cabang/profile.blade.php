@@ -23,7 +23,7 @@
     <div>
         <h2 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
             Profil Cabang
-            <span class="bg-brand/10 text-brand text-xs font-bold px-2.5 py-1 rounded-full border border-brand/20">Cabang Sudirman</span>
+            <span class="bg-brand/10 text-brand text-xs font-bold px-2.5 py-1 rounded-full border border-brand/20">{{ $bengkel?->nama ?? 'Belum Ada Bengkel' }}</span>
         </h2>
         <p class="text-slate-500 mt-2 text-sm font-medium">Kelola jam operasional, foto profil bengkel, dan pantau informasi yang diberikan oleh pusat.</p>
     </div>
@@ -59,20 +59,20 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Nama Bengkel</label>
-                            <input type="text" readonly value="AutoNexa Cabang Sudirman" class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-not-allowed shadow-inner">
+                            <input type="text" readonly value="{{ $bengkel?->nama ?? '-' }}" class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-not-allowed shadow-inner">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Alamat Lengkap</label>
-                            <textarea readonly class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-not-allowed resize-none shadow-inner" rows="3">Jl. Sudirman No. 45, Jakarta Pusat, DKI Jakarta</textarea>
+                            <textarea readonly class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-not-allowed resize-none shadow-inner" rows="3">{{ $bengkel?->alamat ?? '-' }}</textarea>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Latitude</label>
-                                <input type="text" readonly value="-6.2088" class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-not-allowed shadow-inner">
+                                <input type="text" readonly value="{{ $bengkel?->latitude ?? '-' }}" class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-not-allowed shadow-inner">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Longitude</label>
-                                <input type="text" readonly value="106.8456" class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-not-allowed shadow-inner">
+                                <input type="text" readonly value="{{ $bengkel?->longitude ?? '-' }}" class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-not-allowed shadow-inner">
                             </div>
                         </div>
                     </div>
@@ -93,13 +93,16 @@
                     </div>
 
                     <div class="flex flex-wrap gap-2">
-                        <span class="bg-slate-50 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">Ganti Oli Mesin</span>
-                        <span class="bg-slate-50 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">Servis Berkala</span>
-                        <span class="bg-slate-50 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">Ganti Kampas Rem</span>
-                        <span class="bg-slate-50 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">Tune Up Plus</span>
+                        @if($bengkel?->layanan && count($bengkel->layanan) > 0)
+                            @foreach($bengkel->layanan as $layanan)
+                                <span class="bg-slate-50 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">{{ $layanan->nama }}</span>
+                            @endforeach
+                        @else
+                            <span class="text-slate-400 text-sm font-medium">Belum ada layanan</span>
+                        @endif
                     </div>
                     
-                    <a href="{{ url('admin-cabang/layanan') }}" class="block text-center text-brand text-sm font-bold mt-6 hover:underline transition-all">Kelola Layanan Cabang &rarr;</a>
+                    <a href="{{ route('admin-cabang.layanan') }}" class="block text-center text-brand text-sm font-bold mt-6 hover:underline transition-all">Kelola Layanan Cabang &rarr;</a>
                 </div>
             </div>
             
@@ -125,7 +128,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <i class="far fa-sun text-amber-500"></i>
                                 </div>
-                                <input type="time" name="jam_buka" value="08:00" class="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block pl-10 p-3 outline-none font-bold transition-all shadow-sm" required>
+                                <input type="time" name="jam_buka" value="{{ $bengkel?->jam_buka ?? '08:00' }}" class="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block pl-10 p-3 outline-none font-bold transition-all shadow-sm" required>
                             </div>
                         </div>
                         
@@ -136,43 +139,28 @@
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <i class="far fa-moon text-indigo-500"></i>
                                 </div>
-                                <input type="time" name="jam_tutup" value="17:00" class="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block pl-10 p-3 outline-none font-bold transition-all shadow-sm" required>
+                                <input type="time" name="jam_tutup" value="{{ $bengkel?->jam_tutup ?? '17:00' }}" class="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block pl-10 p-3 outline-none font-bold transition-all shadow-sm" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-6 pt-6 border-t border-slate-100">
                         <label class="block text-sm font-bold text-slate-700 mb-4">Hari Operasional Aktif</label>
+                        @php
+                            $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+                            $hariAktif = $bengkel?->hari_operasional ?? ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                        @endphp
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <!-- Sen - Ming Checkboxes -->
-                            <label class="flex items-center justify-between p-3 border border-brand bg-brand/5 rounded-xl cursor-pointer hover:bg-brand/10 transition-colors shadow-sm group">
-                                <span class="text-sm font-bold text-slate-800 group-hover:text-brand transition-colors">Senin</span>
-                                <input type="checkbox" checked class="w-4 h-4 text-brand bg-gray-100 border-gray-300 rounded focus:ring-brand accent-brand cursor-pointer">
-                            </label>
-                            <label class="flex items-center justify-between p-3 border border-brand bg-brand/5 rounded-xl cursor-pointer hover:bg-brand/10 transition-colors shadow-sm group">
-                                <span class="text-sm font-bold text-slate-800 group-hover:text-brand transition-colors">Selasa</span>
-                                <input type="checkbox" checked class="w-4 h-4 text-brand bg-gray-100 border-gray-300 rounded focus:ring-brand accent-brand cursor-pointer">
-                            </label>
-                            <label class="flex items-center justify-between p-3 border border-brand bg-brand/5 rounded-xl cursor-pointer hover:bg-brand/10 transition-colors shadow-sm group">
-                                <span class="text-sm font-bold text-slate-800 group-hover:text-brand transition-colors">Rabu</span>
-                                <input type="checkbox" checked class="w-4 h-4 text-brand bg-gray-100 border-gray-300 rounded focus:ring-brand accent-brand cursor-pointer">
-                            </label>
-                            <label class="flex items-center justify-between p-3 border border-brand bg-brand/5 rounded-xl cursor-pointer hover:bg-brand/10 transition-colors shadow-sm group">
-                                <span class="text-sm font-bold text-slate-800 group-hover:text-brand transition-colors">Kamis</span>
-                                <input type="checkbox" checked class="w-4 h-4 text-brand bg-gray-100 border-gray-300 rounded focus:ring-brand accent-brand cursor-pointer">
-                            </label>
-                            <label class="flex items-center justify-between p-3 border border-brand bg-brand/5 rounded-xl cursor-pointer hover:bg-brand/10 transition-colors shadow-sm group">
-                                <span class="text-sm font-bold text-slate-800 group-hover:text-brand transition-colors">Jumat</span>
-                                <input type="checkbox" checked class="w-4 h-4 text-brand bg-gray-100 border-gray-300 rounded focus:ring-brand accent-brand cursor-pointer">
-                            </label>
-                            <label class="flex items-center justify-between p-3 border border-brand bg-brand/5 rounded-xl cursor-pointer hover:bg-brand/10 transition-colors shadow-sm group">
-                                <span class="text-sm font-bold text-slate-800 group-hover:text-brand transition-colors">Sabtu</span>
-                                <input type="checkbox" checked class="w-4 h-4 text-brand bg-gray-100 border-gray-300 rounded focus:ring-brand accent-brand cursor-pointer">
-                            </label>
-                            <label class="flex items-center justify-between p-3 border border-slate-200 bg-white rounded-xl cursor-pointer hover:bg-slate-50 transition-colors opacity-60 shadow-sm group">
-                                <span class="text-sm font-bold text-slate-500">Minggu (Tutup)</span>
-                                <input type="checkbox" class="w-4 h-4 text-brand bg-gray-100 border-gray-300 rounded focus:ring-brand accent-brand cursor-pointer">
-                            </label>
+                            @foreach($hariList as $hari)
+                                @php
+                                    $isActive = in_array($hari, (array)$hariAktif);
+                                    $isMinggu = $hari === 'Minggu';
+                                @endphp
+                                <label class="flex items-center justify-between p-3 border {{ $isActive && !$isMinggu ? 'border-brand bg-brand/5' : 'border-slate-200 bg-white' }} {{ $isMinggu ? 'opacity-60' : '' }} rounded-xl cursor-pointer {{ !$isMinggu ? 'hover:bg-brand/10' : 'hover:bg-slate-50' }} transition-colors shadow-sm group">
+                                    <span class="text-sm font-bold {{ $isActive && !$isMinggu ? 'text-slate-800 group-hover:text-brand' : 'text-slate-500' }} transition-colors">{{ $hari }}{{ $isMinggu ? ' (Tutup)' : '' }}</span>
+                                    <input type="checkbox" name="hari_operasional[]" value="{{ $hari }}" {{ $isActive && !$isMinggu ? 'checked' : '' }} {{ $isMinggu ? 'disabled' : '' }} class="w-4 h-4 text-brand bg-gray-100 border-gray-300 rounded focus:ring-brand accent-brand cursor-pointer">
+                                </label>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -267,7 +255,7 @@
                     <div class="flex flex-col md:flex-row gap-6 items-start">
                         <!-- Current Photo / Preview -->
                         <div class="w-full md:w-1/3 aspect-video md:aspect-square bg-slate-100 rounded-xl overflow-hidden border-2 border-dashed border-slate-300 flex items-center justify-center relative group shadow-inner">
-                            <img src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=600&auto=format&fit=crop" alt="Bengkel Cabang" class="w-full h-full object-cover z-0">
+                            <img src="{{ $bengkel?->foto ? asset('assets/' . $bengkel->foto) : 'https://via.placeholder.com/600x400?text=Foto+Bengkel' }}" alt="Bengkel Cabang" class="w-full h-full object-cover z-0">
                             
                             <!-- Overlay Hover -->
                             <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">

@@ -60,18 +60,18 @@
 </div>
 
 {{-- ===== STATS PILLS ===== --}}
-<div class="stats-bar">
+<div class="stats-bar" id="statsBar">
     <span class="stat-pill sp-all">
-        Semua <strong>{{ $bengkels->total() ?? 0 }}</strong>
+        Semua <strong id="statSemua">{{ $bengkels->total() ?? 0 }}</strong>
     </span>
     <span class="stat-pill">
-        Aktif <strong class="text-green">{{ $totalAktif ?? 0 }}</strong>
+        Aktif <strong class="text-green" id="statAktif">{{ $totalAktif ?? 0 }}</strong>
     </span>
     <span class="stat-pill">
-        Tidak Aktif <strong class="text-red">{{ $totalNonaktif ?? 0 }}</strong>
+        Tidak Aktif <strong class="text-red" id="statNonaktif">{{ $totalNonaktif ?? 0 }}</strong>
     </span>
     <span class="stat-pill">
-        Kota Tercakup <strong>{{ $totalKota ?? 0 }}</strong>
+        Kota Tercakup <strong id="statKota">{{ $totalKota ?? 0 }}</strong>
     </span>
 </div>
 

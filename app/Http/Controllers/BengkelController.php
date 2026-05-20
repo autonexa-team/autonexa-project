@@ -24,18 +24,38 @@ class BengkelController extends Controller
             abort(403);
         }
 
-        $bengkels = Bengkel::with('layanan')
+        $query = Bengkel::with('layanan')
             ->withCount(['reservasis'])
-            ->withAvg('review as reviews_avg_rating', 'rating')
-            ->paginate(12);
+            ->withAvg('review as reviews_avg_rating', 'rating');
 
-            //karna masih tahapan tampilan, jadi untuk ini nanti aja diurus sama sukma
+        // Apply filter status jika ada
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Apply filter kota jika ada
+        if (request('kota')) {
+            $query->where('kota', request('kota'));
+        }
+
+        // Apply search jika ada
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%$search%")
+                  ->orWhere('alamat', 'like', "%$search%")
+                  ->orWhere('kota', 'like', "%$search%");
+            });
+        }
+
+        $bengkels = $query->paginate(12);
+
         return view('admin-pusat.bengkel', [
             'bengkels'      => $bengkels,
-            // 'kotaList'      => Bengkel::distinct()->pluck('kota'),
-            // 'totalAktif'    => Bengkel::where('status','aktif')->count(),
-            // 'totalNonaktif' => Bengkel::where('status','nonaktif')->count(),
-            // 'totalKota'     => Bengkel::distinct('kota')->count(),
+            'kotaList'      => Bengkel::distinct()->pluck('kota'),
+            'totalAktif'    => Bengkel::where('status','aktif')->count(),
+            'totalNonaktif' => Bengkel::where('status','nonaktif')->count(),
+            'totalKota'     => Bengkel::distinct('kota')->count(),
         ]);
     }
 

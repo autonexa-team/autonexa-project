@@ -47,6 +47,28 @@
     filterStatus?.addEventListener('change', filterCards);
     filterKota?.addEventListener('change',   filterCards);
 
+    /* ── Stat Pills Click Handler ── */
+    function getBaseUrl() {
+        const currentUrl = new URL(window.location.href);
+        return currentUrl.pathname;
+    }
+
+    document.getElementById('statSemua')?.addEventListener('click', function () {
+        window.location.href = getBaseUrl();
+    });
+
+    document.getElementById('statAktif')?.addEventListener('click', function () {
+        window.location.href = getBaseUrl() + '?status=aktif';
+    });
+
+    document.getElementById('statNonaktif')?.addEventListener('click', function () {
+        window.location.href = getBaseUrl() + '?status=nonaktif';
+    });
+
+    document.getElementById('statKota')?.addEventListener('click', function () {
+        window.location.href = getBaseUrl();
+    });
+
     /* ── View Toggle: Grid ↔ List ── */
     document.getElementById('btnGrid')?.addEventListener('click', function () {
         grid?.classList.remove('list-view');

@@ -6,11 +6,23 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Bengkel;
 
+/**
+ * @method static Builder where(string $column, mixed $operator = null, mixed $value = null)
+ * @method static Builder whereHas(string $relation, callable $callback = null)
+ * @method static Builder whereDoesntHave(string $relation, callable $callback = null)
+ * @method static Builder with(string|array $relations)
+ * @method static Builder latest(string $column = 'created_at')
+ * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15)
+ * @method int delete()
+ */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
@@ -38,17 +50,17 @@ class User extends Authenticatable
     }
 
     // RELASI
-    public function reservasis()
+    public function reservasis(): HasMany
     {
         return $this->hasMany(Reservasi::class);
     }
 
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
-    public function bengkel()
+    public function bengkel(): HasOne
     {
         return $this->hasOne(Bengkel::class, 'admin_id');
     }

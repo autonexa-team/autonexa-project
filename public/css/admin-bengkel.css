@@ -143,11 +143,23 @@
     background: var(--white);
     border: 1px solid var(--border);
     color: var(--foreground-t);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.stat-pill:hover {
+    background: var(--primary, #ff6a00);
+    border-color: var(--primary, #ff6a00);
+    color: #fff;
 }
 
 .stat-pill strong { font-weight: 700; color: var(--foreground); }
 .stat-pill .text-green { color: #16a34a; }
 .stat-pill .text-red   { color: #dc2626; }
+
+.stat-pill:hover strong { color: #fff; }
+.stat-pill:hover .text-green { color: #fff; }
+.stat-pill:hover .text-red   { color: #fff; }
 
 .sp-all {
     border-color: var(--primary, #ff6a00);

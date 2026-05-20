@@ -311,10 +311,14 @@ Route::middleware(['auth', 'role:admin_cabang'])
 
 
     // LAYANAN
-    Route::get('/layanan', function () {
-        return view('admin-cabang.layanan');
-    })->name('layanan');
-
+    Route::get('/layanan',
+        [AdminCabangController::class, 'layanan']
+    )->name('layanan');
+    
+    Route::post('/layanan/{id}/toggle',
+        [AdminCabangController::class, 'toggleLayanan']
+    )->name('layanan.toggle');
+    
     // REVIEW LIST
     Route::get('/review', function () {
         return view('admin-cabang.review');
@@ -346,6 +350,5 @@ Route::middleware(['auth', 'role:admin_cabang'])
     })->name('profile');
 
     Route::put('/profile', [AdminCabangController::class, 'updateProfile']) ->name('profile.update');
-
 
 });

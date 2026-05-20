@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Bengkel;
 use Illuminate\Http\Request;
+use App\Models\Layanan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -188,5 +189,37 @@ class AdminCabangController extends Controller
             'Profil cabang berhasil diperbarui.'
         );
     }
+
+
+    // ================== layanan =============================
+    public function layanan()
+    {
+        $user = auth()->user();
+
+        $bengkel = $user->bengkel()->with('layanan')->first();
+
+        $layanans = Layanan::all();
+
+        return view('admin-cabang.layanan', compact(
+            'layanans',
+            'bengkel'
+        ));
+    }  
+
+    public function toggleLayanan($id)
+    {
+        $user = auth()->user();
+        $bengkel = $user->bengkel;
+
+        // cek apakah layanan aktif
+        if ($bengkel->layanan()->where('layanan_id', $id)->exists()) {
+            // nonaktifkan
+            $bengkel->layanan()->detach($id);
+        } else {
+            // aktifkan
+            $bengkel->layanan()->attach($id);
+        }
+        return back()->with('success', 'Status layanan berhasil diubah');
+    }    
     
 }

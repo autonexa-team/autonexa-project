@@ -35,7 +35,10 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Total Layanan Pusat</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="24">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value"
+                    data-target="{{ (int) $layanans->count() }}">
+                    {{ $layanans->count() }}
+                </h3>
             </div>
             <div class="w-12 h-12 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-slate-100">
                 <i class="fas fa-tools"></i>
@@ -102,113 +105,93 @@
                 </tr>
             </thead>
             <tbody class="text-sm">
-                <!-- Row 1: Aktif -->
-                <tr class="border-b border-slate-50 hover:bg-slate-50/80 transition-colors group">
-                    <td class="p-5 text-slate-500 font-bold text-center">1</td>
-                    <td class="p-5">
-                        <h4 class="font-bold text-slate-800 group-hover:text-brand transition-colors">Ganti Oli Mesin</h4>
-                        <p class="text-xs text-slate-500 mt-1 line-clamp-1">Penggantian oli mesin menggunakan oli standar atau sintetis sesuai rekomendasi.</p>
-                    </td>
-                    <td class="p-5">
-                        <p class="font-bold text-slate-800">Rp 150.000</p>
-                    </td>
-                    <td class="p-5">
-                        <div class="flex items-center gap-1.5 text-slate-600 font-medium">
-                            <i class="far fa-clock text-slate-400"></i> 30 Menit
-                        </div>
-                    </td>
-                    <td class="p-5 text-center">
-                        <span class="bg-emerald-50 border border-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
-                        </span>
-                    </td>
-                    <td class="p-5 text-right">
-                        <button onclick="toggleStatus(this, 'Aktif')" class="bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 ml-auto w-32">
-                            <i class="fas fa-power-off"></i> Nonaktifkan
-                        </button>
-                    </td>
-                </tr>
 
-                <!-- Row 2: Aktif -->
-                <tr class="border-b border-slate-50 hover:bg-slate-50/80 transition-colors group">
-                    <td class="p-5 text-slate-500 font-bold text-center">2</td>
-                    <td class="p-5">
-                        <h4 class="font-bold text-slate-800 group-hover:text-brand transition-colors">Servis Berkala (Tune Up)</h4>
-                        <p class="text-xs text-slate-500 mt-1 line-clamp-1">Pengecekan dan pembersihan sistem pembakaran, filter udara, dan busi.</p>
-                    </td>
-                    <td class="p-5">
-                        <p class="font-bold text-slate-800">Rp 350.000</p>
-                    </td>
-                    <td class="p-5">
-                        <div class="flex items-center gap-1.5 text-slate-600 font-medium">
-                            <i class="far fa-clock text-slate-400"></i> 90 Menit
-                        </div>
-                    </td>
-                    <td class="p-5 text-center">
-                        <span class="bg-emerald-50 border border-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
-                        </span>
-                    </td>
-                    <td class="p-5 text-right">
-                        <button onclick="toggleStatus(this, 'Aktif')" class="bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 ml-auto w-32">
-                            <i class="fas fa-power-off"></i> Nonaktifkan
-                        </button>
-                    </td>
-                </tr>
+            @foreach($layanans as $layanan)
 
-                <!-- Row 3: Nonaktif -->
-                <tr class="border-b border-slate-50 hover:bg-slate-50/80 transition-colors group">
-                    <td class="p-5 text-slate-500 font-bold text-center">3</td>
-                    <td class="p-5">
-                        <h4 class="font-bold text-slate-800 opacity-60">Spooring & Balancing</h4>
-                        <p class="text-xs text-slate-500 mt-1 line-clamp-1 opacity-60">Penyelarasan sudut roda dan keseimbangan roda untuk kenyamanan berkendara.</p>
-                    </td>
-                    <td class="p-5">
-                        <p class="font-bold text-slate-800 opacity-60">Rp 250.000</p>
-                    </td>
-                    <td class="p-5">
-                        <div class="flex items-center gap-1.5 text-slate-600 font-medium opacity-60">
-                            <i class="far fa-clock text-slate-400"></i> 60 Menit
-                        </div>
-                    </td>
-                    <td class="p-5 text-center">
+            @php
+                $aktif = $bengkel->layanan->contains($layanan->id);
+            @endphp
+
+            <tr class="border-b border-slate-50 hover:bg-slate-50/80 transition-colors group">
+
+                <td class="p-5 text-slate-500 font-bold text-center">
+                    {{ $loop->iteration }}
+                </td>
+
+                <td class="p-5">
+                    <h4 class="font-bold text-slate-800">
+                        {{ $layanan->nama }}
+                    </h4>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        {{ $layanan->deskripsi }}
+                    </p>
+                </td>
+
+                <td class="p-5">
+                    <p class="font-bold text-slate-800">
+                        Rp {{ number_format($layanan->harga_dasar, 0, ',', '.') }}
+                    </p>
+                </td>
+
+                <td class="p-5">
+                    <div class="flex items-center gap-1.5 text-slate-600 font-medium">
+                        <i class="far fa-clock text-slate-400"></i>
+                        {{ $layanan->durasi }} Menit
+                    </div>
+                </td>
+
+                <td class="p-5 text-center">
+
+                    @if($aktif)
+
+                        <span class="bg-emerald-50 border border-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Aktif
+                        </span>
+
+                    @else
+
                         <span class="bg-slate-50 border border-slate-200 text-slate-500 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Nonaktif
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            Nonaktif
                         </span>
-                    </td>
-                    <td class="p-5 text-right">
-                        <button onclick="toggleStatus(this, 'Nonaktif')" class="bg-brand text-white hover:bg-brand-dark shadow-md shadow-brand/20 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ml-auto w-32">
-                            <i class="fas fa-check"></i> Aktifkan
-                        </button>
-                    </td>
-                </tr>
 
-                 <!-- Row 4: Aktif -->
-                <tr class="hover:bg-slate-50/80 transition-colors group">
-                    <td class="p-5 text-slate-500 font-bold text-center">4</td>
-                    <td class="p-5">
-                        <h4 class="font-bold text-slate-800 group-hover:text-brand transition-colors">Ganti Kampas Rem</h4>
-                        <p class="text-xs text-slate-500 mt-1 line-clamp-1">Penggantian kampas rem depan atau belakang beserta pembersihan area pengereman.</p>
-                    </td>
-                    <td class="p-5">
-                        <p class="font-bold text-slate-800">Rp 450.000</p>
-                    </td>
-                    <td class="p-5">
-                        <div class="flex items-center gap-1.5 text-slate-600 font-medium">
-                            <i class="far fa-clock text-slate-400"></i> 45 Menit
-                        </div>
-                    </td>
-                    <td class="p-5 text-center">
-                        <span class="bg-emerald-50 border border-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
-                        </span>
-                    </td>
-                    <td class="p-5 text-right">
-                        <button onclick="toggleStatus(this, 'Aktif')" class="bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 ml-auto w-32">
-                            <i class="fas fa-power-off"></i> Nonaktifkan
-                        </button>
-                    </td>
-                </tr>
+                    @endif
+
+                </td>
+
+                <td class="p-5 text-right">
+
+                    <form action="{{ route('admin-cabang.layanan.toggle', $layanan->id) }}"
+                        method="POST">
+
+                        @csrf
+
+                    <button type="submit"
+                        class="{{ $aktif
+                            ? 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'
+                            : 'bg-brand text-white hover:bg-brand-dark shadow-md shadow-brand/20'
+                        }} px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ml-auto w-32">
+
+                        @if($aktif)
+                            <i class="fas fa-power-off"></i>
+                            Nonaktifkan
+                        @else
+                            <i class="fas fa-check"></i>
+                            Aktifkan
+                        @endif
+
+                    </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            @endforeach
+
             </tbody>
         </table>
     </div>
@@ -245,47 +228,5 @@ document.addEventListener("DOMContentLoaded", () => {
         window.requestAnimationFrame(step);
     });
 });
-
-// Simulate Toggle Status Feature (Client-side)
-function toggleStatus(btn, currentStatus) {
-    const row = btn.closest('tr');
-    const badgeCell = row.querySelector('td:nth-child(5)');
-    const title = row.querySelector('h4');
-    const desc = row.querySelector('p');
-    const price = row.querySelector('td:nth-child(3) p');
-    const time = row.querySelector('td:nth-child(4) div');
-    
-    if (currentStatus === 'Aktif') {
-        if(confirm('Nonaktifkan layanan ini di cabang Anda?')) {
-            // Ubah button menjadi Aktifkan (style Orange Brand)
-            btn.outerHTML = `<button onclick="toggleStatus(this, 'Nonaktif')" class="bg-brand text-white hover:bg-brand-dark shadow-md shadow-brand/20 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ml-auto w-32"><i class="fas fa-check"></i> Aktifkan</button>`;
-            
-            // Ubah badge menjadi Nonaktif (Abu-abu)
-            badgeCell.innerHTML = `<span class="bg-slate-50 border border-slate-200 text-slate-500 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Nonaktif</span>`;
-            
-            // Tambah efek opacity redup pada teks baris untuk menandakan tidak aktif
-            title.classList.add('opacity-60');
-            desc.classList.add('opacity-60');
-            price.classList.add('opacity-60');
-            time.classList.add('opacity-60');
-            title.classList.remove('group-hover:text-brand');
-        }
-    } else {
-        if(confirm('Aktifkan layanan ini di cabang Anda?')) {
-            // Ubah button menjadi Nonaktifkan (style Neutral)
-            btn.outerHTML = `<button onclick="toggleStatus(this, 'Aktif')" class="bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 ml-auto w-32"><i class="fas fa-power-off"></i> Nonaktifkan</button>`;
-            
-            // Ubah badge menjadi Aktif (Hijau)
-            badgeCell.innerHTML = `<span class="bg-emerald-50 border border-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif</span>`;
-            
-            // Hilangkan efek opacity redup
-            title.classList.remove('opacity-60');
-            desc.classList.remove('opacity-60');
-            price.classList.remove('opacity-60');
-            time.classList.remove('opacity-60');
-            title.classList.add('group-hover:text-brand');
-        }
-    }
-}
 </script>
 @endsection

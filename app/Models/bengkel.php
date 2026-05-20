@@ -9,7 +9,7 @@ use App\Models\Layanan;
 
 class Bengkel extends Model
 {
-    protected $fillable = ['nama', 'alamat', 'latitude', 'longitude', 'kota', 'foto', 'deskripsi', 'status', 'admin_id', 'telepon'];
+    protected $fillable = ['nama', 'alamat', 'latitude', 'longitude', 'kota', 'foto', 'deskripsi', 'status', 'admin_id', 'telepon', 'jam_buka', 'jam_tutup'];
 
     public function admin()
     {
@@ -49,4 +49,14 @@ class Bengkel extends Model
     }    
 
     public function reviews() { return $this->hasMany(Review::class); }    
+
+    public function operasional()
+    {
+        return $this->hasMany(BengkelOperasional::class);
+    }
+
+    public function slotReservasi()
+    {
+        return $this->hasMany(SlotReservasi::class);
+    }    
 }

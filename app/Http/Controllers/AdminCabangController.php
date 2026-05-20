@@ -24,14 +24,14 @@ class AdminCabangController extends Controller
             // total semua admin cabang
             'totalAdmin'   => User::where('role', 'admin_cabang')->count(),
 
-            // ✅ admin dengan bengkel aktif
+            //admin dengan bengkel aktif
             'totalAktif'   => User::where('role', 'admin_cabang')
                 ->whereHas('bengkel', function ($q) {
                     $q->where('status', 'aktif');
                 })
                 ->count(),
 
-            // ✅ admin dengan bengkel nonaktif
+            //admin dengan bengkel nonaktif
             'totalNonaktif' => User::where('role', 'admin_cabang')
                 ->whereHas('bengkel', function ($q) {
                     $q->where('status', 'nonaktif');
@@ -129,4 +129,64 @@ class AdminCabangController extends Controller
 
         return back()->with('success', 'Admin cabang berhasil dihapus.');
     }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $bengkel = $user->bengkel;
+
+        $request->validate([
+            'jam_buka' => 'required',
+            'jam_tutup' => 'required',
+        ]);
+
+        // proses jam operasional
+
+        $bengkel->update([
+            'jam_buka' => $request->jam_buka,
+            'jam_tutup' => $request->jam_tutup,
+        ]);
+
+        // proses hari operasional
+        if ($request->has('hari_operasional')) {
+
+            $bengkel->operasional()->delete();
+
+            foreach ($request->hari_operasional as $hari) {
+
+                $bengkel->operasional()->create([
+                    'hari' => $hari,
+                    'is_buka' => true,
+                ]);
+            }
+        }
+
+        // Proses update slot reservasi
+
+        if ($request->has('slot')) {
+            // menghapus slot lama
+            $bengkel->slotReservasi()->delete();
+
+            foreach ($request->slot as $jam => $kuota) {
+                $jamMulai = $jam;
+                $jamSelesai = date(
+                    'H:i',
+                    strtotime($jamMulai . ' +1 hour')
+                );
+
+                $bengkel->slotReservasi()->create([
+                    'jam_mulai' => $jamMulai,
+                    'jam_selesai' => $jamSelesai,
+                    'kuota' => $kuota,
+                ]);
+            }
+        }
+
+        return back()->with(
+            'success',
+            'Profil cabang berhasil diperbarui.'
+        );
+    }
+    
 }

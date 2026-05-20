@@ -46,47 +46,127 @@
         
         <!-- Navigation -->
         <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-3">Menu Utama</p>
-            
-            <a href="{{ route('admin-cabang.dashboard') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-brand text-white shadow-md shadow-brand/20 transition-all group relative overflow-hidden">
-                <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                <i class="fas fa-border-all w-5 relative z-10 text-lg"></i>
-                <span class="font-semibold relative z-10">Dashboard</span>
-            </a>
-            
-            <a href="{{ route('admin-cabang.reservasi') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
-                <i class="fas fa-calendar-alt w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
-                <span class="font-medium">Reservasi</span>
-                <span class="ml-auto bg-brand/10 text-brand py-0.5 px-2 rounded-md text-xs font-bold">4</span>
+
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-3">
+                Menu Utama
+            </p>
+
+            {{-- Dashboard --}}
+            <a href="{{ route('admin-cabang.dashboard') }}"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group
+            {{ request()->routeIs('admin-cabang.dashboard')
+                    ? 'bg-brand text-white shadow-md shadow-brand/20'
+                    : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }}">
+
+                <i class="fas fa-border-all w-5 text-lg
+                    {{ request()->routeIs('admin-cabang.dashboard')
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-brand' }}"></i>
+
+                <span class="font-medium">Dashboard</span>
             </a>
 
-            <a href="{{ route('admin-cabang.layanan') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
-                <i class="fas fa-screwdriver-wrench w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
-                <span class="font-medium">Layanan</span>                
-            </a>            
-            
-            <a href="{{ route('admin-cabang.sparepart') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
-                <i class="fas fa-box-open w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+            {{-- Reservasi --}}
+            <a href="{{ route('admin-cabang.reservasi') }}"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group
+            {{ request()->routeIs('admin-cabang.reservasi*')
+                    ? 'bg-brand text-white shadow-md shadow-brand/20'
+                    : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }}">
+
+                <i class="fas fa-calendar-alt w-5 text-lg
+                    {{ request()->routeIs('admin-cabang.reservasi*')
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-brand' }}"></i>
+
+                <span class="font-medium">Reservasi</span>
+
+                <span class="ml-auto bg-white/20 text-xs px-2 py-0.5 rounded-md">
+                    4
+                </span>
+            </a>
+
+            {{-- Layanan --}}
+            <a href="{{ route('admin-cabang.layanan') }}"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group
+            {{ request()->routeIs('admin-cabang.layanan*')
+                    ? 'bg-brand text-white shadow-md shadow-brand/20'
+                    : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }}">
+
+                <i class="fas fa-screwdriver-wrench w-5 text-lg
+                    {{ request()->routeIs('admin-cabang.layanan*')
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-brand' }}"></i>
+
+                <span class="font-medium">Layanan</span>
+            </a>
+
+            {{-- Sparepart --}}
+            <a href="{{ route('admin-cabang.sparepart') }}"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group
+            {{ request()->routeIs('admin-cabang.sparepart*')
+                    ? 'bg-brand text-white shadow-md shadow-brand/20'
+                    : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }}">
+
+                <i class="fas fa-box-open w-5 text-lg
+                    {{ request()->routeIs('admin-cabang.sparepart*')
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-brand' }}"></i>
+
                 <span class="font-medium">Sparepart</span>
             </a>
-            
-            <a href="{{ route('admin-cabang.pelanggan-cabang') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
-                <i class="fas fa-users w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+
+            {{-- Pelanggan --}}
+            <a href="{{ route('admin-cabang.pelanggan-cabang') }}"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group
+            {{ request()->routeIs('admin-cabang.pelanggan-cabang*')
+                    ? 'bg-brand text-white shadow-md shadow-brand/20'
+                    : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }}">
+
+                <i class="fas fa-users w-5 text-lg
+                    {{ request()->routeIs('admin-cabang.pelanggan-cabang*')
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-brand' }}"></i>
+
                 <span class="font-medium">Pelanggan</span>
             </a>
-            
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-8 mb-4 px-3">Lainnya</p>
-            
-            <a href="{{ route('admin-cabang.laporan') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
-                <i class="fas fa-chart-pie w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-8 mb-4 px-3">
+                Lainnya
+            </p>
+
+            {{-- Laporan --}}
+            <a href="{{ route('admin-cabang.laporan') }}"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group
+            {{ request()->routeIs('admin-cabang.laporan*')
+                    ? 'bg-brand text-white shadow-md shadow-brand/20'
+                    : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }}">
+
+                <i class="fas fa-chart-pie w-5 text-lg
+                    {{ request()->routeIs('admin-cabang.laporan*')
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-brand' }}"></i>
+
                 <span class="font-medium">Laporan</span>
             </a>
 
-            <a href="{{ route('admin-cabang.review') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
-                <i class="fas fa-tools w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+            {{-- Review --}}
+            <a href="{{ route('admin-cabang.review') }}"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group
+            {{ request()->routeIs('admin-cabang.review*')
+                    ? 'bg-brand text-white shadow-md shadow-brand/20'
+                    : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }}">
+
+                <i class="fas fa-tools w-5 text-lg
+                    {{ request()->routeIs('admin-cabang.review*')
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-brand' }}"></i>
+
                 <span class="font-medium">Review</span>
-            </a>        
+            </a>
+
         </nav>
+
+
 
         <!-- User Info Bottom -->
         <div class="relative p-4 m-4 border border-slate-100 rounded-2xl bg-slate-50 shadow-sm">
@@ -96,7 +176,7 @@
                 <!-- Logo Bengkel -->
                 <div class="w-11 h-11 rounded-xl bg-white overflow-hidden ring-2 ring-white shadow-sm flex-shrink-0">
                     <img
-                        src="https://ui-avatars.com/api/?name=Bengkel+Jaya&background=ff6a00&color=fff"
+                        src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->bengkel->nama ?? auth()->user()->name) }}&background=ff6a00&color=fff"
                         alt="Bengkel"
                         class="w-full h-full object-cover"
                     >
@@ -105,12 +185,12 @@
                 <!-- Info Bengkel -->
                 <div class="flex-1 overflow-hidden">
                     <p class="text-sm font-bold text-slate-800 truncate">
-                        Bengkel Jaya Motor
+                        {{ auth()->user()->bengkel->nama ?? auth()->user()->name }}
                     </p>
 
                     <p class="text-xs text-slate-500 truncate flex items-center gap-1">
                         <i class="fas fa-location-dot text-[10px]"></i>
-                        Jakarta Selatan
+                        {{ auth()->user()->bengkel->alamat ?? 'Alamat tidak tersedia' }}
                     </p>
                 </div>
 

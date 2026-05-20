@@ -345,5 +345,7 @@ Route::middleware(['auth', 'role:admin_cabang'])
         return view('admin-cabang.profile');
     })->name('profile');
 
+    Route::put('/profile', [AdminCabangController::class, 'updateProfile']) ->name('profile.update');
+
 
 });

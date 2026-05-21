@@ -109,7 +109,7 @@ Route::post('/logout', function (Request $request) {
 // ── Landing ── //
 
 Route::get('/reservasi', [ReservasiController::class, 'index'])
-    ->name('reservasi.public');  
+    ->name('reservasi.public');      
 
 Route::get('/bengkel', [BengkelController::class, 'pelangganIndex'])
     ->name('pelanggan.bengkel');    
@@ -130,7 +130,7 @@ Route::middleware(['auth', 'role:pelanggan'])
     Route::post('/booking', [ReservasiController::class, 'store'])
     ->name('booking.store');  
 
-    Route::get('/reservasi', [ReservasiController::class, 'create'])
+    Route::get('/reservasi', [ReservasiController::class, 'index'])
         ->name('reservasi');    
 
     Route::get('/riwayat', [ReservasiController::class, 'riwayat'])

@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.app-clean')
 
 @section('title', 'Riwayat Reservasi — AutoNexa')
 
@@ -15,7 +15,7 @@
     <div class="rw-header anim-up">
         {{-- Breadcrumb --}}
         <div class="rw-header__breadcrumb">
-            <a href="{{ route('pelanggan.dashboard') }}"><i class="fas fa-home"></i> Beranda</a>
+            <a href="{{ route('landing') }}"><i class="fas fa-home"></i> Beranda</a>
             <span class="sep"><i class="fas fa-chevron-right"></i></span>
             <span class="cur">Riwayat Reservasi</span>
         </div>

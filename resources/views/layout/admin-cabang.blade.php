@@ -51,45 +51,47 @@
         <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
             <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-3">Menu Utama</p>
             
-            <a href="{{ route('admin-cabang.dashboard') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl {{ request()->routeIs('admin-cabang.dashboard') ? 'bg-brand text-white shadow-md shadow-brand/20' : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }} transition-all group relative overflow-hidden">
+            <a href="{{ route('admin-cabang.dashboard') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-brand text-white shadow-md shadow-brand/20 transition-all group relative overflow-hidden">
                 <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 <i class="fas fa-border-all w-5 relative z-10 text-lg"></i>
                 <span class="font-semibold relative z-10">Dashboard</span>
             </a>
             
-            <a href="{{ route('admin-cabang.reservasi') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl {{ request()->routeIs('admin-cabang.reservasi') ? 'bg-brand text-white shadow-md shadow-brand/20' : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }} transition-all group relative overflow-hidden">
-                <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                <i class="fas fa-border-all w-5 relative z-10 text-lg"></i>
-                <span class="font-semibold relative z-10">Reservasi</span>
+            <a href="{{ route('admin-cabang.reservasi') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
+                <i class="fas fa-calendar-alt w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+                <span class="font-medium">Reservasi</span>
+                <span class="ml-auto bg-brand/10 text-brand py-0.5 px-2 rounded-md text-xs font-bold">4</span>
             </a>
 
-            <a href="{{ route('admin-cabang.layanan') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl {{ request()->routeIs('admin-cabang.layanan') ? 'bg-brand text-white shadow-md shadow-brand/20' : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }} transition-all group">
-                <i class="fas fa-screwdriver-wrench w-5 {{ request()->routeIs('admin-cabang.layanan') ? 'text-white' : 'text-slate-400 group-hover:text-brand' }} transition-colors text-lg relative z-10"></i>
-                <span class="font-medium relative z-10">Layanan</span>                
+            <a href="{{ route('admin-cabang.layanan') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
+                <i class="fas fa-screwdriver-wrench w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+                <span class="font-medium">Layanan</span>                
             </a>            
             
-            <a href="{{ route('admin-cabang.sparepart') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl {{ request()->routeIs('admin-cabang.sparepart') ? 'bg-brand text-white shadow-md shadow-brand/20' : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }} transition-all group">
-                <i class="fas fa-box-open w-5 {{ request()->routeIs('admin-cabang.sparepart') ? 'text-white' : 'text-slate-400 group-hover:text-brand' }} transition-colors text-lg relative z-10"></i>
-                <span class="font-medium relative z-10">Sparepart</span>
+            <a href="{{ route('admin-cabang.sparepart') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
+                <i class="fas fa-box-open w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+                <span class="font-medium">Sparepart</span>
             </a>
             
-            <a href="{{ route('admin-cabang.pelanggan-cabang') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl {{ request()->routeIs('admin-cabang.pelanggan-cabang') ? 'bg-brand text-white shadow-md shadow-brand/20' : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }} transition-all group">
-                <i class="fas fa-users w-5 {{ request()->routeIs('admin-cabang.pelanggan-cabang') ? 'text-white' : 'text-slate-400 group-hover:text-brand' }} transition-colors text-lg relative z-10"></i>
-                <span class="font-medium relative z-10">Pelanggan</span>
+            <a href="{{ route('admin-cabang.pelanggan-cabang') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
+                <i class="fas fa-users w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+                <span class="font-medium">Pelanggan</span>
             </a>
             
             <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-8 mb-4 px-3">Lainnya</p>
             
-            <a href="{{ route('admin-cabang.laporan') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl {{ request()->routeIs('admin-cabang.laporan') ? 'bg-brand text-white shadow-md shadow-brand/20' : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }} transition-all group">
-                <i class="fas fa-chart-pie w-5 {{ request()->routeIs('admin-cabang.laporan') ? 'text-white' : 'text-slate-400 group-hover:text-brand' }} transition-colors text-lg relative z-10"></i>
-                <span class="font-medium relative z-10">Laporan</span>
+            <a href="{{ route('admin-cabang.laporan') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
+                <i class="fas fa-chart-pie w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+                <span class="font-medium">Laporan</span>
             </a>
 
-            <a href="{{ route('admin-cabang.review') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl {{ request()->routeIs('admin-cabang.review') ? 'bg-brand text-white shadow-md shadow-brand/20' : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }} transition-all group">
-                <i class="fas fa-tools w-5 {{ request()->routeIs('admin-cabang.review') ? 'text-white' : 'text-slate-400 group-hover:text-brand' }} transition-colors text-lg relative z-10"></i>
-                <span class="font-medium relative z-10">Review</span>
+            <a href="{{ route('admin-cabang.review') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-brand transition-all group">
+                <i class="fas fa-tools w-5 text-slate-400 group-hover:text-brand transition-colors text-lg"></i>
+                <span class="font-medium">Review</span>
             </a>        
         </nav>
+
+
 
         <!-- User Info Bottom -->
         <div class="relative p-4 m-4 border border-slate-100 rounded-2xl bg-slate-50 shadow-sm">
@@ -99,7 +101,7 @@
                 <!-- Logo Bengkel -->
                 <div class="w-11 h-11 rounded-xl bg-white overflow-hidden ring-2 ring-white shadow-sm flex-shrink-0">
                     <img
-                        src="https://ui-avatars.com/api/?name={{ urlencode($bengkel?->nama ?? 'Bengkel Jaya') }}&background=ff6a00&color=fff"
+                        src="https://ui-avatars.com/api/?name=Bengkel+Jaya&background=ff6a00&color=fff"
                         alt="Bengkel"
                         class="w-full h-full object-cover"
                     >
@@ -108,12 +110,12 @@
                 <!-- Info Bengkel -->
                 <div class="flex-1 overflow-hidden">
                     <p class="text-sm font-bold text-slate-800 truncate">
-                        {{ $bengkel?->nama ?? 'Bengkel Jaya Motor' }}
+                        Bengkel Jaya Motor
                     </p>
 
                     <p class="text-xs text-slate-500 truncate flex items-center gap-1">
                         <i class="fas fa-location-dot text-[10px]"></i>
-                        {{ $bengkel?->kota ?? 'Jakarta Selatan' }}
+                        Jakarta Selatan
                     </p>
                 </div>
 
@@ -232,3 +234,4 @@ document.addEventListener('click', function(e) {
 </script>
 
 </html>
+

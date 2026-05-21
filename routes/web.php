@@ -109,7 +109,7 @@ Route::post('/logout', function (Request $request) {
 // ── Landing ── //
 
 Route::get('/reservasi', [ReservasiController::class, 'index'])
-    ->name('reservasi.public');  
+    ->name('reservasi.public');      
 
 Route::get('/bengkel', [BengkelController::class, 'pelangganIndex'])
     ->name('pelanggan.bengkel');    
@@ -130,7 +130,7 @@ Route::middleware(['auth', 'role:pelanggan'])
     Route::post('/booking', [ReservasiController::class, 'store'])
     ->name('booking.store');  
 
-    Route::get('/reservasi', [ReservasiController::class, 'create'])
+    Route::get('/reservasi', [ReservasiController::class, 'index'])
         ->name('reservasi');    
 
     Route::get('/riwayat', [ReservasiController::class, 'riwayat'])
@@ -311,10 +311,14 @@ Route::middleware(['auth', 'role:admin_cabang'])
 
 
     // LAYANAN
-    Route::get('/layanan', function () {
-        return view('admin-cabang.layanan');
-    })->name('layanan');
-
+    Route::get('/layanan',
+        [AdminCabangController::class, 'layanan']
+    )->name('layanan');
+    
+    Route::post('/layanan/{id}/toggle',
+        [AdminCabangController::class, 'toggleLayanan']
+    )->name('layanan.toggle');
+    
     // REVIEW LIST
     Route::get('/review', function () {
         return view('admin-cabang.review');
@@ -348,5 +352,6 @@ Route::middleware(['auth', 'role:admin_cabang'])
         ]);
     })->name('profile');
 
+    Route::put('/profile', [AdminCabangController::class, 'updateProfile']) ->name('profile.update');
 
 });

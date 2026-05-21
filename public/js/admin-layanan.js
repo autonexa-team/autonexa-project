@@ -1,185 +1,148 @@
-/* public/js/admin-layanan.js
-   Manajemen Layanan — filter client-side, modal, toggle status
-*/
+/* public/js/admin-layanan.js */
 (function () {
     'use strict';
 
-    /* ── Elemen ── */
-    const searchInput   = document.getElementById('searchInput');
-    const filterStatus  = document.getElementById('filterStatus');
-    const sortBy        = document.getElementById('sortBy');
-    const tableBody     = document.getElementById('layananTableBody');
-    const countPill     = document.getElementById('countPill');
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const modalForm     = document.getElementById('modalForm');
-    const mToggleTrack  = document.getElementById('mToggleTrack');
-    const mToggleLbl    = document.getElementById('mToggleLbl');
-    const mStatusInput  = document.getElementById('mStatusInput');
+    const backdrop    = document.getElementById('modalBackdrop');
+    const modalForm   = document.getElementById('modalForm');
+    const mTitle      = document.getElementById('modalTitle');
+    const mSub        = document.getElementById('modalSub');
+    const mSaveText   = document.getElementById('modalSaveText');
+    const mNama       = document.getElementById('mNama');
+    const mDesc       = document.getElementById('mDesc');
+    const mHarga      = document.getElementById('mHarga');
+    const mDurasi     = document.getElementById('mDurasi');
+    const mStatus     = document.getElementById('mStatusInput');
+    const mTrack      = document.getElementById('mToggleTrack');
+    const mLbl        = document.getElementById('mToggleLbl');
+    const methodField = document.getElementById('methodField');
+    const baseUrl     = document.getElementById('layananBaseUrl')?.value
+                        ?? '/admin-pusat/layanan';
 
-    /* ================================================================
-       FILTER + SORT CLIENT-SIDE (UX cepat tanpa reload)
-    ================================================================ */
+    /* ── Buka modal Tambah ── */
+    document.getElementById('btnTambah')?.addEventListener('click', () => {
+        resetModal();
+        mTitle.textContent    = 'Tambah Layanan';
+        mSub.textContent      = 'Isi detail layanan yang akan ditambahkan';
+        mSaveText.textContent = 'Simpan Layanan';
+        modalForm.action      = baseUrl;
+        methodField.innerHTML = '';
+        openModal();
+    });
+
+    /* ── Buka modal Edit (dipanggil dari blade) ── */
+    window.openModalEdit = function (id, nama, desc, harga, durasi, status) {
+        resetModal();
+        mTitle.textContent    = 'Edit Layanan';
+        mSub.textContent      = `Perbarui data — ${nama}`;
+        mSaveText.textContent = 'Simpan Perubahan';
+        modalForm.action      = `${baseUrl}/${id}`;
+        methodField.innerHTML = '<input type="hidden" name="_method" value="PUT">';
+
+        mNama.value  = nama;
+        mDesc.value  = desc;
+        mHarga.value = harga;
+        mDurasi.value= durasi;
+
+        const isAktif = status === 'aktif';
+        setToggle(isAktif);
+
+        openModal();
+    };
+
+    /* ── Tutup modal ── */
+    window.closeModal = function () {
+        backdrop.style.display = 'none';
+    };
+
+    backdrop?.addEventListener('click', (e) => {
+        if (e.target === backdrop) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    /* ── Toggle status dalam modal ── */
+    document.getElementById('mToggleWrap')?.addEventListener('click', () => {
+        const isOn = mTrack.classList.toggle('on');
+        mLbl.textContent = isOn ? 'Aktif' : 'Nonaktif';
+        mLbl.className   = isOn ? 'toggle-lbl' : 'toggle-lbl off';
+        mStatus.value    = isOn ? 'aktif' : 'nonaktif';
+    });
+
+    /* ── Filter + Search client-side ── */
+    const searchInput  = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    const countPill    = document.getElementById('countPill');
+    const emptyFilter  = document.getElementById('emptyFilter');
+
     function filterTable() {
-        const q   = (searchInput?.value || '').toLowerCase().trim();
-        const st  = filterStatus?.value || '';
-        const so  = sortBy?.value || '';
-
-        const rows = Array.from(tableBody?.querySelectorAll('tr[data-id]') || []);
-        let visible = [];
+        const q  = (searchInput?.value || '').toLowerCase().trim();
+        const fs = filterStatus?.value || '';
+        const rows = document.querySelectorAll('.layanan-row');
+        let visible = 0;
 
         rows.forEach(row => {
-            const nama   = row.dataset.nama   || '';
+            const name   = row.dataset.name   || '';
             const desc   = row.dataset.desc   || '';
             const status = row.dataset.status || '';
 
-            const matchQ  = !q  || nama.includes(q) || desc.includes(q);
-            const matchSt = !st || status === st;
-            const show    = matchQ && matchSt;
+            const show = (
+                (!q  || name.includes(q) || desc.includes(q)) &&
+                (!fs || status === fs)
+            );
 
             row.style.display = show ? '' : 'none';
-            if (show) visible.push(row);
+            if (show) visible++;
         });
 
-        /* Sort visible rows */
-        if (so && visible.length > 1) {
-            visible.sort((a, b) => {
-                if (so === 'harga-asc')   return parseInt(a.dataset.harga)  - parseInt(b.dataset.harga);
-                if (so === 'harga-desc')  return parseInt(b.dataset.harga)  - parseInt(a.dataset.harga);
-                if (so === 'durasi-asc')  return parseInt(a.dataset.durasi) - parseInt(b.dataset.durasi);
-                if (so === 'durasi-desc') return parseInt(b.dataset.durasi) - parseInt(a.dataset.durasi);
-                if (so === 'nama-asc')    return a.dataset.nama.localeCompare(b.dataset.nama);
-                return 0;
-            });
-            visible.forEach(row => tableBody.appendChild(row));
-        }
+        if (countPill) countPill.textContent = `${visible} layanan`;
 
-        if (countPill) countPill.textContent = `${visible.length} layanan`;
-
-        /* Empty state */
-        let emptyRow = tableBody?.querySelector('.empty-filter-row');
-        if (visible.length === 0) {
-            if (!emptyRow) {
-                emptyRow = document.createElement('tr');
-                emptyRow.className = 'empty-filter-row';
-                emptyRow.innerHTML = `<td colspan="5" class="td-empty">
-                    <i class="bi bi-search" style="font-size:24px;opacity:0.3;display:block;margin-bottom:8px;"></i>
-                    Tidak ada layanan yang sesuai filter
-                </td>`;
-                tableBody.appendChild(emptyRow);
-            }
-        } else {
-            emptyRow?.remove();
+        if (emptyFilter) {
+            emptyFilter.style.display = visible === 0 ? 'block' : 'none';
         }
     }
 
     searchInput?.addEventListener('input', filterTable);
     filterStatus?.addEventListener('change', filterTable);
-    sortBy?.addEventListener('change', filterTable);
 
-    /* Sortable header click */
-    document.querySelectorAll('.th-sortable').forEach(th => {
-        th.addEventListener('click', function () {
-            const col = this.dataset.sort;
-            const cur = sortBy?.value || '';
-            const asc = `${col}-asc`;
-            const desc = `${col}-desc`;
-            if (sortBy) {
-                sortBy.value = (cur === asc) ? desc : asc;
-                filterTable();
-            }
-            document.querySelectorAll('.th-sortable').forEach(t => t.classList.remove('sorted'));
-            this.classList.add('sorted');
-        });
-    });
-
-    /* ================================================================
-       MODAL
-    ================================================================ */
-    window.editLayanan = function (id, nama, harga, durasi, desc, status) {
-        document.getElementById('modalTitle').textContent  = 'Edit Layanan';
-        document.getElementById('modalSaveText').textContent = 'Simpan Perubahan';
-        document.getElementById('modalLayananId').value    = id;
-
-        /* Set action ke route update */
-        modalForm.action = `/admin-pusat/layanan/${id}`;
-        document.getElementById('methodField').innerHTML   =
-            '<input type="hidden" name="_method" value="PUT">';
-
-        document.getElementById('mNama').value  = nama;
-        document.getElementById('mHarga').value = harga;
-        document.getElementById('mDurasi').value = durasi;
-        document.getElementById('mDesc').value  = desc;
-
-        const isAktif = status === 'aktif';
-        mToggleTrack.className  = 'toggle-track' + (isAktif ? ' on' : '');
-        mToggleLbl.textContent  = isAktif ? 'Aktif' : 'Nonaktif';
-        mToggleLbl.className    = isAktif ? 'toggle-lbl' : 'toggle-lbl off';
-        mStatusInput.value      = status;
-
-        openModal();
-    };
-
-    document.getElementById('btnTambahLayanan')?.addEventListener('click', function () {
-        document.getElementById('modalTitle').textContent  = 'Tambah Layanan';
-        document.getElementById('modalSaveText').textContent = 'Simpan Layanan';
-        document.getElementById('modalLayananId').value    = '';
-        document.getElementById('methodField').innerHTML   = '';
-
-        modalForm.action = '/admin-pusat/layanan';
-        modalForm.reset();
-
-        mToggleTrack.className = 'toggle-track on';
-        mToggleLbl.textContent = 'Aktif';
-        mToggleLbl.className   = 'toggle-lbl';
-        mStatusInput.value     = 'aktif';
-
-        openModal();
-    });
-
-    function openModal()  { if (modalBackdrop) modalBackdrop.style.display = 'flex'; }
-    window.closeModal = function () {
-        if (modalBackdrop) modalBackdrop.style.display = 'none';
-    };
-
-    /* Klik backdrop (luar modal) untuk tutup */
-    modalBackdrop?.addEventListener('click', function (e) {
-        if (e.target === this) window.closeModal();
-    });
-
-    /* ESC untuk tutup */
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') window.closeModal();
-    });
-
-    /* Toggle status di modal */
-    document.getElementById('mToggleWrap')?.addEventListener('click', function () {
-        const isOn = mToggleTrack.classList.toggle('on');
-        mToggleLbl.textContent = isOn ? 'Aktif' : 'Nonaktif';
-        mToggleLbl.className   = isOn ? 'toggle-lbl' : 'toggle-lbl off';
-        mStatusInput.value     = isOn ? 'aktif' : 'nonaktif';
-    });
-
-    /* Client-side validation */
+    /* ── Validasi submit ── */
     modalForm?.addEventListener('submit', function (e) {
-        const nama   = document.getElementById('mNama').value.trim();
-        const harga  = document.getElementById('mHarga').value;
-        const durasi = document.getElementById('mDurasi').value;
         let valid = true;
-
-        [['mNama', nama], ['mHarga', harga], ['mDurasi', durasi]].forEach(([id, val]) => {
-            const el = document.getElementById(id);
-            if (!val) {
+        [mNama, mHarga, mDurasi].forEach(el => {
+            if (!el?.value.toString().trim()) {
                 el?.classList.add('finput-error');
                 valid = false;
             } else {
                 el?.classList.remove('finput-error');
             }
         });
-
         if (!valid) {
             e.preventDefault();
             document.querySelector('.finput-error')?.focus();
         }
     });
+
+    /* ── Helpers ── */
+    function openModal() {
+        backdrop.style.display = 'flex';
+        setTimeout(() => mNama?.focus(), 100);
+    }
+
+    function resetModal() {
+        modalForm?.reset();
+        methodField.innerHTML = '';
+        setToggle(true);
+        [mNama, mHarga, mDurasi, mDesc].forEach(el =>
+            el?.classList.remove('finput-error')
+        );
+    }
+
+    function setToggle(isOn) {
+        mTrack.className = isOn ? 'toggle-track on' : 'toggle-track';
+        mLbl.textContent = isOn ? 'Aktif' : 'Nonaktif';
+        mLbl.className   = isOn ? 'toggle-lbl' : 'toggle-lbl off';
+        mStatus.value    = isOn ? 'aktif' : 'nonaktif';
+    }
 
 })();

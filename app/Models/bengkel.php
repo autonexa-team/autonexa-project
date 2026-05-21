@@ -65,4 +65,14 @@ class Bengkel extends Model
     }    
 
     public function reviews() { return $this->hasMany(Review::class); }    
+
+    public function operasional()
+    {
+        return $this->hasMany(BengkelOperasional::class);
+    }
+
+    public function slotReservasi()
+    {
+        return $this->hasMany(SlotReservasi::class);
+    }    
 }

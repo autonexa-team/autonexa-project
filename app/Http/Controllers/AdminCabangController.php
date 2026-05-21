@@ -49,8 +49,9 @@ class AdminCabangController extends Controller
                 ->whereHas('bengkel')
                 ->count(),
 
-            Bengkel::whereNull('admin_id')
+            'bengkelTanpaAdmin' => Bengkel::whereNull('admin_id')
                 ->orWhere('admin_id', 0)
+                ->get(),
         ]);
     }
 

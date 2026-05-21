@@ -47,6 +47,28 @@
     filterStatus?.addEventListener('change', filterCards);
     filterKota?.addEventListener('change',   filterCards);
 
+    /* ── Stat Pills Click Handler ── */
+    function getBaseUrl() {
+        const currentUrl = new URL(window.location.href);
+        return currentUrl.pathname;
+    }
+
+    document.getElementById('statSemua')?.addEventListener('click', function () {
+        window.location.href = getBaseUrl();
+    });
+
+    document.getElementById('statAktif')?.addEventListener('click', function () {
+        window.location.href = getBaseUrl() + '?status=aktif';
+    });
+
+    document.getElementById('statNonaktif')?.addEventListener('click', function () {
+        window.location.href = getBaseUrl() + '?status=nonaktif';
+    });
+
+    document.getElementById('statKota')?.addEventListener('click', function () {
+        window.location.href = getBaseUrl();
+    });
+
     /* ── View Toggle: Grid ↔ List ── */
     document.getElementById('btnGrid')?.addEventListener('click', function () {
         grid?.classList.remove('list-view');
@@ -115,49 +137,81 @@
         geoError.style.display   = 'none';
     }
 
-    btnGeocode?.addEventListener('click', async function () {
-        const query = alamatInput?.value.trim();
-        if (!query) { alamatInput?.focus(); return; }
+    async function performGeocoding(query) {
+        if (!query.trim()) {
+            alamatInput?.focus();
+            return;
+        }
 
         hideGeoStates();
         geoLoading.style.display = 'flex';
         btnGeocode.disabled = true;
 
         try {
-            const res = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&q=${encodeURIComponent(query)}`,
-                { headers: { 'Accept-Language': 'id' } }
-            );
+            const encodedQuery = encodeURIComponent(query);
+            const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&q=${encodedQuery}`;
+            
+            const res = await fetch(url, {
+                headers: {
+                    'Accept-Language': 'id',
+                    'User-Agent': 'Mozilla/5.0'
+                }
+            });
+
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
             const data = await res.json();
 
-            if (!data.length) throw new Error('not_found');
+            if (!data || !data.length) {
+                throw new Error('not_found');
+            }
 
-            const { lat, lon, display_name, address } = data[0];
+            const result = data[0];
+            const { lat, lon, display_name, address } = result;
 
+            /* Fill coordinates */
             latInput.value = parseFloat(lat).toFixed(6);
             lngInput.value = parseFloat(lon).toFixed(6);
 
+            /* Fill city - try berbagai field untuk city */
             kotaInput.value =
                 address.city ||
                 address.town ||
+                address.municipality ||
                 address.county ||
-                address.state ||    
+                address.state ||
+                address.region ||
                 '';
 
-            /* Tampilkan peta */
+            /* Show map */
             showMap(parseFloat(lat), parseFloat(lon));
 
             geoLoading.style.display = 'none';
             geoSuccess.style.display = 'flex';
-            document.getElementById('geoSuccessText').textContent =
-                `Ditemukan: ${display_name}`;
+            const successText = document.getElementById('geoSuccessText');
+            successText.textContent = `✓ Ditemukan: ${display_name.substring(0, 60)}${display_name.length > 60 ? '...' : ''}`;
 
-        } catch (e) {
+        } catch (error) {
+            console.error('Geocoding error:', error);
             geoLoading.style.display = 'none';
             geoError.style.display   = 'flex';
         } finally {
             btnGeocode.disabled = false;
+        }
+    }
+
+    /* Tombol "Cari Lokasi" diklik */
+    btnGeocode?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const query = alamatInput?.value.trim();
+        performGeocoding(query);
+    });
+
+    /* Enter di alamat field juga trigger geocoding */
+    alamatInput?.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performGeocoding(this.value.trim());
         }
     });
 
@@ -218,9 +272,24 @@
             }
         });
 
-        /* Jadikan input bisa diedit meski readonly */
-        input?.addEventListener('click', function () {
-            this.removeAttribute('readonly');
+        /* Allows clicking to edit readonly fields */
+        input?.addEventListener('focus', function () {
+            if (this.hasAttribute('readonly')) {
+                this.removeAttribute('readonly');
+                this.classList.add('finput-editable');
+            }
+        });
+
+        input?.addEventListener('blur', function () {
+            /* Validate coordinates jika ada nilai */
+            if (this.value.trim()) {
+                const val = parseFloat(this.value);
+                if (isNaN(val)) {
+                    this.classList.add('finput-error');
+                } else {
+                    this.classList.remove('finput-error');
+                }
+            }
         });
     });
 

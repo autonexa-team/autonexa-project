@@ -72,6 +72,8 @@
                     @endphp
                     <div class="bengkel-card {{ $penuh ? 'bengkel-penuh' : '' }}"
                         data-id="{{ $bengkel->id }}"
+                        data-buka="{{ $bengkel->jam_buka }}"
+                        data-tutup="{{ $bengkel->jam_tutup }}"                        
                         data-nama="{{ $bengkel->nama }}"
                         data-alamat="{{ $bengkel->alamat }}"
                         data-foto="{{ $bengkel->foto ? asset('storage/'.$bengkel->foto) : asset('img/bengkel-default.jpg') }}"
@@ -123,61 +125,45 @@
             </div>
             <div class="block-body">
                 <div class="kendaraan-grid">
+
+                    {{-- Nomor Plat --}}
                     <div class="form-field">
                         <label class="field-label">
-                            <i class="bi bi-tag"></i> Merek Kendaraan
+                            <i class="bi bi-upc-scan"></i>
+                            Nomor Plat
                         </label>
-                        <input type="text" name="merk" class="field-input"
-                               placeholder="cth: Honda, Yamaha, Toyota"
-                               value="{{ old('merk') }}" required>
-                        @error('merk')<div class="field-error">{{ $message }}</div>@enderror
+
+                        <input type="text"
+                            name="plat"
+                            class="field-input plat-input"
+                            placeholder="cth: B 1234 XYZ"
+                            value="{{ old('plat') }}"
+                            required>
+
+                        @error('plat')
+                            <div class="field-error">{{ $message }}</div>
+                        @enderror
                     </div>
+
+                    {{-- Merk + tipe motor --}}
                     <div class="form-field">
                         <label class="field-label">
-                            <i class="bi bi-card-text"></i> Tipe / Model
+                            <i class="bi bi-bicycle"></i>
+                            Motor
                         </label>
-                        <input type="text" name="tipe" class="field-input"
-                               placeholder="cth: Beat, NMAX, Brio"
-                               value="{{ old('tipe') }}" required>
-                        @error('tipe')<div class="field-error">{{ $message }}</div>@enderror
+
+                        <input type="text"
+                            name="kendaraan"
+                            class="field-input"
+                            placeholder="cth: Honda Beat / Yamaha NMAX"
+                            value="{{ old('kendaraan') }}"
+                            required>
+
+                        @error('kendaraan')
+                            <div class="field-error">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <div class="form-field">
-                        <label class="field-label">
-                            <i class="bi bi-upc-scan"></i> Nomor Plat
-                        </label>
-                        <input type="text" name="plat" class="field-input plat-input"
-                               placeholder="cth: B 1234 XYZ"
-                               value="{{ old('plat') }}" required>
-                        @error('plat')<div class="field-error">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="form-field">
-                        <label class="field-label">
-                            <i class="bi bi-palette"></i> Warna Kendaraan
-                        </label>
-                        <input type="text" name="warna" class="field-input"
-                               placeholder="cth: Merah, Hitam, Putih"
-                               value="{{ old('warna') }}">
-                    </div>
-                </div>
-                {{-- Foto kendaraan (opsional) --}}
-                <div class="form-field" style="margin-bottom:0;">
-                    <label class="field-label">
-                        <i class="bi bi-camera"></i> Foto Kendaraan
-                        <span class="label-optional">· opsional</span>
-                    </label>
-                    <div class="foto-upload-area" id="fotoUploadArea">
-                        <i class="bi bi-cloud-arrow-up"></i>
-                        <p>Klik atau drag foto ke sini</p>
-                        <small>JPG, PNG · Maks 2MB</small>
-                    </div>
-                    <input type="file" name="foto_kendaraan" id="fotoKendaraan"
-                           accept="image/*" style="display:none">
-                    <div id="fotoPreview" style="display:none;">
-                        <img id="fotoPreviewImg" src="" class="foto-preview-img" alt="Preview">
-                        <button type="button" class="btn-hapus-foto" id="btnHapusFoto">
-                            <i class="bi bi-x"></i> Hapus
-                        </button>
-                    </div>
+
                 </div>
             </div>
         </div>

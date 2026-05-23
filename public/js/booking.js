@@ -42,6 +42,8 @@
                 rating : parseFloat(this.dataset.rating) || 0,
                 lat    : parseFloat(this.dataset.lat) || null,
                 lng    : parseFloat(this.dataset.lng) || null,
+                buka   : this.dataset.buka,
+                tutup   : this.dataset.tutup,
             };
 
             bengkelIdInput.value  = selectedBengkelData.id;
@@ -71,6 +73,9 @@
             /* Reload slot jika tanggal sudah dipilih */
             if (tanggalInput.value) loadSlotJam();
 
+            /* Disable jam di luar operasional */
+            updateJamOperasional();
+
             updateRingkasan();
         });
     });
@@ -95,6 +100,91 @@
             card.style.display = (nama.includes(q) || alamat.includes(q)) ? 'flex' : 'none';
         });
     });
+
+    /* ================================================================
+    BENGKEL TERDEKAT
+    ================================================================ */
+
+    const btnTerdekat = document.getElementById('btnTerdekat');
+
+    if (btnTerdekat) {
+
+        btnTerdekat.addEventListener('click', () => {
+
+            if (!navigator.geolocation) {
+                alert('Browser tidak mendukung lokasi');
+                return;
+            }
+
+            btnTerdekat.disabled = true;
+
+            btnTerdekat.innerHTML =
+                '<i class="bi bi-hourglass-split"></i> Mencari...';
+
+            navigator.geolocation.getCurrentPosition(
+
+                (position) => {
+
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+
+                    const cards = [
+                        ...document.querySelectorAll('.bengkel-card')
+                    ];
+
+                    cards.forEach(card => {
+
+                        const lat = parseFloat(card.dataset.lat);
+                        const lng = parseFloat(card.dataset.lng);
+
+                        if (!lat || !lng) {
+                            card.dataset.distance = 999999;
+                            return;
+                        }
+
+                        const distance = hitungJarak(
+                            userLat,
+                            userLng,
+                            lat,
+                            lng
+                        );
+
+                        card.dataset.distance = distance;
+                    });
+
+                    /* Sort berdasarkan jarak */
+                    cards.sort((a, b) => {
+                        return a.dataset.distance - b.dataset.distance;
+                    });
+
+                    /* Render ulang */
+                    cards.forEach(card => {
+                        bengkelList.appendChild(card);
+                    });
+
+                    btnTerdekat.disabled = false;
+
+                    btnTerdekat.innerHTML =
+                        '<i class="bi bi-geo-alt-fill"></i> Bengkel Terdekat';
+
+                },
+
+                () => {
+
+                    alert('Gagal mengambil lokasi');
+
+                    btnTerdekat.disabled = false;
+
+                    btnTerdekat.innerHTML =
+                        '<i class="bi bi-geo-alt-fill"></i> Bengkel Terdekat';
+
+                }
+
+            );
+
+        });
+
+    }    
 
     /* ================================================================
        SLOT WAKTU — load dari server saat bengkel + tanggal dipilih
@@ -149,7 +239,10 @@
     /* Pilih jam */
     document.querySelectorAll('.jam-btn').forEach(btn => {
         btn.addEventListener('click', function () {
-            if (this.classList.contains('penuh')) return;
+            if (
+                this.classList.contains('penuh') ||
+                this.classList.contains('jam-disabled')
+            ) return;
             document.querySelectorAll('.jam-btn').forEach(b => b.classList.remove('selected'));
             this.classList.add('selected');
             selectedJam = this.dataset.jam;
@@ -157,6 +250,38 @@
             updateRingkasan();
         });
     });
+
+    /* ================================================================
+    DISABLE JAM
+    ================================================================ */    
+    function updateJamOperasional() {
+
+        const buka  = selectedBengkelData.buka?.substring(0,5);
+        const tutup = selectedBengkelData.tutup?.substring(0,5);
+
+        if (!buka || !tutup) return;
+
+        document.querySelectorAll('.jam-btn').forEach(btn => {
+
+            const jam = btn.dataset.jam;
+
+            if (jam < buka || jam >= tutup) {
+
+                btn.classList.add('jam-disabled');
+                btn.classList.remove('selected');
+
+                btn.disabled = true;
+
+            } else {
+
+                btn.classList.remove('jam-disabled');
+
+                btn.disabled = false;
+            }
+
+        });
+
+    }  
 
     /* ================================================================
        LAYANAN — pilih satu + tampilkan estimasi
@@ -294,11 +419,10 @@
         document.getElementById('rBengkel').textContent = selectedBengkelData.nama || '—';
 
         /* Kendaraan */
-        const merk  = document.querySelector('input[name="merk"]')?.value  || '';
-        const tipe  = document.querySelector('input[name="tipe"]')?.value   || '';
-        const plat  = document.querySelector('input[name="plat"]')?.value   || '';
+        const kendaraan = document.querySelector('input[name="kendaraan"]')?.value || '';
+        const plat      = document.querySelector('input[name="plat"]')?.value || '';
         document.getElementById('rKendaraan').textContent =
-            merk && tipe ? `${merk} ${tipe} · ${plat}` : '—';
+            kendaraan ? `${kendaraan} · ${plat}` : '—';
 
         /* Layanan */
         document.getElementById('rLayanan').textContent =
@@ -329,7 +453,7 @@
     }
 
     /* Update ringkasan saat isi input kendaraan berubah */
-    ['input[name="merk"]', 'input[name="tipe"]', 'input[name="plat"]'].forEach(sel => {
+    ['input[name="kendaraan"]', 'input[name="plat"]'].forEach(sel => {
         document.querySelector(sel)?.addEventListener('input', updateRingkasan);
     });
 
@@ -355,4 +479,29 @@
         }
     });
 
-})();
+    /* ================================================================
+    HITUNG JARAK (HAVERSINE)
+    ================================================================ */
+
+    function hitungJarak(lat1, lon1, lat2, lon2) {
+
+        const R = 6371;
+
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) *
+            Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        );
+
+        return R * c;
+    }    
+
+}());

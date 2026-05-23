@@ -7,13 +7,18 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use App\Models\Layanan;
 
 class BengkelController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth')->except(['pelangganIndex']);
+        $this->middleware('auth')->except([
+            'pelangganIndex',
+            'showPelanggan'
+        ]);
     }
 
 
@@ -292,8 +297,12 @@ class BengkelController extends Controller
         ->withAvg('reviews', 'rating')
         ->findOrFail($id);
 
-        return view('pelanggan.detail-bengkel', [
-            'bengkel' => $bengkel
+        // ambil layanan dari relasi
+        $layanans = $bengkel->layanan;        
+
+        return view('pelanggan.bengkel-detail', [
+            'bengkel' => $bengkel,
+            'layanans' => $layanans
         ]);
     }    
 }

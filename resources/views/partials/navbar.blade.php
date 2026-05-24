@@ -7,7 +7,7 @@
             {{-- LOGO --}}
             <a href="{{ route('landing') }}" class="logo">
                 <img src="{{ asset('assets/logo.png') }}" alt="Autonexa Logo" class="logo-img">
-                Auotonexa
+                AuotoNexa
             </a>
 
             {{-- HAMBURGER (Mobile) --}}

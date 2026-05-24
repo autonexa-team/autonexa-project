@@ -1,108 +1,406 @@
+{{-- resources/views/pelanggan/about.blade.php --}}
 @extends('layout.app')
-@section('title', 'Tentang Autonexa')
+@section('title', 'Tentang AutoNexa')
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/about.css') }}">
+@endpush
 
 @section('content')
 
-<section class="page-header">
-    <div class="container">
-        <h1>Tentang Autonexa</h1>
-        <p>Kenali lebih dekat platform reservasi bengkel terpercaya kami</p>
+{{-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ --}}
+<section class="ab-hero">
+    <div class="ab-hero__inner">
+        <div class="ab-hero__kicker">
+            <span class="ab-hero__kicker-dot"></span>
+            Mengenal Kami
+        </div>
+        <h1 class="ab-hero__title">
+            Platform Bengkel<br>
+            <em>Terpercaya</em> di Indonesia
+        </h1>
+        <p class="ab-hero__sub">
+            Kenali lebih dekat visi, tim, dan jaringan bengkel partner
+            yang membuat AutoNexa menjadi pilihan utama servis kendaraan.
+        </p>
     </div>
 </section>
 
-<section class="section-padding">
-    <div class="container">
-        {{-- Sejarah --}}
-        <div class="row align-items-center g-5 mb-5">
-            <div class="col-lg-6">
-                <span class="section-tag">Siapa Kami</span>
-                <h2 class="section-title">Platform Bengkel Digital Terpercaya</h2>
-                <p>Autonexa berdiri sejak <strong>2020</strong> dengan misi menyederhanakan proses reservasi service kendaraan di Indonesia. Kami menghubungkan pelanggan dengan bengkel-bengkel terpercaya secara digital.</p>
-                <p>Dengan teknologi modern, kami memastikan setiap proses service berjalan transparan dan pelanggan selalu mendapatkan informasi terkini tentang kendaraannya.</p>
-                <div class="row g-3 mt-2">
-                    <div class="col-6">
-                        <div class="about-stat-card">
-                            <div class="stat-big">50+</div>
-                            <div class="stat-sm">Bengkel Partner</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="about-stat-card">
-                            <div class="stat-big">10K+</div>
-                            <div class="stat-sm">Pelanggan Aktif</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="about-stat-card">
-                            <div class="stat-big">200+</div>
-                            <div class="stat-sm">Mekanik Terlatih</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="about-stat-card">
-                            <div class="stat-big">15</div>
-                            <div class="stat-sm">Kota Tersedia</div>
-                        </div>
+
+{{-- ════════════════════════════════════════
+     STAT STRIP
+════════════════════════════════════════ --}}
+<div class="ab-stats">
+    <div class="ab-stat reveal d1">
+        <span class="ab-stat__num">50+</span>
+        <span class="ab-stat__label">Bengkel Partner</span>
+    </div>
+    <div class="ab-stat reveal d2">
+        <span class="ab-stat__num">10K+</span>
+        <span class="ab-stat__label">Pelanggan Aktif</span>
+    </div>
+    <div class="ab-stat reveal d3">
+        <span class="ab-stat__num">200+</span>
+        <span class="ab-stat__label">Mekanik Terlatih</span>
+    </div>
+    <div class="ab-stat reveal d4">
+        <span class="ab-stat__num">15</span>
+        <span class="ab-stat__label">Kota Tersedia</span>
+    </div>
+</div>
+
+
+{{-- ════════════════════════════════════════
+     SIAPA KAMI
+════════════════════════════════════════ --}}
+<section class="ab-section">
+    <div class="ab-wrap">
+        <div class="ab-two-col">
+
+            {{-- Text --}}
+            <div class="reveal">
+                <span class="ab-section-label">Siapa Kami</span>
+                <h2 class="ab-section-title">
+                    Menyederhanakan Servis<br>Kendaraan di Indonesia
+                </h2>
+                <div class="ab-body">
+                    <p>
+                        <strong>AutoNexa</strong> berdiri sejak <strong>2020</strong> dengan misi
+                        menyederhanakan proses reservasi servis kendaraan di Indonesia. Kami
+                        menghubungkan pelanggan dengan bengkel-bengkel terpercaya secara digital,
+                        tanpa perlu antri dan tanpa ketidakpastian.
+                    </p>
+                    <p>
+                        Dengan teknologi modern, kami memastikan setiap proses servis berjalan
+                        transparan — pelanggan selalu mendapat informasi terkini tentang kendaraannya,
+                        dari awal hingga selesai.
+                    </p>
+                    <p>
+                        Kami percaya bahwa servis kendaraan seharusnya semudah memesan makanan online.
+                        Dan itulah yang sedang kami wujudkan, satu reservasi dalam satu waktu.
+                    </p>
+                </div>
+            </div>
+
+            {{-- Image --}}
+            <div class="ab-img-wrap reveal d1">
+                @if(file_exists(public_path('images/about-team.jpg')))
+                    <img src="{{ asset('images/about-team.jpg') }}"
+                         alt="Tim AutoNexa" class="ab-img">
+                @else
+                    <div class="ab-img-placeholder">🔧</div>
+                @endif
+
+                <div class="ab-award">
+                    <div class="ab-award__icon">🏆</div>
+                    <div>
+                        <div class="ab-award__title">Platform Terpercaya</div>
+                        <div class="ab-award__sub">Melayani sejak 2020</div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <img src="{{ asset('images/about-team.jpg') }}" alt="Tim Autonexa" class="img-fluid rounded-3 shadow">
+
+        </div>
+    </div>
+</section>
+
+
+{{-- ════════════════════════════════════════
+     VISI & MISI
+════════════════════════════════════════ --}}
+<section class="ab-section ab-section--alt">
+    <div class="ab-wrap">
+
+        <div class="ab-section-hdr--center reveal">
+            <span class="ab-section-label">Arah & Tujuan</span>
+            <h2 class="ab-section-title">Visi & Misi</h2>
+        </div>
+
+        <div class="vm-grid">
+            <div class="vm-card reveal d1">
+                <div class="vm-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div class="vm-title">Visi</div>
+                <p class="vm-body">
+                    Menjadi platform reservasi bengkel nomor satu di Indonesia yang
+                    menghubungkan jutaan pelanggan dengan bengkel terpercaya secara
+                    digital, cepat, dan transparan.
+                </p>
+            </div>
+            <div class="vm-card reveal d2">
+                <div class="vm-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="vm-title">Misi</div>
+                <p class="vm-body">
+                    Menyederhanakan pengalaman servis kendaraan melalui teknologi,
+                    transparansi harga, dan layanan pelanggan yang prima — di setiap
+                    langkah dari reservasi hingga kendaraan selesai diservis.
+                </p>
             </div>
         </div>
 
-        {{-- Tim --}}
-        <div class="section-header text-center mb-5">
-            <span class="section-tag">Tim Kami</span>
-            <h2 class="section-title">Orang-orang di Balik Autonexa</h2>
+    </div>
+</section>
+
+
+{{-- ════════════════════════════════════════
+     FITUR INOVATIF (BinGo! style)
+════════════════════════════════════════ --}}
+<section class="ab-section">
+    <div class="ab-wrap">
+
+        <div class="ab-section-hdr--center reveal">
+            <span class="ab-section-label">Keunggulan</span>
+            <h2 class="ab-section-title">Fitur Inovatif</h2>
+            <p class="ab-section-desc">
+                Solusi digital untuk servis kendaraan yang lebih mudah, cepat, dan transparan
+            </p>
         </div>
-        <div class="row g-4 mb-5">
-            @foreach([
-                ['nama' => 'Budi Santoso',    'jabatan' => 'CEO & Founder',           'foto' => 'team-1.jpg'],
-                ['nama' => 'Siti Rahayu',     'jabatan' => 'CTO',                     'foto' => 'team-2.jpg'],
-                ['nama' => 'Agus Pratama',    'jabatan' => 'Head of Operations',       'foto' => 'team-3.jpg'],
-                ['nama' => 'Dewi Kusuma',     'jabatan' => 'Customer Success Manager', 'foto' => 'team-4.jpg'],
-            ] as $anggota)
-            <div class="col-6 col-lg-3">
-                <div class="team-card">
-                    <div class="team-avatar">
-                        <img src="{{ asset('images/' . $anggota['foto']) }}" alt="{{ $anggota['nama'] }}">
-                    </div>
-                    <div class="team-info">
-                        <h6>{{ $anggota['nama'] }}</h6>
-                        <span>{{ $anggota['jabatan'] }}</span>
-                    </div>
+
+        <div class="ab-features-grid">
+
+            <div class="ab-feature reveal d1">
+                <div class="ab-feature__icon fi-orange">
+                    <i class="fas fa-calendar-check"></i>
                 </div>
+                <div class="ab-feature__title">Reservasi Instan</div>
+                <p class="ab-feature__desc">
+                    Booking servis hanya dalam beberapa klik — kapan saja, di mana saja,
+                    tanpa perlu antri atau menelepon bengkel.
+                </p>
+            </div>
+
+            <div class="ab-feature reveal d2">
+                <div class="ab-feature__icon fi-blue">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="ab-feature__title">Bengkel Terdekat</div>
+                <p class="ab-feature__desc">
+                    Temukan bengkel partner terdekat dari lokasimu secara otomatis
+                    dengan peta interaktif yang mudah digunakan.
+                </p>
+            </div>
+
+            <div class="ab-feature reveal d3">
+                <div class="ab-feature__icon fi-green">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="ab-feature__title">Pantau Real-Time</div>
+                <p class="ab-feature__desc">
+                    Ikuti progress servis kendaraanmu secara langsung. Tidak perlu
+                    menunggu di bengkel — pantau dari mana saja.
+                </p>
+            </div>
+
+            <div class="ab-feature reveal d1">
+                <div class="ab-feature__icon fi-amber">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="ab-feature__title">Notifikasi Otomatis</div>
+                <p class="ab-feature__desc">
+                    Terima update status servis langsung via email & SMS — dari
+                    konfirmasi hingga kendaraan siap diambil.
+                </p>
+            </div>
+
+            <div class="ab-feature reveal d2">
+                <div class="ab-feature__icon fi-purple">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="ab-feature__title">Harga Transparan</div>
+                <p class="ab-feature__desc">
+                    Estimasi biaya ditampilkan sebelum servis dimulai. Tidak ada
+                    biaya tersembunyi — semua jelas dari awal.
+                </p>
+            </div>
+
+            <div class="ab-feature reveal d3">
+                <div class="ab-feature__icon fi-rose">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="ab-feature__title">Mekanik Bersertifikat</div>
+                <p class="ab-feature__desc">
+                    Semua mekanik di jaringan AutoNexa telah tersertifikasi dan
+                    berpengalaman menangani berbagai jenis kendaraan.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+{{-- ════════════════════════════════════════
+     TIM KAMI
+════════════════════════════════════════ --}}
+<section class="ab-section ab-section--alt">
+    <div class="ab-wrap">
+
+        <div class="ab-section-hdr--center reveal">
+            <span class="ab-section-label">Tim Kami</span>
+            <h2 class="ab-section-title">Orang-orang di Balik AutoNexa</h2>
+        </div>
+
+        <div class="ab-team-grid">
+            @php
+                $team = [
+                    [
+                        'nama' => "Dita Muta'aliy Soihda",
+                        'jabatan' => '162023026',
+                        'info' => 'Tim AutoNexa',
+                        'foto' => 'team-1.jpg'
+                    ],
+
+                    [
+                        'nama' => 'Sukma Oktavia',
+                        'jabatan' => '162023016',
+                        'info' => 'Tim AutoNexa',
+                        'foto' => 'team-2.jpg'
+                    ],
+
+                    [
+                        'nama' => 'Auliya Az Zahrah Salsabilah',
+                        'jabatan' => '162023026',
+                        'info' => 'Tim AutoNexa',
+                        'foto' => 'team-3.jpg'
+                    ],
+
+                    [
+                        'nama' => 'Dhina Nur Rizki Ramadani',
+                        'jabatan' => '162023029',
+                        'info' => 'Tim AutoNexa',
+                        'foto' => 'team-4.jpg'
+                    ],
+                ];
+                $avatarColors = ['#fff4ec', '#eff6ff', '#ecfdf5', '#f5f3ff'];
+                $txtColors    = ['#f97316', '#2563eb', '#059669', '#7c3aed'];
+            @endphp
+
+            @foreach($team as $i => $anggota)
+            @php
+                $initials = collect(explode(' ', $anggota['nama']))
+                    ->map(fn($w) => strtoupper($w[0]))->take(2)->join('');
+                $fotoPath = public_path('images/' . $anggota['foto']);
+                $ci = $i % 4;
+            @endphp
+            <div class="ab-team-card reveal d{{ ($i % 4) + 1 }}">
+                <div class="ab-team-avatar"
+                     style="background:{{ $avatarColors[$ci] }}; color:{{ $txtColors[$ci] }};">
+                    @if(file_exists($fotoPath))
+                        <img src="{{ asset('images/' . $anggota['foto']) }}"
+                             alt="{{ $anggota['nama'] }}">
+                    @else
+                        {{ $initials }}
+                    @endif
+                </div>
+                <div class="ab-team-name">{{ $anggota['nama'] }}</div>
+                <div class="ab-team-role">{{ $anggota['jabatan'] }}</div>
+                <div class="ab-team-info">{{ $anggota['info'] }}</div>
             </div>
             @endforeach
         </div>
 
-        {{-- Bengkel Partner --}}
-        <div class="section-header text-center mb-5">
-            <span class="section-tag">Jaringan Kami</span>
-            <h2 class="section-title">Bengkel Terotorisasi</h2>
+    </div>
+</section>
+
+
+{{-- ════════════════════════════════════════
+     BENGKEL PARTNER
+════════════════════════════════════════ --}}
+<section class="ab-section">
+    <div class="ab-wrap">
+
+        <div class="ab-section-hdr--center reveal">
+            <span class="ab-section-label">Jaringan Kami</span>
+            <h2 class="ab-section-title">Bengkel Terotorisasi</h2>
+            <p class="ab-section-desc">
+                {{ isset($bengkels) ? $bengkels->count() : 0 }} bengkel terpercaya
+                siap melayani kendaraan Anda di seluruh kota
+            </p>
         </div>
-        <div class="row g-4">
-            @foreach($bengkels as $bengkel)
-            <div class="col-md-6 col-lg-4">
-                <div class="partner-card">
-                    <img src="{{ $bengkel->foto ? asset('storage/'.$bengkel->foto) : asset('images/bengkel-default.jpg') }}"
-                         alt="{{ $bengkel->nama }}" class="partner-img">
-                    <div class="partner-info">
-                        <h6>{{ $bengkel->nama }}</h6>
-                        <p><i class="bi bi-geo-alt me-1"></i>{{ $bengkel->alamat }}</p>
-                        <div class="partner-rating">
-                            @for($i = 1; $i <= 5; $i++)
-                                <i class="bi bi-star{{ $i <= ($bengkel->reviews_avg_rating ?? 0) ? '-fill text-warning' : ' text-muted' }}"></i>
-                            @endfor
-                            <span class="ms-1 small text-muted">({{ number_format($bengkel->reviews_avg_rating ?? 0, 1) }})</span>
-                        </div>
+
+        <div class="ab-partner-grid">
+            @forelse($bengkels ?? [] as $bengkel)
+            <div class="ab-partner-card reveal">
+                @if($bengkel->foto)
+                    <img src="{{ asset('storage/' . $bengkel->foto) }}"
+                         alt="{{ $bengkel->nama }}" class="ab-partner-cover">
+                @else
+                    <div class="ab-partner-placeholder">🔧</div>
+                @endif
+
+                <div class="ab-partner-body">
+                    <div class="ab-partner-name">{{ $bengkel->nama }}</div>
+                    <div class="ab-partner-addr">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ $bengkel->alamat }}
+                    </div>
+                    <div class="ab-partner-stars">
+                        @php $avg = round($bengkel->reviews_avg_rating ?? 0); @endphp
+                        @for($i = 1; $i <= 5; $i++)
+                            <i class="fas fa-star ab-star {{ $i <= $avg ? 'on' : '' }}"></i>
+                        @endfor
+                        <span class="ab-partner-score">
+                            ({{ number_format($bengkel->reviews_avg_rating ?? 0, 1) }})
+                        </span>
                     </div>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <div class="ab-partner-empty">
+                <i class="fas fa-store"></i>
+                <p>Bengkel partner segera hadir</p>
+            </div>
+            @endforelse
         </div>
+
     </div>
 </section>
+
+
+{{-- ════════════════════════════════════════
+     CTA
+════════════════════════════════════════ --}}
+<div class="ab-cta reveal">
+    <h3 class="ab-cta__title">Siap Servis Kendaraan Anda?</h3>
+    <p class="ab-cta__desc">
+        Bergabung dengan lebih dari 10.000 pelanggan yang sudah mempercayakan
+        servis kendaraan mereka kepada AutoNexa.
+    </p>
+    <div class="ab-cta__btns">
+        <a href="{{ route('register') }}" class="btn-primary-ab">
+            <i class="fas fa-calendar-plus"></i>
+            Mulai Reservasi Gratis
+        </a>
+        <a href="{{ route('pelanggan.bengkel') }}" class="btn-outline-ab">
+            <i class="fas fa-store"></i>
+            Lihat Bengkel
+        </a>
+    </div>
+</div>
 
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+            } else {
+                e.target.classList.remove('visible');
+            }
+        });
+    }, {
+        threshold: 0.15
+    });
+    els.forEach(el => io.observe(el));
+})();
+</script>
+@endpush

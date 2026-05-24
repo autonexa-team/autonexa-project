@@ -56,11 +56,12 @@
 }
 
 .hero-title {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 800;
     color: #ffffff;
-    line-height: 1.25;
-    margin-bottom: 6px;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin-bottom: 18px;
 }
 
 .hero-title span {
@@ -160,16 +161,20 @@
 
 /* ===== BLOCK ===== */
 .reservasi-block {
-    background: var(--background);
+    background: #ffffff;
     border-radius: var(--radius-lg);
     padding: 20px;
     border: 1px solid var(--border);
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 4px 20px rgba(15,23,42,.04);
     transition: var(--transition);
 }
 
 .reservasi-block:hover {
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+    transform: translateY(-3px);
+    box-shadow:
+        0 10px 30px rgba(204,77,9,.08),
+        0 2px 10px rgba(204,77,9,.05);
+    border-color: rgba(204,77,9,.14);
 }
 
 /* STICKY RINGKASAN */
@@ -289,8 +294,10 @@
 }
 
 .bengkel-card:hover {
-    background: var(--foreground-soft);
-    border-color: #d1d5db;
+    background:rgba(204,77,9,.04);
+    border-color:rgba(204,77,9,.14);
+    transform:translateY(-2px);
+    box-shadow: 0 8px 24px rgba(204,77,9,.06);
 }
 
 .bengkel-card.active {

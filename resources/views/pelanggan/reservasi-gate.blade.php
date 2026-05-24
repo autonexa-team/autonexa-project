@@ -18,7 +18,7 @@
             <div class="rl-brand-icon">
                 <i class="bi bi-gear-wide-connected"></i>
             </div>
-            <span class="rl-brand-name">Autonexa</span>
+            <span class="rl-brand-name">AutoNexa</span>
         </div>
 
         {{-- Teks utama --}}

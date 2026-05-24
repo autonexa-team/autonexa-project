@@ -10,7 +10,7 @@
                     <div class="footer-brand-name">
                         
                         <img src="{{ asset('assets/logo.png') }}" alt="Autonexa Logo" class="logo-img">
-                        Autonexa
+                        AutoNexa
                     </div>                 
                     <p class="footer-desc">
                         Reservasi online, pantau proses dan dapatkan informasi service dengan mudah dan transparan.
@@ -66,6 +66,6 @@
             </div>
 
             <hr class="footer-divider">
-            <p class="footer-copy">&copy; {{ date('Y') }} Autonexa. All rights reserved.</p>
+            <p class="footer-copy">&copy; {{ date('Y') }} AutoNexa. All rights reserved.</p>
         </div>
     </footer>

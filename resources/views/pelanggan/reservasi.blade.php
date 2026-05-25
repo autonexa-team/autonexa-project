@@ -115,6 +115,7 @@
             </div>
         </div>
 
+        @auth
         {{-- ===== BLOK 2: INFORMASI KENDARAAN (BARU) ===== --}}
         <div class="reservasi-block" id="blok-kendaraan">
             <div class="block-header">
@@ -322,8 +323,10 @@
                 </form>
             </div>
         </div>
+        @endauth
     </div>
 
+    @auth
     <div class="reservasi-right">
         {{-- ===== BLOK 4: RINGKASAN ===== --}}
         <div class="reservasi-block" id="blok-ringkasan">
@@ -389,7 +392,23 @@
             </div>
         </div>
     </div>
+    @endauth
 </div>
+
+@guest
+{{-- ===== LOGIN MODAL ===== --}}
+<div id="loginModal" class="login-modal">
+    <div class="login-modal-overlay"></div>
+    <div class="login-modal-content">
+        <i class="bi bi-lock-fill login-modal-icon"></i>
+        <p class="login-modal-text">Silahkan lakukan login terlebih dahulu untuk melakukan reservasi</p>
+        <a href="{{ route('login') }}" class="btn-login-modal">
+            <i class="bi bi-box-arrow-in-right"></i>
+            Login sekarang!
+        </a>
+    </div>
+</div>
+@endguest
 
 @endsection
 
@@ -401,6 +420,8 @@
 <script>
 window.slotData     = @json($slotPerJam ?? []);
 window.kapasitasBengkel = @json($bengkels->pluck('kapasitas', 'id') ?? []);
+window.isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+window.loginModalElement = document.getElementById('loginModal');
 </script>
 
 <script src="{{ asset('js/booking.js') }}"></script>

@@ -22,8 +22,7 @@
                 {{-- Announcement bar --}}
                 <a href="{{ route('about') }}" class="announcement-bar">
                     <span class="ann-badge">✦ Baru</span>
-                    <span class="ann-text">Platform Bengkel #1 di Indonesia</span>
-                    <span class="ann-arrow">→</span>
+                    <span class="ann-text">Platform Bengkel #1 di Indonesia</span>                    
                 </a>
 
                 {{-- Headline --}}

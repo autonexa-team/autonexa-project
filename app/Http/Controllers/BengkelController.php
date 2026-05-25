@@ -97,7 +97,7 @@ class BengkelController extends Controller
         $adminCabang = \App\Models\User::query()
             ->where('role', 'admin_cabang')
             ->where('is_active', true)
-            // ->whereDoesntHave('bengkel')
+            ->whereDoesntHave('bengkel')
             ->get();
 
         return view('admin-pusat.tambah-bengkel', [
@@ -207,8 +207,8 @@ class BengkelController extends Controller
             ->where('role', 'admin_cabang')
             ->where('is_active', true)
             ->where(function($query) use ($bengkel) {
-                // $query->whereDoesntHave('bengkel')
-                $query->orWhere('id', $bengkel->admin_id);
+                $query->whereDoesntHave('bengkel')
+                      ->orWhere('id', $bengkel->admin_id);
             })
             ->get();
 

@@ -108,7 +108,7 @@ Route::post('/logout', function (Request $request) {
 
 // ── Landing ── //
 
-Route::get('/reservasi', [ReservasiController::class, 'index'])
+Route::get('/reservasi', [ReservasiController::class, 'publicReservasi'])
     ->name('reservasi.public');      
 
 Route::get('/bengkel', [BengkelController::class, 'pelangganIndex'])

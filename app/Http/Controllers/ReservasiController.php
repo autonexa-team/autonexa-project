@@ -6,6 +6,7 @@ use App\Models\Bengkel;
 use App\Models\Reservasi;
 use App\Models\Layanan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReservasiController extends Controller
 {
@@ -64,4 +65,13 @@ class ReservasiController extends Controller
         return view('pelanggan.riwayat-detail', compact('id'));
     }    
     
+
+    public function publicReservasi()
+    {
+        if (!Auth::check()) {
+            return view('pelanggan.reservasi-gate');
+        }
+
+        return $this->index();
+    }    
 }

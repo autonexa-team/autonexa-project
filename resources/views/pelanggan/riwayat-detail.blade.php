@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.app-clean')
 
 @section('title', 'Detail Reservasi #RV-2025-001 — AutoNexa')
 

@@ -31,6 +31,22 @@
         card.addEventListener('click', function () {
             if (this.dataset.penuh === '1') return;
 
+            // Jika belum login, tampilkan modal
+            if (!window.isAuthenticated) {
+                const modal = window.loginModalElement;
+                if (modal) {
+                    modal.classList.add('show');
+                    // Close modal saat overlay diklik
+                    const overlay = modal.querySelector('.login-modal-overlay');
+                    if (overlay) {
+                        overlay.addEventListener('click', function() {
+                            modal.classList.remove('show');
+                        });
+                    }
+                }
+                return;
+            }
+
             bengkelCards.forEach(c => c.classList.remove('active'));
             this.classList.add('active');
 

@@ -1,3 +1,101 @@
+/* ===== LOGIN MODAL ===== */
+.login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.login-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.login-modal-content {
+    position: relative;
+    background: var(--foreground);
+    border-radius: var(--radius-lg);
+    padding: 32px 24px;
+    max-width: 380px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.login-modal.show .login-modal-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.login-modal.show .login-modal-content {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.login-modal-icon {
+    font-size: 48px;
+    color: var(--primary);
+    opacity: 0.9;
+}
+
+.login-modal-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.btn-login-modal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.btn-login-modal:hover {
+    background: var(--primary-dark, #e05500);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 106, 0, 0.3);
+}
+
+.btn-login-modal:active {
+    transform: translateY(0);
+}
+
 /* ===== HERO HEADER ===== */
 .reservasi-hero {
     display: flex;
@@ -984,4 +1082,24 @@
 @media (max-width: 576px) {
     .kendaraan-grid { grid-template-columns: 1fr; }
     .jam-grid       { grid-template-columns: repeat(4, 1fr); }
+    
+    /* Login modal responsive */
+    .login-modal-content {
+        padding: 24px 16px;
+        width: 85%;
+    }
+    
+    .login-modal-text {
+        font-size: 14px;
+    }
+    
+    .login-modal-icon {
+        font-size: 40px;
+    }
+    
+    .btn-login-modal {
+        width: 100%;
+        font-size: 14px;
+        padding: 11px 20px;
+    }
 }

@@ -7,18 +7,13 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
-use App\Models\Layanan;
 
 class BengkelController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth')->except([
-            'pelangganIndex',
-            'showPelanggan'
-        ]);
+        $this->middleware('auth')->except(['pelangganIndex']);
     }
 
 
@@ -102,7 +97,7 @@ class BengkelController extends Controller
         $adminCabang = \App\Models\User::query()
             ->where('role', 'admin_cabang')
             ->where('is_active', true)
-            // ->whereDoesntHave('bengkel')
+            ->whereDoesntHave('bengkel')
             ->get();
 
         return view('admin-pusat.tambah-bengkel', [
@@ -212,8 +207,8 @@ class BengkelController extends Controller
             ->where('role', 'admin_cabang')
             ->where('is_active', true)
             ->where(function($query) use ($bengkel) {
-                // $query->whereDoesntHave('bengkel')
-                $query->orWhere('id', $bengkel->admin_id);
+                $query->whereDoesntHave('bengkel')
+                      ->orWhere('id', $bengkel->admin_id);
             })
             ->get();
 
@@ -297,12 +292,8 @@ class BengkelController extends Controller
         ->withAvg('reviews', 'rating')
         ->findOrFail($id);
 
-        // ambil layanan dari relasi
-        $layanans = $bengkel->layanan;        
-
-        return view('pelanggan.bengkel-detail', [
-            'bengkel' => $bengkel,
-            'layanans' => $layanans
+        return view('pelanggan.detail-bengkel', [
+            'bengkel' => $bengkel
         ]);
     }    
 }

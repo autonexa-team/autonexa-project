@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPasswordNotification;
 use App\Models\Bengkel;
 
 /**
@@ -31,6 +32,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
         'role',
         'phone',
         'foto_profil'
@@ -74,4 +76,9 @@ class User extends Authenticatable
     public function isAdminPusat() { return $this->role === 'admin_pusat'; }
     public function isAdminCabang() { return $this->role === 'admin_cabang'; }    
     public function isPelanggan() { return $this->role === 'pelanggan'; }
+
+        public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
 }

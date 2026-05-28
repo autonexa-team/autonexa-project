@@ -8,7 +8,10 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\SparepartController;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\AdminCabangController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Models\Review;
 use App\Models\Bengkel;
 use Illuminate\Http\Request;
@@ -20,6 +23,10 @@ use Illuminate\Support\Facades\Auth;
 
 
 // ── PUBLIC ── //
+
+// auth google
+Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect']);
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 // ── auth ── //
 Route::get('/', function () {
@@ -48,54 +55,15 @@ Route::get('/lupa-password', function () {
     return view('auth.lupa-password');
 })->name('auth.lupa-password');
 
-//lupa password masih pake dummy
-Route::post('/lupa-password', function (Request $request) {
-    $request->validate([
-        'email' => 'required|email'
-    ]);
+//lupa password sudah tidak dummy
+Route::post('/lupa-password', [ForgotPasswordController::class, 'sendResetLink'])
+    ->name('auth.lupa-password.kirim');
 
-    // cek user ada atau tidak (opsional tapi bagus)
-    $user = \App\Models\User::query()->where('email', $request->email)->first();
-    if (!$user) {
-        return back()->with('error', 'Email tidak ditemukan');
-    }
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetPassword'])
+    ->name('password.reset');
 
-    // token dummy (hanya biar URL terlihat realistis)
-    $token = Str::random(40);
-
-    // redirect ke halaman reset + bawa email
-    return redirect()->route('auth.reset-password', [
-        'token' => $token,
-        'email' => $request->email
-    ]);
-})->name('auth.lupa-password.kirim');
-
-Route::get('/reset-password/{token}', function ($token, Request $request) {
-    return view('auth.reset-password', [
-        'token' => $token,
-        'email' => $request->query('email') // ambil dari query string
-    ]);
-})->name('auth.reset-password');
-
-Route::post('/reset-password', function (\Illuminate\Http\Request $request) {
-
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|min:6|confirmed'
-    ]);
-
-    $user = \App\Models\User::query()->where('email', $request->email)->first();
-
-    if (!$user) {
-        return back()->with('error', 'Email tidak ditemukan');
-    }
-
-    $user->password = bcrypt($request->password);
-    $user->save();
-
-    return redirect()->route('login')->with('status', 'Password berhasil diubah');
-
-})->name('password.update');
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
+    ->name('password.update');
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();

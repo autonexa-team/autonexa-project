@@ -80,7 +80,21 @@
                 </button>
             </form>
 
-            <div class="auth-divider"><span>atau</span></div>
+            <!-- Separator -->
+            <div class="d-flex align-items-center my-4">
+                <hr class="flex-grow-1">
+                <span class="px-3 text-muted small">atau masuk dengan</span>
+                <hr class="flex-grow-1">
+            </div>
+
+            <!-- Google Login -->
+            <a href="{{ url('/auth/google/redirect') }}"
+            class="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-google"></i>
+                Login dengan Google
+            </a>            
+
+            <!-- <div class="auth-divider"><span>atau</span></div> -->
 
             <p class="text-center mb-0">
                 Belum punya akun?

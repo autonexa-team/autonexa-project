@@ -61,8 +61,10 @@ class Bengkel extends Model
     public function spareparts(): BelongsToMany
     {
         return $this->belongsToMany(Sparepart::class, 'bengkel_spareparts')
-                    ->withPivot('stok');
-    }    
+                    ->withPivot('stok')
+                    //dita nambah ini 
+                    ->withTimestamps();
+    }   
 
     public function reviews() { return $this->hasMany(Review::class); }    
 

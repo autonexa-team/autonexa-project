@@ -11,25 +11,120 @@ class SparepartController extends Controller
     // ──────────────────────── INDEX ──────────────────────────
     public function index()
     {
-        // Proteksi role
-        if (Auth::user()->role !== 'admin_pusat') {
-            abort(403);
-        }
+
+    $user = Auth::user();
+
+    // ADMIN PUSAT
+    if ($user->role === 'admin_pusat') {
 
         $spareparts = Sparepart::query()
             ->withCount(['bengkels'])
-            ->get();
+            ->paginate(10);
 
-        $totalSparepart = $spareparts->count();
-        $avgHarga       = $spareparts->avg('harga') ?? 0;
-        $maxBengkel     = $spareparts->max('bengkels_count') ?? 0;
+        $totalSparepart = Sparepart::count();
+        $avgHarga       = Sparepart::avg('harga') ?? 0;
+        $maxBengkel     = Sparepart::withCount('bengkels')
+                                ->get()
+                                ->max('bengkels_count') ?? 0;
 
         return view('admin-pusat.sparepart', [
-            'spareparts'    => $spareparts,
+            'spareparts'     => $spareparts,
             'totalSparepart' => $totalSparepart,
-            'avgHarga'      => $avgHarga,
-            'maxBengkel'    => $maxBengkel,
+            'avgHarga'       => $avgHarga,
+            'maxBengkel'     => $maxBengkel,
         ]);
+    }
+
+    // ADMIN CABANG dita ubah ini
+    if ($user->role === 'admin_cabang') {
+
+        $bengkel = \App\Models\Bengkel::where('admin_id', $user->id)->first();
+
+        if (!$bengkel) {
+            abort(404, 'Bengkel tidak ditemukan');
+        }
+
+        $search = request('search');
+        $filter = request('filter');
+
+        $query = $bengkel->spareparts();
+
+        // SEARCH
+        if ($search) {
+            $query->where('nama', 'like', '%' . $search . '%');
+        }
+
+        // FILTER STOK
+        if ($filter === 'aman') {
+            $query->wherePivot('stok', '>', 5);
+        }
+
+        if ($filter === 'hampir-habis') {
+            $query->wherePivot('stok', '>=', 1)
+                ->wherePivot('stok', '<=', 5);
+        }
+
+        if ($filter === 'habis') {
+            $query->wherePivot('stok', 0);
+        }
+
+        $spareparts = $query->paginate(10)->withQueryString();
+
+        $totalJenis = $bengkel->spareparts()->count();
+
+        $totalStok = $bengkel->spareparts->sum(fn($item) => $item->pivot->stok);
+
+        $hampirHabis = $bengkel->spareparts->filter(fn($item) =>
+            $item->pivot->stok > 0 && $item->pivot->stok <= 5
+        )->count();
+
+        $stokHabis = $bengkel->spareparts->filter(fn($item) =>
+            $item->pivot->stok == 0
+        )->count();
+
+        return view('admin-cabang.sparepart', [
+            'spareparts'  => $spareparts,
+            'totalJenis'  => $totalJenis,
+            'totalStok'   => $totalStok,
+            'hampirHabis' => $hampirHabis,
+            'stokHabis'   => $stokHabis,
+            'filter'      => $filter
+        ]);
+    }
+    /* if ($user->role === 'admin_cabang') {
+
+        $bengkel = \App\Models\Bengkel::where('admin_id', $user->id)->first();
+
+        if (!$bengkel) {
+            abort(404, 'Bengkel tidak ditemukan');
+        }
+
+        $spareparts = $bengkel->spareparts()->paginate(10);
+
+        $totalJenis = $spareparts->count();
+
+        $totalStok = $spareparts->sum(function ($item) {
+            return $item->pivot->stok;
+        });
+
+        $hampirHabis = $spareparts->filter(function ($item) {
+            return $item->pivot->stok > 0 && $item->pivot->stok <= 5;
+        })->count();
+
+        $stokHabis = $spareparts->filter(function ($item) {
+            return $item->pivot->stok == 0;
+        })->count();
+
+        return view('admin-cabang.sparepart', [
+            'spareparts'   => $spareparts,
+            'totalJenis'   => $totalJenis,
+            'totalStok'    => $totalStok,
+            'hampirHabis'  => $hampirHabis,
+            'stokHabis'    => $stokHabis,
+        ]);
+    } */
+
+    abort(403);
     }
 
     // ──────────────────────── STORE ──────────────────────────
@@ -87,5 +182,55 @@ class SparepartController extends Controller
 
         return redirect()->route('admin-pusat.sparepart')
                         ->with('success', 'Sparepart berhasil dihapus');
+    }
+
+    // dita nambah ini
+    public function updateStok(Request $request, int $id)
+    {
+        if (Auth::user()->role !== 'admin_cabang') {
+            abort(403);
+        }
+
+        $bengkel = \App\Models\Bengkel::where('admin_id', Auth::id())->firstOrFail();
+
+        $validated = $request->validate([
+            'stok' => 'required|integer|min:0',
+        ]);
+
+        // Update hanya pivot stok, bukan data sparepart global
+        $bengkel->spareparts()->updateExistingPivot($id, [
+            'stok' => $validated['stok'],
+        ]);
+
+        return redirect()->route('admin-cabang.sparepart')
+                        ->with('success', 'Stok berhasil diperbarui');
+    }
+
+    /* DITA NAMBAH INI */
+    public function search(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'admin_cabang') {
+            abort(403);
+        }
+
+        $bengkel = \App\Models\Bengkel::where('admin_id', $user->id)->firstOrFail();
+        $search = $request->search;
+
+        $spareparts = $bengkel->spareparts()
+            ->when($search, function ($q) use ($search) {
+                $q->where('nama', 'like', "%$search%");
+            })
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'nama' => $item->nama,
+                    'stok' => $item->pivot->stok,
+                    'harga' => $item->harga,
+                ];
+            });
+        return response()->json($spareparts);
     }
 }

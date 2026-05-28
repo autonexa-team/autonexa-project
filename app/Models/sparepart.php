@@ -12,6 +12,8 @@ class Sparepart extends Model
     public function bengkels()
     {
         return $this->belongsToMany(Bengkel::class, 'bengkel_spareparts')
-                    ->withPivot('stok');
+                    ->withPivot('stok')
+                    // dita nambah ini
+                    ->withTimestamps();
     }    
 }

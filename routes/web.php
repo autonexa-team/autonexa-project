@@ -259,9 +259,13 @@ Route::middleware(['auth', 'role:admin_cabang'])
         return view('admin-cabang.dashboard');
     })->name('dashboard');
 
-    Route::get('/sparepart', function () {
-        return view('admin-cabang.sparepart');
-    })->name('sparepart');
+    
+    Route::get('/sparepart', [SparepartController::class, 'index'])
+    ->name('sparepart');
+
+    // dita nnambah ini
+    Route::patch('/sparepart/{id}/stok', [SparepartController::class, 'updateStok'])
+    ->name('sparepart.updateStok');
 
     Route::get('/reservasi', function () {
         return view('admin-cabang.reservasi');
@@ -276,6 +280,9 @@ Route::middleware(['auth', 'role:admin_cabang'])
     Route::get('/reservasi/{id}', function ($id) {
         return view('admin-cabang.reservasi-detail', compact('id'));
     })->name('reservasi-detail');
+
+    // SEARCH SPAREPART DITA NAMBAH INI
+    Route::get('/admin-cabang/sparepart/search', [SparepartController::class, 'search']);
 
 
     // LAYANAN

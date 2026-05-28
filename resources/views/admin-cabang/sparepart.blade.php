@@ -4,13 +4,27 @@
 
 <!-- Alert / Notifikasi -->
 <!-- Munculkan alert jika ada barang hampir habis -->
+@if(($hampirHabis + $stokHabis) > 0)
 <div class="mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm flex items-start gap-3">
     <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
     <div>
         <h4 class="text-amber-800 font-bold text-sm">Perhatian: Stok Hampir Habis</h4>
-        <p class="text-amber-700 text-sm mt-1">Terdapat <strong>12</strong> jenis sparepart yang stoknya kurang dari 5 atau sudah habis. Segera lakukan restock untuk menghindari gangguan layanan.</p>
+        <p class="text-amber-700 text-sm mt-1">
+            Terdapat 
+            <strong>{{ $hampirHabis + $stokHabis }}</strong> 
+            jenis sparepart yang stoknya kurang dari 5 atau sudah habis.
+            Segera lakukan restock untuk menghindari gangguan layanan.
+        </p>
     </div>
 </div>
+@endif
+
+{{-- dita nmbh ini --}}
+@if(session('success'))
+<div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl">
+    {{ session('success') }}
+</div>
+@endif
 
 <!-- Custom Animations -->
 <style>
@@ -44,8 +58,10 @@
         <div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-slate-50 to-transparent rounded-bl-full opacity-50 group-hover:scale-110 transition-transform"></div>
         <div class="flex justify-between items-start relative z-10">
             <div>
-                <p class="text-slate-500 text-sm font-semibold mb-1">Jenis Sparepart</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="142">0</h3>
+                <p class="text-slate-500 text-sm font-semibold mb-1">Jenis Sparepart</p> <!-- Dita nambah ini data-target=" $totalJenis -->
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="{{ $totalJenis }}"> 
+                    {{  $totalJenis }}
+                </h3> 
             </div>
             <div class="w-12 h-12 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-slate-100">
                 <i class="fas fa-cogs"></i>
@@ -59,7 +75,9 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Total Stok</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="2450">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="{{ $totalStok }}"> 
+                    {{  $totalStok }}
+                </h3>  
             </div>
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-blue-100">
                 <i class="fas fa-boxes"></i>
@@ -73,7 +91,9 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Hampir Habis (&lt; 5)</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="8">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="{{ $hampirHabis }}"> 
+                    {{  $hampirHabis }}
+                </h3> 
             </div>
             <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-amber-100">
                 <i class="fas fa-exclamation-circle"></i>
@@ -87,7 +107,9 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Stok Habis (= 0)</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="4">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="{{ $stokHabis }}"> 
+                    {{  $stokHabis }}
+                </h3>
             </div>
             <div class="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-red-100">
                 <i class="fas fa-times-circle"></i>
@@ -97,29 +119,40 @@
 </div>
 
 <!-- Filter Section -->
-<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center animate-fade-slide-up stagger-4">
-    <div class="flex items-center bg-slate-50 rounded-xl px-4 py-2 w-full md:w-96 border border-slate-200 focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/20 transition-all">
-        <i class="fas fa-search text-slate-400"></i>
-        <input type="text" placeholder="Cari nama sparepart..." class="bg-transparent border-none outline-none ml-3 w-full text-sm font-medium text-slate-700">
-    </div>
-    
-    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-        <div class="relative">
-            <select class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-brand focus:border-brand block p-2.5 outline-none font-medium appearance-none pr-8">
-                <option selected value="semua">Semua Status Stok</option>
-                <option value="aman">Aman (&gt; 5)</option>
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 flex items-center justify-between">
+    <form method="GET" action="{{ route('admin-cabang.sparepart') }}"
+        class="flex items-center gap-3 w-full">
+        
+        <div class="flex items-center bg-slate-50 rounded-xl px-4 py-2 w-full md:w-96 border border-slate-200 focus-within:ring-2 focus-within:ring-slate-300">
+            <i class="fas fa-search text-slate-400"></i>
+            <input type="text"
+                name="search"
+                id="searchInput"
+                class="w-full bg-transparent outline-none border-none focus:ring-0 focus:outline-none pl-3"
+                placeholder="Cari nama sparepart..."
+                value="{{ request('search') }}">
+        </div>
+
+        <div class="flex items-center gap-3 ml-auto">
+
+            <span id="countLabel" class="text-sm text-slate-500 font-medium"></span>
+
+            <select name="filter" class="bg-slate-50 border border-slate-200 text-sm rounded-xl p-2.5 pr-8">
+                <option value="">Semua Status Stok</option>
+                <option value="aman">Aman (> 5)</option>
                 <option value="hampir-habis">Hampir Habis (1-5)</option>
                 <option value="habis">Habis (0)</option>
             </select>
+
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
                 <i class="fas fa-chevron-down text-[10px]"></i>
             </div>
         </div>
-        
+
         <button class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl transition-colors font-medium text-sm flex items-center gap-2">
             <i class="fas fa-filter"></i> Filter
         </button>
-    </div>
+    </form>
 </div>
 
 <!-- Table Section -->
@@ -137,6 +170,104 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50 text-sm">
+
+                @forelse($spareparts as $index => $sparepart)
+
+                @php
+                    $stok = $sparepart->pivot->stok;
+                @endphp
+
+                <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group
+                    @if($stok == 0)
+                        bg-red-50/30
+                    @elseif($stok <= 5)
+                        bg-amber-50/30
+                    @endif
+                ">
+                    <!-- Nomor -->
+                    <td class="px-6 py-4 text-center font-semibold text-slate-600">
+                        {{ $spareparts->firstItem() + $index }}
+                    </td>
+
+                    <!-- Nama Sparepart -->
+                    <td class="px-6 py-4">
+                        <p class="
+                            font-bold
+                            @if($stok == 0)
+                                text-slate-500 line-through
+                            @else
+                                text-slate-800
+                            @endif
+                        ">
+                            {{ $sparepart->nama }}
+                        </p>
+                    </td>
+
+                    <!-- Stok -->
+                    <td class="
+                        px-6 py-4 font-bold
+
+                        @if($stok == 0)
+                            text-red-500
+                        @elseif($stok <= 5)
+                            text-amber-600
+                        @else
+                            text-slate-800
+                        @endif
+                    ">
+                        {{ $stok }}
+                    </td>
+
+                    <!-- Harga -->
+                    <td class="px-6 py-4 font-medium text-slate-600">Rp {{ number_format($sparepart->harga, 0, ',', '.') }}</td>
+
+                    <!-- Status -->
+                    <td class="px-6 py-4">
+                        @if($stok == 0)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-red-100 text-red-700 border border-red-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>
+                                Habis
+                            </span>
+                        @elseif($stok <= 5)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                Hampir Habis
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Aman
+                            </span>
+                        @endif
+                    </td>
+
+                    <!-- Aksi -->
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button
+                                onclick="openFormModal(
+                                    {{ $sparepart->id }},
+                                    {{ Js::from($sparepart->nama) }},
+                                    {{ $stok }},
+                                    {{ $sparepart->harga }}
+                                )"
+                                class="w-8 h-8 rounded-lg text-slate-400 hover:text-brand hover:bg-orange-50 transition-colors flex items-center justify-center"
+                                title="Edit"
+                            >
+                                <i class="fas fa-pen text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="px-6 py-10 text-center text-slate-500">
+                        Tidak ada data sparepart
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+            {{-- <tbody class="divide-y divide-slate-50 text-sm">
                 <!-- Data Row 1 (Aman) -->
                 <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
                     <td class="px-6 py-4 text-center font-semibold text-slate-600">1</td>
@@ -258,11 +389,11 @@
                         </div>
                     </td>
                 </tr>
-            </tbody>
+            </tbody> --}}
         </table>
     </div>
     
-    <!-- Empty State (Hidden by default) -->
+    <!-- Empty State (Hidden by default) 
     <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center">
         <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
             <i class="fas fa-box-open text-4xl text-slate-300"></i>
@@ -270,23 +401,20 @@
         <h3 class="text-lg font-bold text-slate-800">Belum ada sparepart tersedia</h3>
         <p class="text-slate-500 text-sm mt-1 max-w-sm">Data stok sparepart bengkel Anda akan muncul di sini. Silakan tambah sparepart baru untuk memulai manajemen stok.</p>
 
-    </div>
+    </div> -->
 
     <!-- Pagination -->
     <div class="px-6 py-4 border-t border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between bg-white">
-        <span class="text-sm text-slate-500 font-medium">Menampilkan 1-5 dari 142 data</span>
-        <div class="flex items-center gap-2">
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-400 hover:bg-slate-50 transition-colors disabled:opacity-50" disabled>
-                <i class="fas fa-chevron-left text-xs"></i>
-            </button>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center bg-brand text-white font-bold text-sm shadow-md shadow-brand/20">1</button>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors font-bold text-sm">2</button>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors font-bold text-sm">3</button>
-            <span class="text-slate-400">...</span>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-                <i class="fas fa-chevron-right text-xs"></i>
-            </button>
-        </div>
+        <span class="text-sm text-slate-500 font-medium"> 
+            Menampilkan
+            {{ $spareparts->firstItem() ?? 0 }}
+            -
+            {{ $spareparts->lastItem() ?? 0 }}
+            dari
+            {{ $spareparts->total() }}
+            data
+        </span>
+        {{ $spareparts->links() }}
     </div>
 </div>
 
@@ -299,8 +427,13 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div class="p-6">
-            <form id="sparepartForm">
+        <div class="p-6"> {{-- dita nambah ini --}}
+            <form id="sparepartForm" method="POST">
+                @csrf
+                @method('PATCH')
+
+                <input type="hidden" id="sparepartId">
+
                 <div class="mb-4">
                     <label for="namaSparepart" class="block text-sm font-medium text-slate-700 mb-2">Nama Sparepart</label>
                     <input type="text" id="namaSparepart" class="bg-slate-100 border border-slate-200 text-slate-500 text-sm rounded-xl block w-full p-3 outline-none font-medium cursor-not-allowed" readonly>
@@ -335,20 +468,23 @@
                         Update Stok
                     </button>
                 </div>
-            </form>
+            </form> 
         </div>
     </div>
 </div>
 
 <script>
     // Simple Modal Logic
-    function openFormModal(action, nama = '', stok = '', harga = '') {
+    function openFormModal(id, nama = '', stok = '', harga = '') {
         const modal = document.getElementById('formModal');
         const content = document.getElementById('formModalContent');
         const title = document.getElementById('modalTitle');
         
         // Hanya melayani mode edit stok
         title.textContent = 'Update Stok Sparepart';
+        /* dita nambah ii */
+        document.getElementById('sparepartId').value = id;
+
         document.getElementById('namaSparepart').value = nama;
         document.getElementById('stokSparepart').value = stok;
         document.getElementById('hargaSparepart').value = harga;
@@ -372,9 +508,33 @@
         }, 300);
     }
     
-    function saveSparepart() {
+    /* function saveSparepart() {
         alert('Stok sparepart berhasil diperbarui (Dummy)');
         closeFormModal();
+    } */
+
+    /* dita ganti ini buat stok*/
+    function saveSparepart() {
+
+        const sparepartId = document.getElementById('sparepartId').value;
+        const stok = document.getElementById('stokSparepart').value;
+        const form = document.getElementById('sparepartForm');
+
+        form.action = `/admin-cabang/sparepart/${sparepartId}/stok`;
+
+        let stokInput = document.getElementById('stokHidden');
+
+        if (!stokInput) {
+            stokInput = document.createElement('input');
+            stokInput.type = 'hidden';
+            stokInput.name = 'stok';
+            stokInput.id = 'stokHidden';
+            form.appendChild(stokInput);
+        }
+
+        stokInput.value = stok;
+
+        form.submit();
     }
     
     function confirmDelete() {
@@ -415,6 +575,28 @@ document.addEventListener("DOMContentLoaded", () => {
         
         window.requestAnimationFrame(step);
     });
+});
+</script>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const countLabel = document.getElementById('countLabel');
+
+searchInput.addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+
+    let visible = 0;
+
+    rows.forEach(row => {
+        const nama = row.querySelector('td:nth-child(2)')?.innerText.toLowerCase() || '';
+        const match = nama.includes(q);
+
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+
+    countLabel.innerHTML = `Menampilkan <b>${visible}</b> sparepart`;
 });
 </script>
 @endsection

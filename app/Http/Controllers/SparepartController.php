@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Sparepart;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Bengkel;
 
 class SparepartController extends Controller
 {
@@ -13,25 +15,45 @@ class SparepartController extends Controller
     {
 
     $user = Auth::user();
+    $search = request('search');
 
     // ADMIN PUSAT
     if ($user->role === 'admin_pusat') {
 
         $spareparts = Sparepart::query()
-            ->withCount(['bengkels'])
-            ->paginate(10);
+            ->withCount('bengkels')        
+            
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama', 'like', '%' . $search . '%')
+                    ->orWhere('deskripsi', 'like', '%' . $search . '%')
+                    ->orWhere('harga', 'like', '%' . $search . '%');
+                });
+            })
 
+            ->paginate(25)
+            ->withQueryString();
+
+        // Hitung hanya data yang belum dihapus
         $totalSparepart = Sparepart::count();
-        $avgHarga       = Sparepart::avg('harga') ?? 0;
-        $maxBengkel     = Sparepart::withCount('bengkels')
-                                ->get()
-                                ->max('bengkels_count') ?? 0;
+
+        $avgHarga = Sparepart::avg('harga') ?? 0;
+
+        $maxBengkel = Sparepart::withCount('bengkels')
+            ->get()
+            ->max('bengkels_count') ?? 0;
+
+        // Total penggunaan sparepart
+        $totalPenggunaan = Sparepart::withCount('bengkels')
+            ->get()
+            ->sum('bengkels_count');
 
         return view('admin-pusat.sparepart', [
-            'spareparts'     => $spareparts,
-            'totalSparepart' => $totalSparepart,
-            'avgHarga'       => $avgHarga,
-            'maxBengkel'     => $maxBengkel,
+            'spareparts'      => $spareparts,
+            'totalSparepart'  => $totalSparepart,
+            'avgHarga'        => $avgHarga,
+            'maxBengkel'      => $maxBengkel,
+            'totalPenggunaan' => $totalPenggunaan,
         ]);
     }
 
@@ -141,10 +163,25 @@ class SparepartController extends Controller
             'deskripsi'  => 'nullable|string',
         ]);
 
-        Sparepart::create($validated);
+        // Simpan sparepart master
+        $sparepart = Sparepart::create($validated);
 
-        return redirect()->route('admin-pusat.sparepart')
-                        ->with('success', 'Sparepart berhasil ditambahkan');
+        // Ambil semua bengkel
+        $bengkels = Bengkel::all();
+
+        // Hubungkan sparepart baru ke semua bengkel
+        foreach ($bengkels as $bengkel) {
+            $bengkel->spareparts()->attach(
+                $sparepart->id,
+                [
+                    'stok' => 0
+                ]
+            );
+        }
+
+        return redirect()
+            ->route('admin-pusat.sparepart')
+            ->with('success', 'Sparepart berhasil ditambahkan');
     }
 
     // ──────────────────────── UPDATE ──────────────────────────

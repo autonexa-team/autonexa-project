@@ -1083,6 +1083,97 @@
 
 .spf-info-list li strong { color: var(--foreground); }
 
+/* ── PAGINATION ── */
+.sp-pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border, #f3f4f6);
+    flex-wrap: wrap;
+}
+
+.sp-pagination-info,
+.sp-pagination-pages {
+    font-size: 12px;
+    color: var(--foreground-t, #6b7280);
+    white-space: nowrap;
+}
+
+.sp-pagination-info strong,
+.sp-pagination-pages strong {
+    color: var(--foreground, #111827);
+    font-weight: 700;
+}
+
+.sp-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.sp-page-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #e5e7eb);
+    background: var(--white, #fff);
+    color: var(--foreground, #374151);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    line-height: 1;
+}
+
+.sp-page-btn:hover:not(.sp-page-disabled):not(.sp-page-active) {
+    border-color: var(--primary, #ff6a00);
+    color: var(--primary, #ff6a00);
+    background: rgba(255, 106, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.sp-page-btn.sp-page-active {
+    background: var(--primary, #ff6a00);
+    border-color: var(--primary, #ff6a00);
+    color: #fff;
+    cursor: default;
+    box-shadow: 0 3px 10px rgba(255, 106, 0, 0.28);
+}
+
+.sp-page-btn.sp-page-disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.sp-page-ellipsis {
+    min-width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--foreground-t, #9ca3af);
+    letter-spacing: 1px;
+}
+
+.sp-page-btn i { font-size: 12px; }
+
+@media (max-width: 640px) {
+    .sp-pagination-wrap    { flex-direction: column; align-items: center; gap: 10px; }
+    .sp-pagination-pages   { display: none; }
+    .sp-page-btn           { min-width: 32px; height: 32px; font-size: 12px; }
+}
+
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 900px) {
     .spf-wrap {

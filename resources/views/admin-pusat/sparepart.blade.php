@@ -74,19 +74,27 @@
 
     {{-- Search & Filter Bar --}}
     <div class="sp-toolbar">
-        <div class="sp-search-wrap">
-            <i class="bi bi-search sp-search-icon"></i>
-            <input
-                type="text"
-                id="searchInput"
-                class="sp-search"
-                placeholder="Cari sparepart..."
-                autocomplete="off"
-            >
-            <button class="sp-search-clear" id="btnClearSearch" style="display:none;">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
+        <form method="GET" action="{{ route('admin-pusat.sparepart') }}" class="sp-search-form">
+            <div class="sp-search-wrap">
+                <i class="bi bi-search sp-search-icon"></i>
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    class="sp-search"
+                    placeholder="Cari sparepart..."
+                    autocomplete="off"
+                    oninput="debouncedSubmit()"
+                >
+
+                @if(request('search'))
+                    <a href="{{ route('admin-pusat.sparepart') }}" class="sp-search-clear">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                @endif
+            </div>
+        </form>
         <div class="sp-toolbar-right">
             <span class="sp-count-label" id="countLabel">
                 Menampilkan <strong>{{ $totalSparepart }}</strong> sparepart
@@ -112,7 +120,7 @@
                 <tr class="sp-row" data-name="{{ strtolower($sp->nama) }}" data-desc="{{ strtolower($sp->deskripsi ?? '') }}">
 
                     {{-- No --}}
-                    <td class="td-mono">{{ $i + 1 }}</td>
+                    <td class="td-mono">{{ $spareparts->firstItem() + $i }}</td>
 
                     {{-- Nama --}}
                     <td>
@@ -182,6 +190,104 @@
             <div class="sp-empty-sub">Coba kata kunci lain</div>
         </div>
     </div>
+    
+    {{-- Pagination --}}
+    @if($spareparts instanceof \Illuminate\Pagination\LengthAwarePaginator && $spareparts->hasPages())
+    <div class="sp-pagination-wrap">
+
+        {{-- Info kiri --}}
+        <div class="sp-pagination-info">
+            Menampilkan
+            <strong>{{ $spareparts->firstItem() }}</strong>–<strong>{{ $spareparts->lastItem() }}</strong>
+            dari <strong>{{ $spareparts->total() }}</strong> sparepart
+        </div>
+
+        {{-- Tombol navigasi --}}
+        <div class="sp-pagination-controls">
+            {{-- Pertama --}}
+            @if($spareparts->onFirstPage())
+                <button class="sp-page-btn sp-page-disabled" disabled>
+                    <i class="bi bi-chevron-double-left"></i>
+                </button>
+            @else
+                <a href="{{ $spareparts->url(1) }}" class="sp-page-btn">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            @endif
+
+            {{-- Sebelumnya --}}
+            @if($spareparts->onFirstPage())
+                <button class="sp-page-btn sp-page-disabled" disabled>
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+            @else
+                <a href="{{ $spareparts->previousPageUrl() }}" class="sp-page-btn">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            @endif
+
+            {{-- Nomor halaman --}}
+            @php
+                $start = max(1, $spareparts->currentPage() - 2);
+                $end   = min($spareparts->lastPage(), $spareparts->currentPage() + 2);
+            @endphp
+
+            @if($start > 1)
+                <a href="{{ $spareparts->url(1) }}" class="sp-page-btn">1</a>
+                @if($start > 2)
+                    <span class="sp-page-ellipsis">...</span>
+                @endif
+            @endif
+
+            @for($page = $start; $page <= $end; $page++)
+                @if($page == $spareparts->currentPage())
+                    <button class="sp-page-btn sp-page-active" disabled>{{ $page }}</button>
+                @else
+                    <a href="{{ $spareparts->url($page) }}" class="sp-page-btn">{{ $page }}</a>
+                @endif
+            @endfor
+
+            @if($end < $spareparts->lastPage())
+                @if($end < $spareparts->lastPage() - 1)
+                    <span class="sp-page-ellipsis">...</span>
+                @endif
+                <a href="{{ $spareparts->url($spareparts->lastPage()) }}" class="sp-page-btn">
+                    {{ $spareparts->lastPage() }}
+                </a>
+            @endif
+
+            {{-- Selanjutnya --}}
+            @if($spareparts->hasMorePages())
+                <a href="{{ $spareparts->nextPageUrl() }}" class="sp-page-btn">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            @else
+                <button class="sp-page-btn sp-page-disabled" disabled>
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            @endif
+
+            {{-- Terakhir --}}
+            @if($spareparts->hasMorePages())
+                <a href="{{ $spareparts->url($spareparts->lastPage()) }}" class="sp-page-btn">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            @else
+                <button class="sp-page-btn sp-page-disabled" disabled>
+                    <i class="bi bi-chevron-double-right"></i>
+                </button>
+            @endif
+
+        </div>
+
+        {{-- Info kanan --}}
+        <div class="sp-pagination-pages">
+            Hal <strong>{{ $spareparts->currentPage() }}</strong>
+            / <strong>{{ $spareparts->lastPage() }}</strong>
+        </div>
+
+    </div>
+    @endif
 
 </div>
 
@@ -309,42 +415,21 @@
 @endsection
 
 
+
 @push('scripts')
 <script>
-// ── SEARCH ──────────────────────────────────────────────
-const searchInput  = document.getElementById('searchInput');
-const clearBtn     = document.getElementById('btnClearSearch');
-const countLabel   = document.getElementById('countLabel');
-const emptyState   = document.getElementById('emptyState');
-const rows         = document.querySelectorAll('.sp-row');
-const tableEl      = document.getElementById('sparepartTable');
+// ── LIVE SEARCH ───────────────────────────────────────
 
-searchInput.addEventListener('input', function () {
-    const q = this.value.trim().toLowerCase();
-    clearBtn.style.display = q ? 'flex' : 'none';
+let searchTimer;
 
-    let visible = 0;
-    rows.forEach(row => {
-        const match = row.dataset.name.includes(q) || row.dataset.desc.includes(q);
-        row.style.display = match ? '' : 'none';
-        if (match) visible++;
-    });
+function debouncedSubmit() {
+    clearTimeout(searchTimer);
 
-    countLabel.innerHTML = `Menampilkan <strong>${visible}</strong> sparepart`;
-    emptyState.style.display = visible === 0 ? 'flex' : 'none';
-    tableEl.style.display    = visible === 0 ? 'none'  : '';
-});
-
-clearBtn.addEventListener('click', function () {
-    searchInput.value = '';
-    this.style.display = 'none';
-    rows.forEach(r => r.style.display = '');
-    countLabel.innerHTML = `Menampilkan <strong>${rows.length}</strong> sparepart`;
-    emptyState.style.display = 'none';
-    tableEl.style.display = '';
-    searchInput.focus();
-});
-
+    searchTimer = setTimeout(() => {
+        document.querySelector('.sp-search-form').submit();
+    }, 400);
+}
+    
 // ── MODAL HELPERS ────────────────────────────────────────
 function openModal(id) {
     const el = document.getElementById(id);

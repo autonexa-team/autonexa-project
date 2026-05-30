@@ -2,115 +2,242 @@
 
 @section('content')
 
-<!-- Style untuk Print (Export PDF via Browser) -->
 <style>
     @media print {
-        /* Sembunyikan elemen UI dashboard dan Sidebar */
-        aside, header, nav, .no-print, button, input, select {
-            display: none !important;
-        }
-        
-        /* Reset background dan spacing khusus untuk A4/Kertas */
-        body {
-            background-color: white !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            color: black !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-        
-        main {
-            padding: 0 !important;
-            margin: 0 !important;
-            width: 100% !important;
-            margin-left: 0 !important;
+        /* ── HIDE UI CHROME ── */
+        ::-webkit-scrollbar { display: none !important; }
+        aside, header, nav, footer,
+        .no-print, button, input, select,
+        .sidebar, [class*="sidebar"] { display: none !important; }
+
+        html, body {
+            background: white !important;
+            padding: 0 !important; margin: 0 !important;
+            width: 100% !important; height: auto !important;
+            overflow: visible !important;
+            font-family: 'Inter', Arial, sans-serif !important;
+            color: #1e293b !important;
+            font-size: 11px !important;
         }
 
-        /* Hilangkan shadow dan border radius berlebih di print */
-        .shadow-sm, .rounded-2xl, .border {
+        main, [class*="main"], #main-content {
+            padding: 0 !important; margin: 0 !important;
+            width: 100% !important; max-width: 100% !important;
+            overflow: visible !important;
+        }
+
+        *, *::before, *::after {
+            overflow: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* ── SHOW PRINT-ONLY ELEMENTS ── */
+        .print-only  { display: block !important; }
+        .print-flex  { display: flex  !important; }
+        .print-header{ display: block !important; }
+
+        /* ── PRINT HEADER ── */
+        .print-header {
+            margin-bottom: 16px !important;
+            padding-bottom: 10px !important;
+            border-bottom: 2px solid #f97316 !important;
+        }
+
+        /* ── WATERMARK ── */
+        .print-watermark {
+            position: fixed !important;
+            top: 50% !important; left: 50% !important;
+            transform: translate(-50%, -50%) rotate(-35deg) !important;
+            font-size: 100px !important; font-weight: 900 !important;
+            color: rgba(0,0,0,0.04) !important;
+            z-index: 9999 !important; pointer-events: none !important;
+            white-space: nowrap !important;
+        }
+
+        /* ── PRINT FOOTER ── */
+        .print-footer {
+            position: fixed !important;
+            bottom: 0 !important; left: 0 !important; right: 0 !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            font-size: 9px !important; color: #64748b !important;
+            border-top: 1px solid #e2e8f0 !important;
+            padding: 5px 0 0 !important;
+            background: white !important;
+        }
+
+        /* ══════════════════════════════════════════
+        SUMMARY CARDS → UBAH JADI TABEL HORIZONTAL
+        ══════════════════════════════════════════ */
+        .grid.lg\:grid-cols-4,
+        .grid.md\:grid-cols-2.lg\:grid-cols-4 {
+            display: table !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-bottom: 16px !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        /* Setiap card jadi sel tabel */
+        .grid.lg\:grid-cols-4 > div,
+        .grid.md\:grid-cols-2.lg\:grid-cols-4 > div {
+            display: table-cell !important;
+            width: 25% !important;
+            padding: 10px 14px !important;
+            border: 1px solid #cbd5e1 !important;
+            vertical-align: top !important;
+            background: white !important;
             box-shadow: none !important;
             border-radius: 0 !important;
+        }
+
+        /* Sembunyikan icon, badge trend, elemen dekoratif di card */
+        .grid.lg\:grid-cols-4 .w-12,
+        .grid.md\:grid-cols-2.lg\:grid-cols-4 .w-12,
+        .grid.lg\:grid-cols-4 [class*="bg-blue-50"],
+        .grid.lg\:grid-cols-4 [class*="bg-emerald-50"],
+        .grid.lg\:grid-cols-4 [class*="bg-orange-50"],
+        .grid.lg\:grid-cols-4 [class*="bg-amber-50"],
+        .grid.md\:grid-cols-2.lg\:grid-cols-4 .w-12,
+        .grid.lg\:grid-cols-4 .mt-4,
+        .grid.md\:grid-cols-2.lg\:grid-cols-4 .mt-4 {
+            display: none !important;
+        }
+
+        /* Label teks di card */
+        .grid.lg\:grid-cols-4 p.text-slate-500,
+        .grid.md\:grid-cols-2.lg\:grid-cols-4 p.text-slate-500 {
+            font-size: 8.5px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            color: #64748b !important;
+            margin-bottom: 4px !important;
+        }
+
+        /* Angka besar di card */
+        .grid.lg\:grid-cols-4 h3,
+        .grid.md\:grid-cols-2.lg\:grid-cols-4 h3 {
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            color: #1e293b !important;
+            margin: 0 !important;
+        }
+
+        /* ── 2-COLUMN LAYOUT ── */
+        .grid.lg\:grid-cols-2 {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+            break-inside: avoid !important;
+        }
+
+        /* ── SECTION CARDS ── */
+        .bg-white {
             border: 1px solid #e2e8f0 !important;
+            border-radius: 4px !important;
+            box-shadow: none !important;
+            break-inside: avoid !important;
         }
 
-        /* Tampilkan elemen khusus print */
-        .print-only {
-            display: block !important;
-        }
-        
-        .print-flex {
-            display: flex !important;
-        }
-
-        /* Watermark Resmi */
-        .print-watermark {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 150px;
-            color: rgba(0, 0, 0, 0.04);
-            font-weight: 900;
-            z-index: -1;
-            white-space: nowrap;
-            letter-spacing: 10px;
-        }
-
-        /* Footer Laporan */
-        .print-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            font-size: 10px;
-            color: #666;
-            border-top: 1px solid #ddd;
-            padding-top: 5px;
-            display: flex !important;
-            justify-content: space-between;
-        }
-
-        /* Styling Tabel Laporan untuk Print */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 11px;
-        }
-        th, td {
-            border: 1px solid #cbd5e1;
-            padding: 8px 12px;
-            text-align: left;
-        }
-        th {
+        /* ── SECTION HEADER ── */
+        .bg-slate-50\/50, .bg-slate-50 {
             background-color: #f8fafc !important;
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-            font-weight: bold;
         }
-        
-        /* Force background colors to print (Tailwind bg colors) */
-        * {
-            -webkit-print-color-adjust: exact !important;
-            color-adjust: exact !important;
+
+        /* ── TABLES ── */
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 10px !important;
         }
-        
-        .print-break-page {
-            page-break-before: always;
+        thead { display: table-header-group !important; }
+        tfoot { display: table-footer-group !important; }
+        tr    { page-break-inside: avoid !important; }
+
+        th {
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
+            font-size: 8.5px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.4px !important;
+            padding: 6px 10px !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        td {
+            padding: 6px 10px !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #334155 !important;
+            font-size: 10px !important;
+        }
+
+        /* ── STATUS BADGE → TEXT SAJA ── */
+        span[class*="bg-emerald-100"],
+        span[class*="bg-amber-100"],
+        span[class*="bg-red-50"],
+        span[class*="bg-amber-50"] {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            font-weight: 700 !important;
+            font-size: 10px !important;
+        }
+
+        /* Warna status tetap terbaca */
+        span.text-emerald-700 { color: #15803d !important; }
+        span.text-amber-700   { color: #b45309 !important; }
+        span.text-amber-600   { color: #d97706 !important; }
+        span.text-red-600     { color: #dc2626 !important; }
+
+        /* ── TFOOT ROW ── */
+        tfoot tr td {
+            background-color: #f8fafc !important;
+            font-weight: 700 !important;
+            font-size: 10px !important;
+            border-top: 2px solid #94a3b8 !important;
+        }
+
+        /* ── BAR CHART ── */
+        div[style*="height: 160px"] {
+            height: 120px !important;
+        }
+
+        /* ── SPACING ── */
+        .space-y-8 > * + * { margin-top: 12px !important; }
+        .mb-8 { margin-bottom: 14px !important; }
+        .mb-4 { margin-bottom: 8px !important; }
+        .gap-6 { gap: 10px !important; }
+
+        /* ── REMOVE LINK ── */
+        .p-4.border-t a { display: none !important; }
+
+        /* ── ANIMATE RESET (biar tidak invisible saat print) ── */
+        [style*="opacity: 0"] {
+            opacity: 1 !important;
+            animation: none !important;
+        }
+        .animate-fade {
+            animation: none !important;
+            opacity: 1 !important;
         }
     }
 
-    /* Sembunyikan elemen print di layar biasa (Dashboard) */
     @media screen {
-        .print-only, .print-flex, .print-watermark, .print-footer, .print-header {
+        .print-only,
+        .print-flex,
+        .print-watermark,
+        .print-footer,
+        .print-header {
             display: none !important;
         }
     }
 
-    /* Animasi Layar */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        to   { opacity: 1; transform: translateY(0); }
     }
     .animate-fade {
         animation: fadeIn 0.5s ease-out forwards;
@@ -135,13 +262,15 @@
 <!-- Watermark Background PDF -->
 <div class="print-watermark">AUTONEXA</div>
 
-<!-- Footer PDF -->
+<!-- Footer PDF dita merubah supaya sesuai dgn role-->
 <div class="print-footer">
-    <div>Diunduh oleh: <strong>Admin Pusat (Budi Hartono)</strong></div>
-    <div id="printDate">Tanggal Cetak: {{ date('d M Y, H:i') }} WIB</div>
+    <div>Diunduh oleh: <strong>{{ auth()->user()->name }}</strong>
+        <span style="font-weight:normal;color:#94a3b8;">
+            ({{ auth()->user()->role === 'admin_pusat' ? 'Admin Pusat' : 'Admin Cabang' }})
+        </span>
+    </div>
+    <div id="printDate">Tanggal Cetak: <span id="printDateValue"></span> WIB</div>
 </div>
-
-<!-- Akhir Elemen Khusus Print -->
 
 <!-- Container Utama Dashboard -->
 <div class="animate-fade no-print">
@@ -158,7 +287,13 @@
             <button onclick="window.print()" class="bg-brand hover:bg-brand-dark text-white px-5 py-2.5 rounded-xl shadow-md shadow-brand/20 hover:shadow-lg hover:-translate-y-0.5 transition-all font-bold text-sm flex items-center gap-2">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
-            <button class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-md shadow-emerald-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all font-bold text-sm flex items-center gap-2">
+            <button
+                onclick="exportToExcel(
+                    '{{ auth()->user()->name }}',
+                    '{{ auth()->user()->role === 'admin_pusat' ? 'Admin Pusat' : 'Admin Cabang' }}',
+                    document.getElementById('printPeriode')?.textContent ?? '01 Mei 2026 - 31 Mei 2026'
+                )"
+                class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-md shadow-emerald-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all font-bold text-sm flex items-center gap-2">
                 <i class="fas fa-file-excel"></i> Export Excel
             </button>
         </div>
@@ -171,13 +306,11 @@
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <!-- Tanggal Mulai -->
             <div class="md:col-span-3">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Mulai</label>
                 <input type="date" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block w-full p-2.5 outline-none font-medium transition-all" value="2026-05-01">
             </div>
             
-            <!-- Tanggal Selesai -->
             <div class="md:col-span-3">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Selesai</label>
                 <input type="date" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block w-full p-2.5 outline-none font-medium transition-all" value="2026-05-31">
@@ -275,7 +408,7 @@
 <!-- Laporan Utama (Tables) -->
 <div class="space-y-8 animate-fade" style="animation-delay: 200ms; opacity: 0;">
     
-    <!-- C. LAPORAN BENGKEL (Performa Penting) -->
+    <!-- LAPORAN BENGKEL (Performa Penting) -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
             <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
@@ -342,10 +475,10 @@
     </div>
 
     <!-- Print Page Break Marker -->
-    <div class="print-break-page"></div>
+    <div style="margin-top: 16px;"></div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- A. LAPORAN RESERVASI (Detail Terakhir) -->
+        <!-- LAPORAN RESERVASI -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
@@ -404,7 +537,7 @@
             </div>
         </div>
 
-        <!-- B. LAPORAN PENDAPATAN (Tren Visual) -->
+        <!-- LAPORAN PENDAPATAN -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
             <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
@@ -412,40 +545,35 @@
                 </h3>
             </div>
             <div class="p-6 flex-1 flex flex-col">
-                <!-- Simple HTML/CSS Bar Chart -->
-                <div class="h-48 flex items-end justify-between gap-3 border-b border-slate-200 pb-2 mb-4 mt-2 flex-1 relative">
-                    <!-- Garis bantu background -->
-                    <div class="absolute w-full border-t border-dashed border-slate-200 top-1/4 z-0"></div>
-                    <div class="absolute w-full border-t border-dashed border-slate-200 top-2/4 z-0"></div>
-                    <div class="absolute w-full border-t border-dashed border-slate-200 top-3/4 z-0"></div>
+                <div style="height: 160px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; position: relative;">
+                    <!-- Grid lines -->
+                    <div style="position:absolute;width:100%;border-top:1px dashed #e2e8f0;top:25%;"></div>
+                    <div style="position:absolute;width:100%;border-top:1px dashed #e2e8f0;top:50%;"></div>
+                    <div style="position:absolute;width:100%;border-top:1px dashed #e2e8f0;top:75%;"></div>
 
-                    <!-- Week 1 -->
-                    <div class="w-full flex flex-col justify-end items-center group relative cursor-pointer z-10 h-full">
-                        <div class="absolute -top-8 bg-slate-800 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity shadow-md pointer-events-none">Rp 110Jt</div>
-                        <div class="w-full bg-brand/30 hover:bg-brand transition-colors rounded-t-md border-t border-x border-brand/50" style="height: 60%;"></div>
+                    <!-- Minggu 1 -->
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative;">
+                        <div style="width:100%;height:60%;background:#fed7aa;border-top:2px solid #f97316;border-radius:4px 4px 0 0;"></div>
                     </div>
-                    <!-- Week 2 -->
-                    <div class="w-full flex flex-col justify-end items-center group relative cursor-pointer z-10 h-full">
-                        <div class="absolute -top-8 bg-slate-800 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity shadow-md pointer-events-none">Rp 125Jt</div>
-                        <div class="w-full bg-brand/50 hover:bg-brand transition-colors rounded-t-md border-t border-x border-brand/50" style="height: 75%;"></div>
+                    <!-- Minggu 2 -->
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative;">
+                        <div style="width:100%;height:75%;background:#fdba74;border-top:2px solid #f97316;border-radius:4px 4px 0 0;"></div>
                     </div>
-                    <!-- Week 3 (Peak) -->
-                    <div class="w-full flex flex-col justify-end items-center group relative cursor-pointer z-10 h-full">
-                        <div class="absolute -top-8 bg-slate-800 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity shadow-md pointer-events-none">Rp 150Jt</div>
-                        <div class="w-full bg-brand hover:bg-brand-dark transition-colors rounded-t-md border-t border-x border-brand shadow-[0_0_15px_rgba(255,106,0,0.3)]" style="height: 90%;"></div>
+                    <!-- Minggu 3 -->
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative;">
+                        <div style="width:100%;height:90%;background:#f97316;border-top:2px solid #ea580c;border-radius:4px 4px 0 0;"></div>
                     </div>
-                    <!-- Week 4 -->
-                    <div class="w-full flex flex-col justify-end items-center group relative cursor-pointer z-10 h-full">
-                        <div class="absolute -top-8 bg-slate-800 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity shadow-md pointer-events-none">Rp 100Jt</div>
-                        <div class="w-full bg-brand/20 hover:bg-brand transition-colors rounded-t-md border-t border-x border-brand/50" style="height: 55%;"></div>
+                    <!-- Minggu 4 -->
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative;">
+                        <div style="width:100%;height:55%;background:#ffedd5;border-top:2px solid #f97316;border-radius:4px 4px 0 0;"></div>
                     </div>
                 </div>
-                <!-- Label sumbu X -->
-                <div class="flex justify-between text-xs text-slate-500 font-bold px-2 mt-2">
-                    <span class="text-center w-full">Minggu 1</span>
-                    <span class="text-center w-full">Minggu 2</span>
-                    <span class="text-center w-full text-brand">Minggu 3</span>
-                    <span class="text-center w-full">Minggu 4</span>
+                <!-- Label -->
+                <div style="display:flex;justify-content:space-between;margin-top:8px;">
+                    <span style="flex:1;text-align:center;font-size:11px;font-weight:700;color:#64748b;">Minggu 1<br><span style="font-weight:400;font-size:10px;">Rp 110Jt</span></span>
+                    <span style="flex:1;text-align:center;font-size:11px;font-weight:700;color:#64748b;">Minggu 2<br><span style="font-weight:400;font-size:10px;">Rp 125Jt</span></span>
+                    <span style="flex:1;text-align:center;font-size:11px;font-weight:700;color:#f97316;">Minggu 3<br><span style="font-weight:400;font-size:10px;">Rp 150Jt</span></span>
+                    <span style="flex:1;text-align:center;font-size:11px;font-weight:700;color:#64748b;">Minggu 4<br><span style="font-weight:400;font-size:10px;">Rp 100Jt</span></span>
                 </div>
             </div>
         </div>
@@ -456,7 +584,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const counters = document.querySelectorAll(".counter-value");
-    const duration = 1500; // 1.5 seconds
+    const duration = 1500; 
 
     counters.forEach(counter => {
         const target = parseFloat(counter.getAttribute("data-target"));
@@ -469,8 +597,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            
-            // easeOutExpo easing function
             const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
             const current = easeProgress * target;
             
@@ -486,5 +612,26 @@ document.addEventListener("DOMContentLoaded", () => {
         window.requestAnimationFrame(step);
     });
 });
+
+// Update jam footer print agar selalu real-time saat print ditekan
+function updatePrintDate() {
+    const now = new Date();
+    const day   = now.getDate().toString().padStart(2, '0');
+    const month = now.toLocaleString('id-ID', { month: 'long' });
+    const year  = now.getFullYear();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const mins  = now.getMinutes().toString().padStart(2, '0');
+    
+    const formatted = `${day} ${month} ${year}, ${hours}:${mins}`;
+    
+    const el = document.getElementById('printDateValue');
+    if (el) el.textContent = formatted;
+}
+
+// Jalankan saat halaman load (untuk preview)
+updatePrintDate();
+
+// Jalankan ulang tepat sebelum print agar jamnya akurat
+window.addEventListener('beforeprint', updatePrintDate);
 </script>
 @endsection

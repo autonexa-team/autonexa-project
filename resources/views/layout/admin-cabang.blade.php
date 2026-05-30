@@ -27,11 +27,23 @@
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
+    <!-- SheetJS untuk Export Excel -->
+    <script src="{{ asset('js/export-excel.js') }}"></script>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admincabang-dashboard.css') }}">
+
+    <style>
+        @page {
+            /* Kosongkan margin agar header/footer browser tidak muncul */
+            /* Catatan: ini hanya bekerja di beberapa browser */
+            margin-top: 15mm;
+            margin-bottom: 20mm;
+        }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800">
 
@@ -275,6 +287,21 @@
         </div>
     </main>
 
+    <script>
+        // Hilangkan header/footer browser saat print
+        // dengan mengosongkan title dan inject style khusus
+        window.addEventListener('beforeprint', function () {
+            // Simpan title asli
+            window._originalTitle = document.title;
+            // Kosongkan title → header browser jadi kosong
+            document.title = '';
+        });
+
+        window.addEventListener('afterprint', function () {
+            // Kembalikan title setelah selesai print
+            document.title = window._originalTitle;
+        });
+    </script>
 </body>
 
 <script>

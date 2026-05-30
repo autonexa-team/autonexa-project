@@ -87,10 +87,16 @@
             }
 
             /* Reload slot jika tanggal sudah dipilih */
-            if (tanggalInput.value) loadSlotJam();
+            if (tanggalInput.value) {
+                loadSlotJam();
+                // Update jam operasional + disable jam yang sudah terlewat
+                updateJamOperasional(tanggalInput.value);
+            }
 
             /* Disable jam di luar operasional */
-            updateJamOperasional();
+            if (tanggalInput.value) {
+                updateJamOperasional(tanggalInput.value);
+            }
 
             updateRingkasan();
         });
@@ -206,7 +212,11 @@
        SLOT WAKTU — load dari server saat bengkel + tanggal dipilih
     ================================================================ */
     tanggalInput?.addEventListener('change', () => {
-        if (bengkelIdInput.value) loadSlotJam();
+        if (bengkelIdInput.value) {
+            loadSlotJam();
+            // Update jam operasional + disable jam yang sudah terlewat
+            updateJamOperasional(tanggalInput.value);
+        }
         updateRingkasan();
     });
 
@@ -270,29 +280,45 @@
     /* ================================================================
     DISABLE JAM
     ================================================================ */    
-    function updateJamOperasional() {
+    function updateJamOperasional(tanggal = null) {
 
         const buka  = selectedBengkelData.buka?.substring(0,5);
         const tutup = selectedBengkelData.tutup?.substring(0,5);
 
         if (!buka || !tutup) return;
 
+        // Cek apakah tanggal adalah hari ini
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const selectedDate = tanggal ? new Date(tanggal) : null;
+        const isToday = selectedDate && selectedDate.toDateString() === today.toDateString();
+
+        // Ambil jam saat ini jika hari ini
+        const currentHour = isToday ? String(now.getHours()).padStart(2, '0') : null;
+        const currentMin = isToday ? String(now.getMinutes()).padStart(2, '0') : null;
+        const currentTime = isToday ? `${currentHour}:${currentMin}` : null;
+
         document.querySelectorAll('.jam-btn').forEach(btn => {
 
             const jam = btn.dataset.jam;
 
+            // Check jam di luar operasional
             if (jam < buka || jam >= tutup) {
 
                 btn.classList.add('jam-disabled');
                 btn.classList.remove('selected');
-
                 btn.disabled = true;
 
             } else {
-
-                btn.classList.remove('jam-disabled');
-
-                btn.disabled = false;
+                // Check jam sudah terlewat (jika hari ini)
+                if (isToday && jam <= currentTime) {
+                    btn.classList.add('jam-disabled');
+                    btn.classList.remove('selected');
+                    btn.disabled = true;
+                } else {
+                    btn.classList.remove('jam-disabled');
+                    btn.disabled = false;
+                }
             }
 
         });

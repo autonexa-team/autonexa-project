@@ -248,6 +248,20 @@ Route::middleware(['auth', 'role:admin_pusat'])
         
 });
 
+// ── API ENDPOINTS UNTUK RESERVASI ────
+Route::middleware(['auth', 'role:admin_cabang'])
+    ->prefix('api')
+    ->name('api.')
+    ->group(function () {
+    Route::get('/pelanggan-existing', [ReservasiController::class, 'getPelangganExisting'])
+        ->name('pelanggan-existing');
+    
+    Route::get('/pelanggan/{userId}', [ReservasiController::class, 'getPelangganDetail'])
+        ->name('pelanggan-detail');
+    
+    Route::get('/layanan-aktif', [ReservasiController::class, 'getLayananAktif'])
+        ->name('layanan-aktif');
+});
 
 // ── ADMIN CABANG ──────────────────────
 Route::middleware(['auth', 'role:admin_cabang'])
@@ -267,19 +281,33 @@ Route::middleware(['auth', 'role:admin_cabang'])
     Route::patch('/sparepart/{id}/stok', [SparepartController::class, 'updateStok'])
     ->name('sparepart.updateStok');
 
-    Route::get('/reservasi', function () {
-        return view('admin-cabang.reservasi');
-    })->name('reservasi');
+    Route::get('/reservasi', [ReservasiController::class, 'getReservasiCabang'])
+        ->name('reservasi');
 
     // TAMBAH RESERVASI
     Route::get('/reservasi/create', function () {
         return view('admin-cabang.reservasi-create');
     })->name('reservasi-create');
 
+    // STORE RESERVASI (dari form create)
+    Route::post('/reservasi/store', [ReservasiController::class, 'storeAdminCabang'])
+        ->name('reservasi.store');
+
     // DETAIL RESERVASI
-    Route::get('/reservasi/{id}', function ($id) {
-        return view('admin-cabang.reservasi-detail', compact('id'));
-    })->name('reservasi-detail');
+    Route::get('/reservasi/{id}', [ReservasiController::class, 'showDetailAdminCabang'])
+        ->name('reservasi-detail');
+
+    // EDIT RESERVASI (untuk future use)
+    Route::get('/reservasi/{id}/edit', [ReservasiController::class, 'showDetailAdminCabang'])
+        ->name('reservasi.edit');
+
+    // UPDATE STATUS RESERVASI
+    Route::post('/reservasi/{id}/update-status', [ReservasiController::class, 'updateStatusAdminCabang'])
+        ->name('reservasi.update-status');
+
+    // UPDATE STATUS RESERVASI (Alias untuk detail view)
+    Route::post('/reservasi/{id}/toggle-status', [ReservasiController::class, 'updateStatusAdminCabang'])
+        ->name('reservasi.toggle-status');
 
     // SEARCH SPAREPART DITA NAMBAH INI
     Route::get('/admin-cabang/sparepart/search', [SparepartController::class, 'search']);
@@ -321,7 +349,7 @@ Route::middleware(['auth', 'role:admin_cabang'])
 
     // profile    
     Route::get('/profile', function () {
-        $bengkel = auth()->user()->bengkel()->with('layanan')->first();
+        $bengkel = Auth::user()->bengkel()->with('layanan')->first();
         return view('admin-cabang.profile', [
             'bengkel' => $bengkel
         ]);

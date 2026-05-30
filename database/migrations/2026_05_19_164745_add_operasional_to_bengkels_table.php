@@ -11,12 +11,10 @@ return new class extends Migration
         Schema::table('bengkels', function (Blueprint $table) {
 
             $table->time('jam_buka')
-                  ->nullable()
-                  ->after('telepon');
+                  ->nullable();
 
             $table->time('jam_tutup')
-                  ->nullable()
-                  ->after('jam_buka');
+                  ->nullable();
         });
     }
 

@@ -218,7 +218,7 @@
                             </div>
                             <p class="field-helper">
                                 <i class="bi bi-info-circle"></i>
-                                Slot penuh ditandai abu-abu. Pilih tanggal dulu untuk cek ketersediaan.
+                                Slot penuh ditandai abu-abu. Jam yang sudah terlewat tidak bisa dipilih. Pilih tanggal dulu untuk cek ketersediaan.
                             </p>
                             @error('waktu')<div class="field-error">{{ $message }}</div>@enderror
                         </div>

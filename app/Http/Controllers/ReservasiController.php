@@ -16,10 +16,31 @@ class ReservasiController extends Controller
 {
     public function index()
     {
-        $bengkels = Bengkel::all();
+        $bengkels = Bengkel::withAvg('reviews', 'rating')->get();
         $layanans = Layanan::all();
 
-        return view('pelanggan.reservasi', compact('bengkels', 'layanans'));
+        // Hitung jumlah reservasi hari ini per bengkel (untuk tampil slot sisa)
+        $today = Carbon::today()->toDateString();
+        $reservasiHariIni = Reservasi::query()
+            ->where('tanggal', '=', $today)
+            ->whereNotIn('status', ['dibatalkan'])
+            ->selectRaw('bengkel_id, COUNT(*) as total')
+            ->groupBy('bengkel_id')
+            ->pluck('total', 'bengkel_id')
+            ->toArray();
+
+        // Hitung slot per jam per bengkel untuk hari ini (dipakai booking.js)
+        $slotPerJam = Reservasi::query()
+            ->where('tanggal', '=', $today)
+            ->whereNotIn('status', ['dibatalkan'])
+            ->selectRaw('bengkel_id, waktu, COUNT(*) as total')
+            ->groupBy('bengkel_id', 'waktu')
+            ->get()
+            ->groupBy('bengkel_id')
+            ->map(fn($rows) => $rows->pluck('total', 'waktu'))
+            ->toArray();
+
+        return view('pelanggan.reservasi', compact('bengkels', 'layanans', 'reservasiHariIni', 'slotPerJam'));
     }
 
     public function indexAdminPusat(Request $request)
@@ -51,7 +72,82 @@ class ReservasiController extends Controller
 
     public function store(Request $request)
     {
-        // nanti isi logic simpan
+        try {
+            // Validate incoming data
+            $validated = $request->validate([
+                'bengkel_id' => 'required|exists:bengkels,id',
+                'layanan_id' => 'required|exists:layanans,id',
+                'tanggal'    => 'required|date|after_or_equal:today',
+                'waktu'      => 'required|string',
+                'plat'       => 'required|string|max:20',
+                'kendaraan'  => 'required|string|max:100',
+                'keluhan'    => 'required|string',
+                'total_biaya'=> 'nullable|integer|min:0',
+            ]);
+
+            // Get current user
+            $user = Auth::user();
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+            }
+
+            // Validate date is not in the past
+            $tanggalReservasi = Carbon::parse($request->tanggal)->startOfDay();
+            $today = Carbon::now()->startOfDay();
+            
+            if ($tanggalReservasi->lt($today)) {
+                return back()->with('error', 'Tanggal reservasi tidak boleh di masa lalu');
+            }
+
+            // Validate time is not in the past if today
+            if ($tanggalReservasi->isSameDay($today)) {
+                $now = Carbon::now();
+                $reservasiDateTime = Carbon::createFromFormat(
+                    'Y-m-d H:i',
+                    $request->tanggal . ' ' . $request->waktu,
+                    date_default_timezone_get()
+                );
+                
+                if ($reservasiDateTime->isPast()) {
+                    return back()->with('error', 'Jam reservasi sudah terlewat');
+                }
+            }
+
+            // Hitung total biaya dari harga layanan
+            // Prioritas: pakai total_biaya dari form (dikirim JS), fallback ke harga layanan dari DB
+            $layanan = Layanan::query()->where('id', '=', (int) $request->layanan_id)->first();
+            $totalBiaya = $request->filled('total_biaya')
+                ? (int) $request->total_biaya
+                : ($layanan ? (int) $layanan->harga : 0);
+
+            // Create new reservation
+            $reservasi = Reservasi::create([
+                'user_id'     => $user->id,
+                'bengkel_id'  => $request->bengkel_id,
+                'layanan_id'  => $request->layanan_id,
+                'tanggal'     => $request->tanggal,
+                'waktu'       => $request->waktu,
+                'plat'        => $request->plat,
+                'kendaraan'   => $request->kendaraan,
+                'keluhan'     => $request->keluhan,
+                'status'      => 'pending',
+                'total_biaya' => $totalBiaya,
+            ]);
+
+            return redirect()
+                ->route('pelanggan.riwayat')
+                ->with('success', 'Reservasi berhasil dibuat! Nomor reservasi: #' . str_pad($reservasi->id, 6, '0', STR_PAD_LEFT));
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (\Exception $e) {
+            Log::error('Error creating reservation: ' . $e->getMessage());
+            return back()
+                ->with('error', 'Terjadi kesalahan saat membuat reservasi. Silakan coba lagi.')
+                ->withInput();
+        }
     }
 
     /**
@@ -69,7 +165,7 @@ class ReservasiController extends Controller
                     'nama' => $user->name,
                     'hp' => $user->phone ?? '-',
                     'email' => $user->email ?? '',
-                    'plat' => '-' // TODO: Dapatkan dari reservation terakhir atau profile
+                    'plat' => '' 
                 ];
             });
 
@@ -259,7 +355,7 @@ class ReservasiController extends Controller
             }
 
             // Get layanan to get harga
-            $layanan = Layanan::find($request->layanan_id);
+            $layanan = Layanan::query()->where('id', '=', (int) $request->layanan_id)->first();
             $totalBiaya = $layanan ? (int)$layanan->harga : 0;
 
             // Buat reservasi
@@ -301,7 +397,7 @@ class ReservasiController extends Controller
         }
     }
 
-    public function updateStatusAdminCabang(Request $request, $id)
+    public function updateStatusAdminCabang(Request $request, int $id)
     {
         try {
             $user = Auth::user();
@@ -351,7 +447,7 @@ class ReservasiController extends Controller
     /**
      * Show detail reservasi untuk admin cabang
      */
-    public function showDetailAdminCabang($id)
+    public function showDetailAdminCabang(int $id)
     {
         try {
             $user = Auth::user();
@@ -379,7 +475,65 @@ class ReservasiController extends Controller
 
     public function riwayat()
     {
-        return view('pelanggan.riwayat');
+        $user = Auth::user();
+
+        $reservasiList = Reservasi::query()
+            ->where('user_id', $user->id)
+            ->with(['bengkel', 'layanan'])
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        // Hitung statistik
+        $totalReservasi  = $reservasiList->count();
+        $aktif           = $reservasiList->whereIn('status', ['pending', 'dikonfirmasi', 'diproses'])->count();
+        $selesai         = $reservasiList->where('status', 'selesai')->count();
+        $dibatalkan      = $reservasiList->where('status', 'dibatalkan')->count();
+
+        // Map ke format yang dipakai JS di blade
+        $reservasiJs = $reservasiList->map(function ($r) {
+            $statusMap = [
+                'pending'      => 'waiting',
+                'dikonfirmasi' => 'waiting',
+                'diproses'     => 'process',
+                'selesai'      => 'done',
+                'dibatalkan'   => 'cancel',
+            ];
+
+            $stepMap = [
+                'pending'      => 0,
+                'dikonfirmasi' => 1,
+                'diproses'     => 3,
+                'selesai'      => 5,
+                'dibatalkan'   => 0,
+            ];
+
+            return [
+                'id'        => 'RV-' . str_pad($r->id, 7, '0', STR_PAD_LEFT),
+                'db_id'     => $r->id,
+                'status'    => $statusMap[$r->status] ?? 'waiting',
+                'bengkel'   => $r->bengkel->nama ?? '-',
+                'alamat'    => $r->bengkel->alamat ?? '-',
+                'kendaraan' => $r->kendaraan ?? '-',
+                'plat'      => $r->plat ?? '-',
+                'layanan'   => $r->layanan->nama ?? '-',
+                'tanggal'   => $r->tanggal,
+                'jam'       => $r->waktu . ' WIB',
+                'keluhan'   => $r->keluhan ?? '',
+                'biaya'     => $r->total_biaya ? 'Rp ' . number_format($r->total_biaya, 0, ',', '.') : null,
+                'step'      => $stepMap[$r->status] ?? 0,
+                'timeline'  => [
+                    ['time' => $r->created_at->format('d M Y · H:i') . ' WIB', 'title' => 'Reservasi Dibuat', 'desc' => 'Reservasi berhasil dibuat.', 'state' => 'done'],
+                ],
+            ];
+        })->values()->toArray();
+
+        return view('pelanggan.riwayat', compact(
+            'reservasiJs',
+            'totalReservasi',
+            'aktif',
+            'selesai',
+            'dibatalkan'
+        ));
     }
 
     public function profile()
@@ -389,7 +543,52 @@ class ReservasiController extends Controller
 
     public function riwayatDetail(int $id)
     {
-        return view('pelanggan.riwayat-detail', compact('id'));
+        $user = Auth::user();
+
+        $reservasi = Reservasi::with(['bengkel', 'layanan'])
+            ->where('user_id', $user->id)
+            ->findOrFail($id);
+
+        $statusMap = [
+            'pending'      => 'waiting',
+            'dikonfirmasi' => 'waiting',
+            'diproses'     => 'process',
+            'selesai'      => 'done',
+            'dibatalkan'   => 'cancel',
+        ];
+
+        $stepMap = [
+            'pending'      => 0,
+            'dikonfirmasi' => 1,
+            'diproses'     => 3,
+            'selesai'      => 5,
+            'dibatalkan'   => 0,
+        ];
+
+        $reservasiJs = [
+            'id'        => 'RV-' . str_pad($reservasi->id, 7, '0', STR_PAD_LEFT),
+            'db_id'     => $reservasi->id,
+            'status'    => $statusMap[$reservasi->status] ?? 'waiting',
+            'step'      => $stepMap[$reservasi->status] ?? 0,
+            'bengkel'   => $reservasi->bengkel->nama ?? '-',
+            'alamat'    => $reservasi->bengkel->alamat ?? '-',
+            'telepon'   => $reservasi->bengkel->telepon ?? '-',
+            'jam_buka'  => ($reservasi->bengkel->jam_buka ?? '08:00') . ' – ' . ($reservasi->bengkel->jam_tutup ?? '17:00'),
+            'kendaraan' => $reservasi->kendaraan ?? '-',
+            'plat'      => $reservasi->plat ?? '-',
+            'layanan'   => $reservasi->layanan->nama ?? '-',
+            'durasi'    => $reservasi->layanan->durasi ?? null,
+            'tanggal'   => $reservasi->tanggal,
+            'jam'       => $reservasi->waktu . ' WIB',
+            'keluhan'   => $reservasi->keluhan ?? '',
+            'biaya'     => $reservasi->total_biaya ? 'Rp ' . number_format($reservasi->total_biaya, 0, ',', '.') : null,
+            'created_at'=> $reservasi->created_at->format('d F Y, H:i') . ' WIB',
+            'timeline'  => [
+                ['time' => $reservasi->created_at->format('d M Y · H:i') . ' WIB', 'title' => 'Reservasi Dibuat', 'desc' => 'Reservasi berhasil dibuat secara online.', 'state' => 'done'],
+            ],
+        ];
+
+        return view('pelanggan.riwayat-detail', compact('reservasi', 'reservasiJs'));
     }    
     
 

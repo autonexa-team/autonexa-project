@@ -503,10 +503,31 @@
        VALIDASI SUBMIT
     ================================================================ */
     document.getElementById('formBooking')?.addEventListener('submit', function (e) {
+        /* Sinkronkan nilai Blok 2 (di luar form) ke hidden field di dalam form */
+        const platVal      = document.querySelector('input[name="plat"]')?.value ?? '';
+        const kendaraanVal = document.querySelector('input[name="kendaraan"]')?.value ?? '';
+        const platHidden      = document.getElementById('platHidden');
+        const kendaraanHidden = document.getElementById('kendaraanHidden');
+        if (platHidden)      platHidden.value      = platVal;
+        if (kendaraanHidden) kendaraanHidden.value = kendaraanVal;
+
+        /* Validasi */
         if (!bengkelIdForm.value) {
             e.preventDefault();
             alert('Silakan pilih bengkel terlebih dahulu.');
             document.getElementById('blok-bengkel').scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+        if (!platVal.trim()) {
+            e.preventDefault();
+            alert('Silakan isi nomor plat kendaraan.');
+            document.getElementById('blok-kendaraan').scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+        if (!kendaraanVal.trim()) {
+            e.preventDefault();
+            alert('Silakan isi jenis kendaraan.');
+            document.getElementById('blok-kendaraan').scrollIntoView({ behavior: 'smooth' });
             return;
         }
         if (!document.getElementById('layananIdForm').value) {

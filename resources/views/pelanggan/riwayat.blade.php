@@ -44,7 +44,7 @@
                     --c-icon-bg:rgba(249,115,22,.08); --c-icon-border:rgba(249,115,22,.18); --c-icon:#f97316;">
             <div class="stat-tile__blob"></div>
             <div class="stat-tile__icon"><i class="fas fa-calendar-alt"></i></div>
-            <div class="stat-tile__num counter" data-target="12">0</div>
+            <div class="stat-tile__num counter" data-target="{{ $totalReservasi }}">0</div>
             <div class="stat-tile__label">Total Reservasi</div>
         </div>
 
@@ -54,7 +54,7 @@
                     --c-icon-bg:rgba(59,130,246,.08); --c-icon-border:rgba(59,130,246,.18); --c-icon:#2563eb;">
             <div class="stat-tile__blob"></div>
             <div class="stat-tile__icon"><i class="fas fa-wrench"></i></div>
-            <div class="stat-tile__num counter" data-target="2">0</div>
+            <div class="stat-tile__num counter" data-target="{{ $aktif }}">0</div>
             <div class="stat-tile__label">Sedang Aktif</div>
         </div>
 
@@ -64,7 +64,7 @@
                     --c-icon-bg:rgba(16,185,129,.08); --c-icon-border:rgba(16,185,129,.18); --c-icon:#059669;">
             <div class="stat-tile__blob"></div>
             <div class="stat-tile__icon"><i class="fas fa-check-circle"></i></div>
-            <div class="stat-tile__num counter" data-target="8">0</div>
+            <div class="stat-tile__num counter" data-target="{{ $selesai }}">0</div>
             <div class="stat-tile__label">Selesai</div>
         </div>
 
@@ -74,7 +74,7 @@
                     --c-icon-bg:rgba(239,68,68,.08); --c-icon-border:rgba(239,68,68,.18); --c-icon:#dc2626;">
             <div class="stat-tile__blob"></div>
             <div class="stat-tile__icon"><i class="fas fa-times-circle"></i></div>
-            <div class="stat-tile__num counter" data-target="2">0</div>
+            <div class="stat-tile__num counter" data-target="{{ $dibatalkan }}">0</div>
             <div class="stat-tile__label">Dibatalkan</div>
         </div>
     </div>
@@ -100,19 +100,19 @@
     ════════════════════════════════════════ --}}
     <div class="tabs" id="tabBar">
         <button class="tab-btn active" data-tab="all">
-            Semua <span class="tab-count">12</span>
+            Semua <span class="tab-count">{{ $totalReservasi }}</span>
         </button>
         <button class="tab-btn" data-tab="process">
-            <i class="fas fa-wrench" style="font-size:.7rem;"></i> Diproses <span class="tab-count">1</span>
+            <i class="fas fa-wrench" style="font-size:.7rem;"></i> Diproses <span class="tab-count">{{ collect($reservasiJs)->where('status','process')->count() }}</span>
         </button>
         <button class="tab-btn" data-tab="waiting">
-            <i class="fas fa-clock" style="font-size:.7rem;"></i> Menunggu <span class="tab-count">1</span>
+            <i class="fas fa-clock" style="font-size:.7rem;"></i> Menunggu <span class="tab-count">{{ collect($reservasiJs)->where('status','waiting')->count() }}</span>
         </button>
         <button class="tab-btn" data-tab="done">
-            <i class="fas fa-check" style="font-size:.7rem;"></i> Selesai <span class="tab-count">8</span>
+            <i class="fas fa-check" style="font-size:.7rem;"></i> Selesai <span class="tab-count">{{ $selesai }}</span>
         </button>
         <button class="tab-btn" data-tab="cancel">
-            <i class="fas fa-ban" style="font-size:.7rem;"></i> Dibatalkan <span class="tab-count">2</span>
+            <i class="fas fa-ban" style="font-size:.7rem;"></i> Dibatalkan <span class="tab-count">{{ $dibatalkan }}</span>
         </button>
     </div>
 
@@ -181,240 +181,9 @@
     'use strict';
 
     /* ══════════════════════════════════════
-       DUMMY DATA
+       DATA DARI DATABASE
     ══════════════════════════════════════ */
-    const RESERVATIONS = [
-        {
-            id: 'RV-2025-001',
-            status: 'process',
-            bengkel: 'AutoNexa Cabang Bandung',
-            alamat: 'Jl. Soekarno-Hatta No. 88',
-            kendaraan: 'Honda Brio',
-            plat: 'B 1234 XYZ',
-            layanan: 'Servis Berkala 10.000 KM',
-            tanggal: '2025-07-10',
-            jam: '10:00 WIB',
-            keluhan: 'Mesin terasa kasar, oli sudah lama tidak ganti',
-            biaya: null,
-            step: 3, // 0-5
-            timeline: [
-                { time: '10 Jul, 09:15', title: 'Reservasi Dibuat', desc: 'Kamu berhasil membuat reservasi online.', state: 'done' },
-                { time: '10 Jul, 09:45', title: 'Reservasi Dikonfirmasi', desc: 'Admin bengkel telah mengkonfirmasi reservasi kamu.', state: 'done' },
-                { time: '10 Jul, 10:10', title: 'Kendaraan Diterima', desc: 'Kendaraan sudah tiba dan sedang diperiksa mekanik.', state: 'done' },
-                { time: 'Sedang berlangsung', title: 'Proses Servis', desc: 'Mekanik sedang mengerjakan kendaraan kamu.', state: 'active' },
-                { time: '—', title: 'Quality Check', desc: 'Pengecekan akhir kualitas hasil servis.', state: 'idle' },
-                { time: '—', title: 'Selesai', desc: 'Kendaraan siap diambil.', state: 'idle' },
-            ]
-        },
-        {
-            id: 'RV-2025-002',
-            status: 'waiting',
-            bengkel: 'AutoNexa Cabang Jakarta Selatan',
-            alamat: 'Jl. TB Simatupang No. 12',
-            kendaraan: 'Toyota Avanza',
-            plat: 'D 5678 ABC',
-            layanan: 'Tune Up Mesin',
-            tanggal: '2025-07-14',
-            jam: '13:00 WIB',
-            keluhan: 'Konsumsi BBM boros, akselerasi kurang responsif',
-            biaya: null,
-            step: 0,
-            timeline: [
-                { time: '12 Jul, 14:30', title: 'Reservasi Dibuat', desc: 'Kamu berhasil membuat reservasi untuk 14 Juli.', state: 'done' },
-                { time: '—', title: 'Menunggu Konfirmasi Admin', desc: 'Admin akan segera mengkonfirmasi reservasimu.', state: 'active' },
-                { time: '—', title: 'Kendaraan Diterima', desc: '', state: 'idle' },
-                { time: '—', title: 'Proses Servis', desc: '', state: 'idle' },
-                { time: '—', title: 'Quality Check', desc: '', state: 'idle' },
-                { time: '—', title: 'Selesai', desc: '', state: 'idle' },
-            ]
-        },
-        {
-            id: 'RV-2025-003',
-            status: 'done',
-            bengkel: 'AutoNexa Cabang Bandung',
-            alamat: 'Jl. Soekarno-Hatta No. 88',
-            kendaraan: 'Honda Brio',
-            plat: 'B 1234 XYZ',
-            layanan: 'Ganti Oli & Filter',
-            tanggal: '2025-06-20',
-            jam: '09:00 WIB',
-            keluhan: 'Ganti oli rutin',
-            biaya: 'Rp 185.000',
-            step: 5,
-            timeline: [
-                { time: '20 Jun, 08:30', title: 'Reservasi Dibuat',       desc: 'Reservasi online berhasil dibuat.', state: 'done' },
-                { time: '20 Jun, 08:50', title: 'Reservasi Dikonfirmasi', desc: 'Admin telah mengkonfirmasi.', state: 'done' },
-                { time: '20 Jun, 09:05', title: 'Kendaraan Diterima',     desc: 'Kendaraan sudah di bengkel.', state: 'done' },
-                { time: '20 Jun, 09:20', title: 'Proses Servis',          desc: 'Mekanik mengerjakan ganti oli.', state: 'done' },
-                { time: '20 Jun, 09:45', title: 'Quality Check',          desc: 'Pengecekan kebocoran & tekanan oli.', state: 'done' },
-                { time: '20 Jun, 10:00', title: 'Selesai',                desc: 'Kendaraan siap diambil. Terima kasih!', state: 'done' },
-            ]
-        },
-        {
-            id: 'RV-2025-004',
-            status: 'done',
-            bengkel: 'AutoNexa Cabang Surabaya',
-            alamat: 'Jl. Ahmad Yani No. 45',
-            kendaraan: 'Toyota Avanza',
-            plat: 'D 5678 ABC',
-            layanan: 'Pengecekan & Servis Rem',
-            tanggal: '2025-05-15',
-            jam: '11:00 WIB',
-            keluhan: 'Rem terasa blong saat pengereman mendadak',
-            biaya: 'Rp 420.000',
-            step: 5,
-            timeline: [
-                { time: '15 Mei, 10:30', title: 'Reservasi Dibuat',       desc: '', state: 'done' },
-                { time: '15 Mei, 10:45', title: 'Reservasi Dikonfirmasi', desc: '', state: 'done' },
-                { time: '15 Mei, 11:05', title: 'Kendaraan Diterima',     desc: '', state: 'done' },
-                { time: '15 Mei, 11:30', title: 'Proses Servis',          desc: 'Penggantian kampas rem depan & belakang.', state: 'done' },
-                { time: '15 Mei, 13:00', title: 'Quality Check',          desc: '', state: 'done' },
-                { time: '15 Mei, 13:30', title: 'Selesai',                desc: 'Kendaraan telah selesai diservis.', state: 'done' },
-            ]
-        },
-        {
-            id: 'RV-2025-005',
-            status: 'done',
-            bengkel: 'AutoNexa Cabang Bandung',
-            alamat: 'Jl. Soekarno-Hatta No. 88',
-            kendaraan: 'Honda Brio',
-            plat: 'B 1234 XYZ',
-            layanan: 'Servis AC Mobil',
-            tanggal: '2025-04-08',
-            jam: '10:30 WIB',
-            keluhan: 'AC tidak dingin, ada suara berisik dari blower',
-            biaya: 'Rp 650.000',
-            step: 5,
-            timeline: [
-                { time: '08 Apr, 10:00', title: 'Reservasi Dibuat',       desc: '', state: 'done' },
-                { time: '08 Apr, 10:15', title: 'Reservasi Dikonfirmasi', desc: '', state: 'done' },
-                { time: '08 Apr, 10:35', title: 'Kendaraan Diterima',     desc: '', state: 'done' },
-                { time: '08 Apr, 11:00', title: 'Proses Servis',          desc: 'Pembersihan evaporator & isi freon.', state: 'done' },
-                { time: '08 Apr, 13:30', title: 'Quality Check',          desc: '', state: 'done' },
-                { time: '08 Apr, 14:00', title: 'Selesai',                desc: '', state: 'done' },
-            ]
-        },
-        {
-            id: 'RV-2025-006',
-            status: 'done',
-            bengkel: 'AutoNexa Cabang Jakarta Selatan',
-            alamat: 'Jl. TB Simatupang No. 12',
-            kendaraan: 'Toyota Avanza',
-            plat: 'D 5678 ABC',
-            layanan: 'Balancing & Rotasi Ban',
-            tanggal: '2025-03-22',
-            jam: '14:00 WIB',
-            keluhan: 'Setir goyang di kecepatan tinggi',
-            biaya: 'Rp 150.000',
-            step: 5,
-            timeline: [
-                { time: '22 Mar', title: 'Reservasi Dibuat',       desc: '', state: 'done' },
-                { time: '22 Mar', title: 'Reservasi Dikonfirmasi', desc: '', state: 'done' },
-                { time: '22 Mar', title: 'Kendaraan Diterima',     desc: '', state: 'done' },
-                { time: '22 Mar', title: 'Proses Servis',          desc: '', state: 'done' },
-                { time: '22 Mar', title: 'Quality Check',          desc: '', state: 'done' },
-                { time: '22 Mar', title: 'Selesai',                desc: '', state: 'done' },
-            ]
-        },
-        {
-            id: 'RV-2025-007',
-            status: 'done',
-            bengkel: 'AutoNexa Cabang Bandung',
-            alamat: 'Jl. Soekarno-Hatta No. 88',
-            kendaraan: 'Honda Brio',
-            plat: 'B 1234 XYZ',
-            layanan: 'Servis Berkala 20.000 KM',
-            tanggal: '2025-02-14',
-            jam: '09:30 WIB',
-            keluhan: 'Servis berkala rutin 20.000 KM',
-            biaya: 'Rp 490.000',
-            step: 5,
-            timeline: [
-                { time: '14 Feb', title: 'Selesai', desc: '', state: 'done' },
-            ]
-        },
-        {
-            id: 'RV-2025-008',
-            status: 'done',
-            bengkel: 'AutoNexa Cabang Surabaya',
-            alamat: 'Jl. Ahmad Yani No. 45',
-            kendaraan: 'Toyota Avanza',
-            plat: 'D 5678 ABC',
-            layanan: 'Ganti Oli & Filter',
-            tanggal: '2025-01-05',
-            jam: '11:30 WIB',
-            keluhan: 'Ganti oli awal tahun',
-            biaya: 'Rp 175.000',
-            step: 5,
-            timeline: []
-        },
-        {
-            id: 'RV-2024-011',
-            status: 'done',
-            bengkel: 'AutoNexa Cabang Bandung',
-            alamat: 'Jl. Soekarno-Hatta No. 88',
-            kendaraan: 'Honda Brio',
-            plat: 'B 1234 XYZ',
-            layanan: 'Tune Up Mesin',
-            tanggal: '2024-11-30',
-            jam: '10:00 WIB',
-            keluhan: 'Mesin sering brebet pagi hari',
-            biaya: 'Rp 780.000',
-            step: 5,
-            timeline: []
-        },
-        {
-            id: 'RV-2024-009',
-            status: 'done',
-            bengkel: 'AutoNexa Cabang Jakarta Selatan',
-            alamat: 'Jl. TB Simatupang No. 12',
-            kendaraan: 'Toyota Avanza',
-            plat: 'D 5678 ABC',
-            layanan: 'Servis AC Mobil',
-            tanggal: '2024-09-18',
-            jam: '13:30 WIB',
-            keluhan: 'AC kurang dingin saat macet',
-            biaya: 'Rp 520.000',
-            step: 5,
-            timeline: []
-        },
-        {
-            id: 'RV-2024-007',
-            status: 'cancel',
-            bengkel: 'AutoNexa Cabang Bandung',
-            alamat: 'Jl. Soekarno-Hatta No. 88',
-            kendaraan: 'Honda Brio',
-            plat: 'B 1234 XYZ',
-            layanan: 'Servis Berkala 10.000 KM',
-            tanggal: '2024-08-03',
-            jam: '09:00 WIB',
-            keluhan: 'Servis rutin',
-            biaya: null,
-            step: 0,
-            timeline: [
-                { time: '01 Agu, 10:00', title: 'Reservasi Dibuat', desc: '', state: 'done' },
-                { time: '02 Agu, 14:00', title: 'Dibatalkan', desc: 'Reservasi dibatalkan oleh pelanggan.', state: 'active' },
-            ]
-        },
-        {
-            id: 'RV-2024-005',
-            status: 'cancel',
-            bengkel: 'AutoNexa Cabang Surabaya',
-            alamat: 'Jl. Ahmad Yani No. 45',
-            kendaraan: 'Toyota Avanza',
-            plat: 'D 5678 ABC',
-            layanan: 'Pengecekan Rem',
-            tanggal: '2024-06-20',
-            jam: '14:30 WIB',
-            keluhan: 'Rem sedikit blong',
-            biaya: null,
-            step: 0,
-            timeline: [
-                { time: '18 Jun', title: 'Reservasi Dibuat', desc: '', state: 'done' },
-                { time: '19 Jun', title: 'Dibatalkan', desc: 'Reservasi dibatalkan oleh admin (slot penuh).', state: 'active' },
-            ]
-        },
-    ];
+    const RESERVATIONS = @json($reservasiJs);
 
     /* step labels & icons */
     const STEPS = [
@@ -575,7 +344,7 @@
                 </div>
                 <div class="foot-right">
                     ${biayaHtml}
-                    <a href="{{ url('pelanggan/riwayat') }}/${r.id}" class="btn btn--ghost btn--sm">
+                    <a href="{{ url('pelanggan/riwayat') }}/${r.db_id}" class="btn btn--ghost btn--sm">
                         <i class="fas fa-eye"></i> Lihat Detail
                     </a>
                     ${isCancelled ? '' : `<a href="#" class="btn btn--outline btn--sm">

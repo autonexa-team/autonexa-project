@@ -6,6 +6,7 @@ use App\Models\Bengkel;
 use App\Models\Reservasi;
 use App\Models\Layanan;
 use App\Models\User;
+use App\Models\Sparepart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -450,25 +451,45 @@ class ReservasiController extends Controller
     public function showDetailAdminCabang(int $id)
     {
         try {
+
             $user = Auth::user();
+
             if (!$user || !$user->isAdminCabang()) {
                 abort(401, 'Unauthorized');
             }
 
-            $reservasi = Reservasi::with(['user', 'layanan', 'bengkel'])
-                ->findOrFail($id);
+            $reservasi = Reservasi::with([
+                'user',
+                'layanan',
+                'bengkel',
+                'spareparts'
+            ])->findOrFail($id);
 
-            // Verify ownership - admin cabang hanya bisa lihat reservasi dari bengkelnya sendiri
             if ($reservasi->bengkel_id !== $user->bengkel->id) {
                 abort(403, 'Forbidden');
             }
 
-            return view('admin-cabang.reservasi-detail', compact('reservasi'));
+            // sparepart aktif milik bengkel
+            $sparepartsAktif = $reservasi->bengkel
+                ->spareparts()
+                ->wherePivot('stok', '>', 0)
+                ->get();
+
+            return view(
+                'admin-cabang.reservasi-detail',
+                compact(
+                    'reservasi',
+                    'sparepartsAktif'
+                )
+            );
+
         } catch (\Exception $e) {
-            Log::error('Error showing reservasi detail: ' . $e->getMessage(), [
+
+            Log::error('Error showing reservasi detail: '.$e->getMessage(), [
                 'exception' => $e,
                 'reservasi_id' => $id
             ]);
+
             abort(404, 'Reservasi tidak ditemukan');
         }
     }
@@ -599,5 +620,68 @@ class ReservasiController extends Controller
         }
 
         return $this->index();
+    }    
+
+    // update catatan service    
+    public function updateHasilService(Request $request, $id)
+    {
+        $request->validate([
+            'hasil_service' => 'nullable|string'
+        ]);
+
+        $reservasi = Reservasi::findOrFail($id);
+
+        $reservasi->update([
+            'hasil_service' => $request->hasil_service
+        ]);
+
+        return back()->with(
+            'success',
+            'Catatan servis berhasil disimpan'
+        );
+    }    
+
+    public function tambahSparepart(Request $request, $id)
+    {
+        $request->validate([
+            'sparepart_id' => 'required|exists:sparepart,id',
+            'qty' => 'required|integer|min:1'
+        ]);
+
+        $reservasi = Reservasi::findOrFail($id);
+
+        $sparepart = Sparepart::findOrFail(
+            $request->sparepart_id
+        );
+
+        $reservasi->spareparts()->attach(
+            $sparepart->id,
+            [
+                'qty' => $request->qty,
+                'harga' => $sparepart->harga
+            ]
+        );
+
+        $reservasi->increment(
+            'total_biaya',
+            $sparepart->harga * $request->qty
+        );
+
+        return back()->with(
+            'success',
+            'Sparepart berhasil ditambahkan'
+        );
+    }    
+
+    public function hapusSparepart($reservasiId, $sparepartId)
+    {
+        $reservasi = Reservasi::findOrFail($reservasiId);
+
+        $reservasi->spareparts()->detach($sparepartId);
+
+        return back()->with(
+            'success',
+            'Sparepart berhasil dihapus'
+        );
     }    
 }

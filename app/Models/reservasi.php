@@ -18,7 +18,18 @@ class Reservasi extends Model
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function bengkel(): BelongsTo { return $this->belongsTo(Bengkel::class); }
     public function layanan(): BelongsTo { return $this->belongsTo(Layanan::class); }
-    public function spareparts(): HasMany { return $this->hasMany(Sparepart::class); }
+    
+    public function spareparts()
+    {
+        return $this->belongsToMany(
+            Sparepart::class,
+            'reservasi_spareparts'
+        )->withPivot([
+            'qty',
+            'harga'
+        ])->withTimestamps();
+    }
+    
     public function review() { return $this->hasOne(Review::class); }
 
     public function getStatusLabelAttribute(): string

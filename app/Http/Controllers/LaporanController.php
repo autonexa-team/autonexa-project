@@ -27,14 +27,14 @@ class LaporanController extends Controller
         }
 
         return [
-            $request->input('dari',   now()->startOfMonth()->format('Y-m-d')),
-            $request->input('sampai', now()->format('Y-m-d')),
+            $request->input('dari',   now()->startOfYear()->format('Y-m-d')),
+            $request->input('sampai', now()->endOfYear()->format('Y-m-d')),
         ];
     }
 
     private function getReportData(string $dari, string $sampai): array
     {
-        $reservasis = Reservasi::with(['user', 'bengkel'])
+        $reservasis = Reservasi::with(['user', 'bengkel', 'layanan'])
             ->whereBetween('tanggal', [$dari, $sampai])
             ->orderBy('tanggal')
             ->get();
@@ -44,7 +44,7 @@ class LaporanController extends Controller
                          COUNT(*) as jumlah_transaksi,
                          SUM(total_biaya) as total')
             ->whereBetween('tanggal', [$dari, $sampai])
-            ->where('status', '=', 'done')
+            ->where('status', '=', 'selesai')
             ->groupBy('tanggal', 'bengkel_id')
             ->orderBy('tanggal')
             ->get()
@@ -62,7 +62,7 @@ class LaporanController extends Controller
             ->withSum([
                 'reservasis as total_pendapatan' => fn($q) =>
                     $q->whereBetween('tanggal', [$dari, $sampai])
-                      ->where('status', '=', 'done')
+                      ->where('status', '=', 'selesai')
             ], 'total_biaya')
             ->withAvg([
                 'reviews as rating' => fn($q) =>
@@ -97,7 +97,7 @@ class LaporanController extends Controller
     private function getReportDataCabang(int $bengkelId, string $dari, string $sampai): array
     {
         $reservasis = Reservasi::query()
-            ->with('user')
+            ->with(['user', 'layanan'])
             ->where('bengkel_id', '=', $bengkelId)
             ->whereBetween('tanggal', [$dari, $sampai])
             ->orderBy('tanggal')
@@ -110,7 +110,7 @@ class LaporanController extends Controller
             )
             ->where('bengkel_id', '=', $bengkelId)
             ->whereBetween('tanggal', [$dari, $sampai])
-            ->where('status', '=', 'done')
+            ->where('status', '=', 'selesai')
             ->groupBy('tanggal')
             ->orderBy('tanggal')
             ->get()
@@ -142,9 +142,9 @@ class LaporanController extends Controller
             $this->getReportData($dari, $sampai);
 
         $totalReservasi  = $reservasis->count();
-        $selesai         = $reservasis->where('status', 'done')->count();
-        $dibatalkan      = $reservasis->where('status', 'cancelled')->count();
-        $totalPendapatan = $reservasis->where('status', 'done')->sum('total_biaya');
+        $selesai         = $reservasis->where('status', 'selesai')->count();
+        $dibatalkan      = $reservasis->where('status', 'dibatalkan')->count();
+        $totalPendapatan = $reservasis->where('status', 'selesai')->sum('total_biaya');
         $totalReview     = $reviews->sum('jumlah_review');
         $avgRating       = $reviews->avg('rating_avg') ?? 0;
 
@@ -165,9 +165,9 @@ class LaporanController extends Controller
             $this->getReportData($dari, $sampai);
 
         $totalReservasi  = $reservasis->count();
-        $selesai         = $reservasis->where('status', 'done')->count();
-        $dibatalkan      = $reservasis->where('status', 'cancelled')->count();
-        $totalPendapatan = $reservasis->where('status', 'done')->sum('total_biaya');
+        $selesai         = $reservasis->where('status', 'selesai')->count();
+        $dibatalkan      = $reservasis->where('status', 'dibatalkan')->count();
+        $totalPendapatan = $reservasis->where('status', 'selesai')->sum('total_biaya');
         $totalReview     = $reviews->sum('jumlah_review');
         $avgRating       = $reviews->avg('rating_avg') ?? 0;
 
@@ -198,20 +198,20 @@ class LaporanController extends Controller
     // ── ADMIN CABANG — Halaman laporan ────────────────────────────
     public function indexCabang(Request $request)
     {
-        /** @var \App\Models\User $user */
         $user    = Auth::user();
         $bengkel = $user->bengkel;
 
-        $dari   = $request->dari   ?? now()->startOfMonth()->toDateString();
-        $sampai = $request->sampai ?? now()->endOfMonth()->toDateString();
+        // Default: tampilkan seluruh tahun berjalan
+        $dari   = $request->dari   ?? now()->startOfYear()->toDateString();
+        $sampai = $request->sampai ?? now()->endOfYear()->toDateString();
 
         [$reservasis, $pendapatanHarian, $reviews] =
             $this->getReportDataCabang($bengkel->id, $dari, $sampai);
 
         $totalReservasi  = $reservasis->count();
-        $totalPendapatan = $reservasis->where('status', 'done')->sum('total_biaya');
-        $selesai         = $reservasis->where('status', 'done')->count();
-        $dibatalkan      = $reservasis->where('status', 'cancelled')->count();
+        $totalPendapatan = $reservasis->where('status', 'selesai')->sum('total_biaya');
+        $selesai         = $reservasis->where('status', 'selesai')->count();
+        $dibatalkan      = $reservasis->where('status', 'dibatalkan')->count();
         $totalReview     = $reviews->count();
         $avgRating       = $reviews->avg('rating') ?? 0;
 
@@ -219,7 +219,7 @@ class LaporanController extends Controller
             'reservasis', 'pendapatanHarian', 'reviews',
             'totalReservasi', 'totalPendapatan',
             'selesai', 'dibatalkan', 'totalReview', 'avgRating',
-            'dari', 'sampai', 'bengkel'          // ← tambah $bengkel biar bisa dipakai di blade
+            'dari', 'sampai', 'bengkel'
         ));
     }
 
@@ -234,9 +234,9 @@ class LaporanController extends Controller
             $this->getReportDataCabang($bengkel->id, $dari, $sampai);
 
         $totalReservasi  = $reservasis->count();
-        $selesai         = $reservasis->where('status', 'done')->count();
-        $dibatalkan      = $reservasis->where('status', 'cancelled')->count();
-        $totalPendapatan = $reservasis->where('status', 'done')->sum('total_biaya');
+        $selesai         = $reservasis->where('status', 'selesai')->count();
+        $dibatalkan      = $reservasis->where('status', 'dibatalkan')->count();
+        $totalPendapatan = $reservasis->where('status', 'selesai')->sum('total_biaya');
         $totalReview     = $reviews->count();
         $avgRating       = $reviews->avg('rating') ?? 0;
 

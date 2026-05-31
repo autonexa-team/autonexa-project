@@ -9,7 +9,7 @@
 @section('content')
 
 {{-- ===== PAGE HEADER ===== --}}
-<div class="dash-header">
+<div class="dash-hea{{ number_format($totalPelanggan ?? 0) }}der">
     <div>
         <h1 class="dash-title">Dashboard</h1>
         <p class="dash-sub">Selamat datang kembali, <strong>{{ auth()->user()->name ?? 'Admin' }}</strong> · Terakhir diperbarui {{ now()->format('d M Y, H:i') }} WIB</p>
@@ -102,7 +102,11 @@
         </div>
         <div class="stat-body">
             <div class="stat-label">Total Pelanggan</div>
-            <div class="stat-value">{{ number_format($totalPelanggan ?? 0) }}</div>
+            <div class="stat-value">
+                'totalPelanggan' => DB::table('users')
+                ->where('role', 'pelanggan')
+                ->count(),
+            </div>
             <div class="stat-trend {{ ($trendPelanggan ?? 0) >= 0 ? 'trend-up' : 'trend-down' }}">
                 <i class="bi bi-arrow-{{ ($trendPelanggan ?? 0) >= 0 ? 'up' : 'down' }}-short"></i>
                 {{ abs($trendPelanggan ?? 0) }}% bulan ini

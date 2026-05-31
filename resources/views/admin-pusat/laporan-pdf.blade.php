@@ -566,8 +566,8 @@
                     'pending'     => ['Menunggu',     'b-pending'],
                     'dikonfirmasi'   => ['Dikonfirmasi', 'b-konfirm'],
                     'in_progress' => ['Dikerjakan',   'b-proses'],
-                    'done'        => ['Selesai',       'b-selesai'],
-                    'cancelled'   => ['Dibatalkan',   'b-batal'],
+                    'selesai'        => ['Selesai',       'b-selesai'],
+                    'dibatalkan'   => ['Dibatalkan',   'b-batal'],
                 ];
                 [$statusLbl, $statusCls] = $statusMap[$r->status]
                     ?? [ucfirst($r->status), 'b-pending'];

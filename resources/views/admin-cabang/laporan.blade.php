@@ -439,7 +439,7 @@
                                 'pending'      => ['Menunggu',     'bg-slate-100 text-slate-600'],
                                 'dikonfirmasi' => ['Dikonfirmasi', 'bg-blue-100 text-blue-700'],
                                 'in_progress'  => ['Dikerjakan',   'bg-amber-100 text-amber-700'],
-                                'done'         => ['Selesai',      'bg-emerald-100 text-emerald-700'],
+                                'selesai'         => ['Selesai',      'bg-emerald-100 text-emerald-700'],
                                 'cancelled'    => ['Dibatalkan',   'bg-red-100 text-red-600'],
                             ];
                             [$label, $cls] = $sMap[$r->status] ?? [ucfirst($r->status), 'bg-slate-100 text-slate-600'];
@@ -450,7 +450,7 @@
                                 <p class="text-xs text-slate-400">{{ \Carbon\Carbon::parse($r->tanggal)->format('d M Y') }}</p>
                             </td>
                             <td class="p-4 text-slate-600 font-medium text-sm">
-                                {{ $r->layanan ?? $r->keluhan ?? '-' }}
+                                {{ $r->layanan->nama ?? $r->keluhan ?? '-' }}
                             </td>
                             <td class="p-4">
                                 <span class="px-2 py-1 rounded text-xs font-bold border {{ $cls }} border-opacity-30">
@@ -628,7 +628,7 @@ function setFilter(type) {
 var _reservasis     = {!! json_encode(($reservasis ?? collect())->map(fn($r) => [
     'nama'        => $r->user->name ?? '-',
     'tanggal'     => \Carbon\Carbon::parse($r->tanggal)->format('d M Y'),
-    'layanan'     => $r->layanan ?? $r->keluhan ?? '-',
+    'layanan'     => $r->layanan->nama ?? $r->keluhan ?? '-' ,
     'status'      => $r->status,
     'total_biaya' => $r->total_biaya ?? 0,
 ])->values()) !!};
@@ -731,7 +731,7 @@ const statusMap = {
     'pending':      { label: 'Menunggu',     color: COLOR.slate500, bg: '#f1f5f9' },
     'dikonfirmasi': { label: 'Dikonfirmasi', color: '#1e40af',      bg: '#dbeafe' },
     'in_progress':  { label: 'Dikerjakan',   color: COLOR.amber,    bg: COLOR.amberBg },
-    'done':         { label: 'Selesai',      color: COLOR.emerald,  bg: COLOR.emeraldBg },
+    'selesai':         { label: 'Selesai',      color: COLOR.emerald,  bg: COLOR.emeraldBg },
     'cancelled':    { label: 'Dibatalkan',   color: COLOR.red,      bg: COLOR.redBg },
 };
 

@@ -284,9 +284,8 @@ Route::middleware(['auth', 'role:admin_cabang'])
     Route::get('/review/{id}', [ReviewController::class, 'showCabang'])->name('review.detail');
     
     // PELANGGAN
-    Route::get('/pelanggan', function () {
-        return view('admin-cabang.pelanggan-cabang');
-    })->name('pelanggan-cabang');
+    Route::get('/pelanggan', [AdminCabangController::class, 'pelangganCabang'])
+    ->name('pelanggan-cabang');
 
     // LAPORAN
     Route::get('/laporan',     [LaporanController::class, 'indexCabang'])

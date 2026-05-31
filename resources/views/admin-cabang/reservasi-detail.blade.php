@@ -156,14 +156,33 @@
                 
                 <div class="mt-6 pt-6 border-t border-slate-100">
                     <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
-                        <span class="flex items-center gap-2">Deskripsi Perbaikan <span class="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-[10px]">Admin</span></span>
+                        <span class="flex items-center gap-2">
+                            Deskripsi Perbaikan
+                            <span class="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-[10px]">
+                                Admin
+                            </span>
+                        </span>
                     </p>
-                    <textarea class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand p-4 outline-none transition-all resize-none" rows="3" placeholder="Masukkan detail perbaikan yang telah dilakukan pada kendaraan..."></textarea>
-                    <div class="mt-3 flex justify-end">
-                        <button class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors flex items-center gap-2 shadow-sm">
-                            <i class="fas fa-save"></i> Simpan Catatan
-                        </button>
-                    </div>
+
+                    <form action="{{ route('admin-cabang.reservasi.hasil-service', $reservasi->id) }}" method="POST">
+                        @csrf
+                        <textarea
+                            name="hasil_service"
+                            rows="3"
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand p-4 outline-none transition-all resize-none"
+                            placeholder="Masukkan detail perbaikan yang telah dilakukan pada kendaraan..."
+                        >{{ old('hasil_service', $reservasi->hasil_service) }}</textarea>
+
+                        <div class="mt-3 flex justify-end">
+                            <button
+                                type="submit"
+                                class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors flex items-center gap-2 shadow-sm"
+                            >
+                                <i class="fas fa-save"></i>
+                                Simpan Catatan
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -193,81 +212,75 @@
                                 <th class="px-6 py-3 font-bold text-center w-16">Aksi</th>
                             </tr>
                         </thead>
+
                         <tbody class="divide-y divide-slate-50 text-sm">
-                            <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
-                                <td class="px-6 py-4 font-bold text-slate-700">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-2 h-2 rounded-full bg-brand"></div>
-                                        Oli Mesin Fastron 10W-40
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <div class="inline-flex items-center bg-slate-50 border border-slate-200 rounded-lg">
-                                        <button class="px-2 py-1 text-slate-400 hover:text-brand">-</button>
-                                        <span class="font-bold w-6 text-center text-slate-700">1</span>
-                                        <button class="px-2 py-1 text-slate-400 hover:text-brand">+</button>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-right text-slate-500 font-medium">Rp 350.000</td>
-                                <td class="px-6 py-4 text-right font-bold text-slate-800">Rp 350.000</td>
-                                <td class="px-6 py-4 text-center">
-                                    <button class="w-8 h-8 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors inline-flex items-center justify-center">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
-                                <td class="px-6 py-4 font-bold text-slate-700">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-2 h-2 rounded-full bg-brand"></div>
-                                        Filter Udara Toyota
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <div class="inline-flex items-center bg-slate-50 border border-slate-200 rounded-lg">
-                                        <button class="px-2 py-1 text-slate-400 hover:text-brand">-</button>
-                                        <span class="font-bold w-6 text-center text-slate-700">1</span>
-                                        <button class="px-2 py-1 text-slate-400 hover:text-brand">+</button>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-right text-slate-500 font-medium">Rp 125.000</td>
-                                <td class="px-6 py-4 text-right font-bold text-slate-800">Rp 125.000</td>
-                                <td class="px-6 py-4 text-center">
-                                    <button class="w-8 h-8 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors inline-flex items-center justify-center">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
-                                <td class="px-6 py-4 font-bold text-slate-700">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-2 h-2 rounded-full bg-brand"></div>
-                                        Freon AC (Tambah)
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <div class="inline-flex items-center bg-slate-50 border border-slate-200 rounded-lg">
-                                        <button class="px-2 py-1 text-slate-400 hover:text-brand">-</button>
-                                        <span class="font-bold w-6 text-center text-slate-700">1</span>
-                                        <button class="px-2 py-1 text-slate-400 hover:text-brand">+</button>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-right text-slate-500 font-medium">Rp 150.000</td>
-                                <td class="px-6 py-4 text-right font-bold text-slate-800">Rp 150.000</td>
-                                <td class="px-6 py-4 text-center">
-                                    <button class="w-8 h-8 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors inline-flex items-center justify-center">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </td>
-                            </tr>
+
+                        @forelse($reservasi->spareparts as $sparepart)
+
+                        <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
+
+                            <td class="px-6 py-4 font-bold text-slate-700">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-brand"></div>
+                                    {{ $sparepart->nama }}
+                                </div>
+                            </td>
+
+                            <td class="px-6 py-4 text-center">
+                                {{ $sparepart->pivot->qty }}
+                            </td>
+
+                            <td class="px-6 py-4 text-right text-slate-500 font-medium">
+                                Rp {{ number_format($sparepart->pivot->harga,0,',','.') }}
+                            </td>
+
+                            <td class="px-6 py-4 text-right font-bold text-slate-800">
+                                Rp {{ number_format(
+                                    $sparepart->pivot->harga * $sparepart->pivot->qty,
+                                    0,
+                                    ',',
+                                    '.'
+                                ) }}
+                            </td>
+
+                            <td class="px-6 py-4 text-center">
+                                -
+                            </td>
+
+                        </tr>
+
+                        @empty
+
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-slate-400">
+                                Belum ada sparepart digunakan
+                            </td>
+                        </tr>
+
+                        @endforelse
                         </tbody>
+
+                        @php
+                            $totalSparepart = $reservasi->spareparts->sum(function ($sparepart) {
+                                return $sparepart->pivot->qty * $sparepart->pivot->harga;
+                            });
+                        @endphp                        
+
                         <tfoot class="bg-slate-50 border-t border-slate-100">
                             <tr>
-                                <td colspan="3" class="px-6 py-4 text-right font-bold text-slate-500 uppercase text-xs tracking-wider">Total Sparepart</td>
-                                <td class="px-6 py-4 text-right font-black text-slate-800 text-base counter-value" data-target="625000" data-prefix="Rp ">Rp 0</td>
+                                <td colspan="3"
+                                    class="px-6 py-4 text-right font-bold text-slate-500 uppercase text-xs tracking-wider">
+                                    Total Sparepart
+                                </td>
+
+                                <td class="px-6 py-4 text-right font-black text-slate-800 text-base">
+                                    Rp {{ number_format($totalSparepart, 0, ',', '.') }}
+                                </td>
+
                                 <td></td>
                             </tr>
                         </tfoot>
+
                     </table>
                 </div>
             </div>
@@ -278,6 +291,17 @@
     <!-- Right Column: Cost Summary & Logs -->
     <div class="space-y-6">
         
+    @php
+        $hargaLayanan = $reservasi->layanan->harga ?? 0;
+
+        $totalSparepart = $reservasi->spareparts->sum(function ($sparepart) {
+            return $sparepart->pivot->qty * $sparepart->pivot->harga;
+        });
+
+        $diskon = 0;
+
+        $totalTagihan = $hargaLayanan + $totalSparepart - $diskon;
+    @endphp    
         <!-- Summary Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden sticky top-24 animate-fade-slide-up stagger-2">
             <div class="bg-slate-800 px-6 py-4 flex items-center justify-center gap-3">
@@ -288,11 +312,15 @@
                 <div class="space-y-4 mb-6">
                     <div class="flex justify-between items-center text-sm">
                         <span class="text-slate-500 font-medium"><i class="fas fa-wrench text-slate-300 mr-1 w-4"></i> Layanan Utama</span>
-                        <span class="font-bold text-slate-800 counter-value" data-target="350000" data-prefix="Rp ">Rp 0</span>
+                        <span class="font-bold text-slate-800">
+                            Rp {{ number_format($hargaLayanan, 0, ',', '.') }}
+                        </span>
                     </div>
                     <div class="flex justify-between items-center text-sm">
                         <span class="text-slate-500 font-medium"><i class="fas fa-cogs text-slate-300 mr-1 w-4"></i> Sparepart</span>
-                        <span class="font-bold text-slate-800 counter-value" data-target="625000" data-prefix="Rp ">Rp 0</span>
+                        <span class="font-black text-3xl text-brand tracking-tight">
+                            Rp {{ number_format($totalTagihan, 0, ',', '.') }}
+                        </span>
                     </div>
                     <div class="flex justify-between items-center text-sm text-emerald-600 bg-emerald-50 px-2 py-1.5 rounded-lg -mx-2">
                         <span class="font-bold"><i class="fas fa-tags mr-1"></i> Diskon</span>
@@ -303,7 +331,9 @@
                 <div class="pt-5 border-t border-dashed border-slate-200">
                     <div class="flex flex-col items-center text-center bg-orange-50 rounded-xl p-4 border border-orange-100">
                         <span class="text-brand-dark text-xs font-bold uppercase tracking-widest mb-1">Total Tagihan</span>
-                        <span class="font-black text-3xl text-brand tracking-tight counter-value" data-target="975000" data-prefix="Rp ">Rp 0</span>
+                        <span class="font-black text-3xl text-brand tracking-tight">
+                            Rp {{ number_format($totalTagihan, 0, ',', '.') }}
+                        </span>
                     </div>
                 </div>
                 
@@ -369,28 +399,71 @@
             </button>
         </div>
         <div class="p-6">
-            <div class="mb-4">
-                <label class="block text-sm font-bold text-slate-700 mb-2">Pilih Sparepart</label>
-                <div class="relative">
-                    <select class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block w-full p-3 outline-none font-medium appearance-none cursor-pointer">
-                        <option value="">-- Pilih Part --</option>
-                        <option value="1">Busi NGK Iridium - Rp 95.000</option>
-                        <option value="2">Filter AC Denso - Rp 150.000</option>
-                        <option value="3">Kampas Rem Depan - Rp 250.000</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                        <i class="fas fa-chevron-down text-xs"></i>
+            <form
+                action="{{ route('admin-cabang.reservasi.tambah-sparepart', $reservasi->id) }}"
+                method="POST"
+            >
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Pilih Sparepart
+                    </label>
+                    <div class="relative">
+                        <select
+                            name="sparepart_id"
+                            required
+                            class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block w-full p-3 outline-none font-medium appearance-none cursor-pointer"
+                        >
+                            <option value="">
+                                -- Pilih Part --
+                            </option>
+                            @foreach($sparepartsAktif as $sp)
+                                <option value="{{ $sp->id }}">
+                                    {{ $sp->nama }}
+                                    -
+                                    Rp {{ number_format($sp->harga,0,',','.') }}
+                                    (stok: {{ $sp->pivot->stok }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="mb-6">
-                <label class="block text-sm font-bold text-slate-700 mb-2">Kuantitas (Qty)</label>
-                <input type="number" min="1" value="1" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block w-full p-3 outline-none transition-all">
-            </div>
-            <div class="flex justify-end gap-3 pt-2">
-                <button onclick="document.getElementById('modalTambahPart').classList.add('hidden')" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors">Batal</button>
-                <button onclick="document.getElementById('modalTambahPart').classList.add('hidden')" class="px-5 py-2.5 bg-brand hover:bg-brand-dark text-white text-sm font-bold rounded-xl transition-colors shadow-md shadow-brand/20">Tambahkan</button>
-            </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Kuantitas (Qty)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="qty"
+                        min="1"
+                        value="1"
+                        required
+                        class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-brand/20 focus:border-brand block w-full p-3 outline-none transition-all"
+                    >
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button
+                        type="button"
+                        onclick="document.getElementById('modalTambahPart').classList.add('hidden')"
+                        class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="px-5 py-2.5 bg-brand hover:bg-brand-dark text-white text-sm font-bold rounded-xl transition-colors shadow-md shadow-brand/20"
+                    >
+                        Tambahkan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -357,4 +357,14 @@ Route::middleware(['auth', 'role:admin_cabang'])
 
     Route::put('/profile', [AdminCabangController::class, 'updateProfile']) ->name('profile.update');
 
+    Route::post(
+        '/reservasi/{id}/sparepart',
+        [ReservasiController::class, 'tambahSparepart']
+    )->name('reservasi.tambah-sparepart');    
+
+    Route::post(
+        '/reservasi/{id}/hasil-service',
+        [ReservasiController::class, 'updateHasilService']
+    )->name('reservasi.hasil-service');    
+
 });

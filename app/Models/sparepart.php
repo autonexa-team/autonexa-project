@@ -17,4 +17,15 @@ class Sparepart extends Model
                     // dita nambah ini
                     ->withTimestamps();
     }    
+
+    public function reservasis()
+    {
+        return $this->belongsToMany(
+            Reservasi::class,
+            'reservasi_spareparts'
+        )->withPivot([
+            'qty',
+            'harga'
+        ])->withTimestamps();
+    }    
 }

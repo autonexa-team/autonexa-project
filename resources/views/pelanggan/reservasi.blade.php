@@ -187,6 +187,10 @@
                     <input type="hidden" name="tipe_form"     id="tipeForm">
                     <input type="hidden" name="plat_form"     id="platForm">
                     <input type="hidden" name="warna_form"    id="warnaForm">
+                    <input type="hidden" name="total_biaya"   id="totalBiayaForm" value="0">
+                    {{-- Mirror field dari Blok 2 (di luar form) agar ikut tersubmit --}}
+                    <input type="hidden" name="plat"          id="platHidden">
+                    <input type="hidden" name="kendaraan"     id="kendaraanHidden">
 
                     <div class="form-row-2">
                         <div class="form-field">
@@ -216,10 +220,7 @@
                                 </button>
                                 @endforeach
                             </div>
-                            <p class="field-helper">
-                                <i class="bi bi-info-circle"></i>
-                                Slot penuh ditandai abu-abu. Pilih tanggal dulu untuk cek ketersediaan.
-                            </p>
+                            
                             @error('waktu')<div class="field-error">{{ $message }}</div>@enderror
                         </div>
                     </div>
@@ -411,4 +412,42 @@ window.loginModalElement = document.getElementById('loginModal');
 </script>
 
 <script src="{{ asset('js/booking.js') }}"></script>
+
+{{-- ===== SYNC total_biaya ke hidden field saat layanan dipilih ===== --}}
+<script>
+(function () {
+    // Dijalankan setelah booking.js selesai dimuat
+    // Pantau perubahan pada layananIdForm (diisi oleh booking.js saat klik layanan-card)
+    const layananIdInput  = document.getElementById('layananIdForm');
+    const totalBiayaInput = document.getElementById('totalBiayaForm');
+
+    // Fungsi sync: baca harga dari card yang sedang selected
+    function syncTotalBiaya() {
+        const selectedCard = document.querySelector('.layanan-card.selected');
+        if (selectedCard) {
+            const harga = parseInt(selectedCard.dataset.harga) || 0;
+            if (totalBiayaInput) totalBiayaInput.value = harga;
+        } else {
+            if (totalBiayaInput) totalBiayaInput.value = 0;
+        }
+    }
+
+    // Delegasi event pada container layanan agar berjalan setelah booking.js
+    const layananList = document.getElementById('layananList');
+    if (layananList) {
+        layananList.addEventListener('click', function () {
+            // Tunggu booking.js selesai menambahkan class 'selected'
+            setTimeout(syncTotalBiaya, 0);
+        });
+    }
+
+    // Saat form di-submit, pastikan nilai sudah terisi
+    const form = document.getElementById('formBooking');
+    if (form) {
+        form.addEventListener('submit', function () {
+            syncTotalBiaya();
+        });
+    }
+})();
+</script>
 @endpush

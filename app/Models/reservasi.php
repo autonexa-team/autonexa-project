@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Reservasi extends Model
 {
     protected $fillable = [
-        'user_id', 'bengkel_id', 'mekanik_id',
-        'tanggal', 'waktu', 'keluhan',
+        'user_id', 'bengkel_id', 'layanan_id', 'mekanik_id',
+        'tanggal', 'waktu', 'kendaraan', 'plat', 'keluhan',
         'status', 'hasil_service', 'total_biaya',
     ];
 
@@ -17,6 +17,7 @@ class Reservasi extends Model
 
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function bengkel(): BelongsTo { return $this->belongsTo(Bengkel::class); }
+    public function layanan(): BelongsTo { return $this->belongsTo(Layanan::class); }
     public function spareparts(): HasMany { return $this->hasMany(Sparepart::class); }
     public function review() { return $this->hasOne(Review::class); }
 

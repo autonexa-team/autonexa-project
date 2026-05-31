@@ -25,7 +25,7 @@
             <i class="fas fa-arrow-left"></i> Kembali ke Daftar
         </a>
         <h2 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
-            Detail Reservasi <span class="text-slate-400 font-medium text-xl bg-slate-100 px-2 py-0.5 rounded-lg">#RSV-20260518-001</span>
+            Detail Reservasi <span class="text-slate-400 font-medium text-xl bg-slate-100 px-2 py-0.5 rounded-lg">#RSV-{{ str_pad($reservasi->id, 8, '0', STR_PAD_LEFT) }}</span>
         </h2>
         <p class="text-slate-500 mt-2 text-sm font-medium">Informasi lengkap reservasi pelanggan dan riwayat operasional</p>
     </div>
@@ -87,25 +87,25 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">Nama Lengkap</p>
-                        <p class="text-slate-800 font-bold text-lg">Budi Setiawan</p>
+                        <p class="text-slate-800 font-bold text-lg">{{ $reservasi->user->name ?? '-' }}</p>
                     </div>
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">Nomor HP</p>
                         <p class="text-slate-800 font-bold text-lg">
-                            <a href="#" class="text-brand hover:text-brand-dark transition-colors flex items-center gap-2">
-                                <i class="fab fa-whatsapp text-emerald-500"></i> 0812-3456-7890
+                            <a href="https://wa.me/{{ str_replace(['0', '-', ' '], ['62', '', ''], $reservasi->user->phone ?? '') }}" target="_blank" class="text-brand hover:text-brand-dark transition-colors flex items-center gap-2">
+                                <i class="fab fa-whatsapp text-emerald-500"></i> {{ $reservasi->user->phone ?? '-' }}
                             </a>
                         </p>
                     </div>
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">Plat Nomor Kendaraan</p>
-                        <p class="text-slate-800 font-bold text-lg">D 5678 ABC</p>
+                        <p class="text-slate-800 font-bold text-lg">{{ $reservasi->plat ?? '-' }}</p>
                     </div>
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">Jadwal Reservasi</p>
                         <p class="text-slate-800 font-bold flex items-center gap-2 text-base">
-                            <i class="far fa-calendar-alt text-brand"></i> 18 Mei 2026
-                            <span class="bg-orange-50 text-brand border border-orange-100 px-2 py-0.5 rounded text-sm">10:00 WIB</span>
+                            <i class="far fa-calendar-alt text-brand"></i> {{ \Carbon\Carbon::parse($reservasi->tanggal)->format('d M Y') }}
+                            <span class="bg-orange-50 text-brand border border-orange-100 px-2 py-0.5 rounded text-sm">{{ $reservasi->waktu }}</span>
                         </p>
                     </div>
                 </div>
@@ -125,16 +125,16 @@
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Bengkel Tujuan</p>
                         <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                            <p class="text-slate-800 font-bold"><i class="fas fa-store text-slate-400 mr-2"></i> AutoNexa Cabang Sudirman</p>
-                            <p class="text-slate-500 text-xs font-medium mt-1 pl-6">Jl. Jend. Sudirman No. 45, Jakarta</p>
+                            <p class="text-slate-800 font-bold"><i class="fas fa-store text-slate-400 mr-2"></i> {{ $reservasi->bengkel->nama ?? '-' }}</p>
+                            <p class="text-slate-500 text-xs font-medium mt-1 pl-6">{{ $reservasi->bengkel->alamat ?? '-' }}</p>
                         </div>
                     </div>
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Layanan Utama</p>
                         <div class="flex items-start justify-between bg-orange-50 border border-orange-100 p-3 rounded-xl">
                             <div>
-                                <p class="text-brand font-bold">Servis Berkala 10rb KM</p>
-                                <p class="text-brand-dark text-sm mt-0.5 font-bold">Rp 350.000</p>
+                                <p class="text-brand font-bold">{{ $reservasi->layanan->nama ?? '-' }}</p>
+                                <p class="text-brand-dark text-sm mt-0.5 font-bold">Rp {{ number_format($reservasi->layanan->harga ?? 0, 0, ',', '.') }}</p>
                             </div>
                             <div class="w-6 h-6 rounded-full bg-brand text-white flex items-center justify-center shadow-sm text-xs">
                                 <i class="fas fa-check"></i>
@@ -149,7 +149,7 @@
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-slate-700 font-medium relative">
                         <i class="fas fa-quote-left absolute top-3 left-3 text-slate-200 text-2xl"></i>
                         <p class="relative z-10 pl-6 text-sm leading-relaxed">
-                            "Mesin terasa agak kasar saat dipanaskan pagi hari, dan AC kurang dingin kalau siang hari. Tolong dicek sekalian filter udaranya karena rasanya sudah kotor."
+                            "{{ $reservasi->keluhan ?? 'Tidak ada keluhan' }}"
                         </p>
                     </div>
                 </div>

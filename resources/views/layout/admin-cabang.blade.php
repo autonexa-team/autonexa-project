@@ -33,6 +33,15 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admincabang-dashboard.css') }}">
+
+    <style>
+        @page {
+            /* Kosongkan margin agar header/footer browser tidak muncul */
+            /* Catatan: ini hanya bekerja di beberapa browser */
+            margin-top: 15mm;
+            margin-bottom: 20mm;
+        }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800">
 
@@ -276,6 +285,21 @@
         </div>
     </main>
 
+    <script>
+        // Hilangkan header/footer browser saat print
+        // dengan mengosongkan title dan inject style khusus
+        window.addEventListener('beforeprint', function () {
+            // Simpan title asli
+            window._originalTitle = document.title;
+            // Kosongkan title → header browser jadi kosong
+            document.title = '';
+        });
+
+        window.addEventListener('afterprint', function () {
+            // Kembalikan title setelah selesai print
+            document.title = window._originalTitle;
+        });
+    </script>
 </body>
 
 <script>

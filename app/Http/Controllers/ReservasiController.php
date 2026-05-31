@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Bengkel;
 use App\Models\Reservasi;
 use App\Models\Layanan;
+use App\Models\ReservasiSparepart;
 use App\Models\User;
 use App\Models\Sparepart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -684,4 +686,109 @@ class ReservasiController extends Controller
             'Sparepart berhasil dihapus'
         );
     }    
+
+    /* ================================================================
+       ADMIN CABANG — Sparepart CRUD (real-time)
+    ================================================================ */
+
+    /**
+     * GET /admin-cabang/reservasi/{id}/sparepart
+     */
+    public function sparepartIndex(int $id): \Illuminate\Http\JsonResponse
+    {
+        $user      = Auth::user();
+        $reservasi = Reservasi::query()
+            ->where('bengkel_id', '=', $user->bengkel->id)
+            ->where('id', '=', $id)
+            ->firstOrFail();
+
+        return response()->json(
+            $reservasi->spareparts()
+                ->select(['id', 'nama', 'qty', 'harga', 'keterangan'])
+                ->orderBy('created_at', 'asc')
+                ->get()
+        );
+    }
+
+    /**
+     * POST /admin-cabang/reservasi/{id}/sparepart
+     */
+    public function sparepartStore(Request $request, int $id): \Illuminate\Http\JsonResponse
+    {
+        $user      = Auth::user();
+        $reservasi = Reservasi::query()
+            ->where('bengkel_id', '=', $user->bengkel->id)
+            ->where('id', '=', $id)
+            ->firstOrFail();
+
+        if (in_array($reservasi->status, ['selesai', 'dibatalkan'])) {
+            return response()->json(['message' => 'Reservasi sudah selesai atau dibatalkan.'], 403);
+        }
+
+        $validated = $request->validate([
+            'nama'        => 'required|string|max:255',
+            'harga'       => 'required|integer|min:1',
+            'qty'         => 'required|integer|min:1',
+            'keterangan'  => 'nullable|string|max:500',
+        ]);
+
+        $sp = $reservasi->spareparts()->create($validated);
+
+        // Update total biaya reservasi
+        $reservasi->total_biaya = ($reservasi->layanan->harga ?? 0)
+            + $reservasi->spareparts()->sum(DB::raw('harga * qty'));
+        $reservasi->save();
+
+        return response()->json(['data' => $sp], 201);
+    }
+
+    /**
+     * PATCH /admin-cabang/reservasi/{id}/sparepart/{spId}
+     * Update qty saja.
+     */
+    public function sparepartUpdate(Request $request, int $id, int $spId): \Illuminate\Http\JsonResponse
+    {
+        $user      = Auth::user();
+        $reservasi = Reservasi::query()
+            ->where('bengkel_id', '=', $user->bengkel->id)
+            ->where('id', '=', $id)
+            ->firstOrFail();
+
+        $sp = $reservasi->spareparts()->findOrFail($spId);
+
+        $validated = $request->validate(['qty' => 'required|integer|min:1']);
+        $sp->update($validated);
+
+        // Update total biaya reservasi
+        $reservasi->total_biaya = ($reservasi->layanan->harga ?? 0)
+            + $reservasi->spareparts()->sum(DB::raw('harga * qty'));
+        $reservasi->save();
+
+        return response()->json(['data' => $sp]);
+    }
+
+    /**
+     * DELETE /admin-cabang/reservasi/{id}/sparepart/{spId}
+     */
+    public function sparepartDestroy(int $id, int $spId): \Illuminate\Http\JsonResponse
+    {
+        $user      = Auth::user();
+        $reservasi = Reservasi::query()
+            ->where('bengkel_id', '=', $user->bengkel->id)
+            ->where('id', '=', $id)
+            ->firstOrFail();
+
+        if (in_array($reservasi->status, ['selesai', 'dibatalkan'])) {
+            return response()->json(['message' => 'Reservasi sudah selesai atau dibatalkan.'], 403);
+        }
+
+        $reservasi->spareparts()->findOrFail($spId)->delete();
+
+        // Update total biaya reservasi
+        $reservasi->total_biaya = ($reservasi->layanan->harga ?? 0)
+            + $reservasi->spareparts()->sum(DB::raw('harga * qty'));
+        $reservasi->save();
+
+        return response()->json(['message' => 'Sparepart dihapus.', 'total_biaya' => $reservasi->total_biaya]);
+    }
 }

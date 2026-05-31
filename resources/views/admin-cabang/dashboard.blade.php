@@ -34,7 +34,7 @@
             <div class="stat-card__head">
                 <div>
                     <p class="stat-card__label">Total Reservasi</p>
-                    <h3 class="stat-card__value counter-value" data-target="24">0</h3>
+                    <h3 class="stat-card__value counter-value" data-target="{{ $totalReservasi }}">0</h3>
                 </div>
                 <div class="stat-card__icon">
                     <i class="fas fa-calendar-check"></i>
@@ -56,7 +56,7 @@
             <div class="stat-card__head">
                 <div>
                     <p class="stat-card__label">Service Aktif</p>
-                    <h3 class="stat-card__value counter-value" data-target="8">0</h3>
+                    <h3 class="stat-card__value counter-value" data-target="{{ $serviceAktif }}">0</h3>
                 </div>
                 <div class="stat-card__icon">
                     <i class="fas fa-tools"></i>
@@ -75,7 +75,7 @@
             <div class="stat-card__head">
                 <div>
                     <p class="stat-card__label">Sparepart Menipis</p>
-                    <h3 class="stat-card__value counter-value" data-target="12">0</h3>
+                    <h3 class="stat-card__value counter-value" data-target="{{ $sparepartMenipis }}">0</h3>
                 </div>
                 <div class="stat-card__icon">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -98,8 +98,11 @@
                 <div>
                     <p class="stat-card__label">Pendapatan Hari Ini</p>
                     <h3 class="stat-card__value stat-card__value--md">
-                        <span class="counter-value" data-target="4.5" data-decimals="1"
-                              data-prefix="Rp " data-suffix="M">Rp 0.0M</span>
+                        <span class="counter-value" 
+                            data-target="{{ number_format($pendapatanHariIni / 1000000, 1, '.', '') }}" 
+                            data-decimals="1"
+                            data-prefix="Rp " 
+                            data-suffix="M">Rp 0.0M</span>
                     </h3>
                 </div>
                 <div class="stat-card__icon">
@@ -140,137 +143,88 @@
                 <thead>
                     <tr>
                         <th>Pelanggan</th>
-                        <th>Kendaraan</th>
-                        <th>Layanan</th>
+                        <th>Keluhan</th>
                         <th>Waktu</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
+                @forelse($reservasiHariIni as $rsv)
+                <tr>
+                    {{-- Kolom Pelanggan --}}
+                    <td>
+                        <div class="cell-user">
+                            <div class="avatar">
+                                {{ strtoupper(substr($rsv->nama_pelanggan ?? 'P', 0, 2)) }}
+                            </div>
+                            <div>
+                                <p class="cell-name">{{ $rsv->nama_pelanggan ?? '-' }}</p>
+                            </div>
+                        </div>
+                    </td>
 
-                    {{-- Row 1 — Menunggu --}}
-                    <tr>
-                        <td>
-                            <div class="cell-user">
-                                <div class="avatar" style="background:#eef2ff; color:#4f46e5;">AS</div>
-                                <div>
-                                    <p class="cell-name">Andi Saputra</p>
-                                    <p class="cell-sub">0812-3456-7890</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="cell-vehicle-name">Honda Brio</p>
-                            <span class="cell-plate">B 1234 XYZ</span>
-                        </td>
-                        <td><span class="cell-service">Servis Berkala 10rb KM</span></td>
-                        <td>
-                            <span class="cell-time">
-                                <i class="far fa-clock"></i> 10:00 WIB
-                            </span>
-                        </td>
-                        <td>
-                            <span class="status status--waiting">
-                                <span class="status__dot"></span>
-                                Menunggu
-                            </span>
-                        </td>
-                        <td>
-                            <div class="cell-actions">
-                                <button class="action-btn action-btn--edit" title="Edit">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button class="action-btn action-btn--confirm" title="Terima">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    {{-- Kolom Keluhan --}}
+                    <td>
+                        <span class="cell-service">
+                            {{ \Illuminate\Support\Str::limit($rsv->keluhan, 40) }}
+                        </span>
+                    </td>
 
-                    {{-- Row 2 — Proses Servis --}}
-                    <tr>
-                        <td>
-                            <div class="cell-user">
-                                <div class="avatar" style="background:#eff6ff; color:#2563eb;">BS</div>
-                                <div>
-                                    <p class="cell-name">Budi Setiawan</p>
-                                    <p class="cell-sub">0856-7890-1234</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="cell-vehicle-name">Toyota Avanza</p>
-                            <span class="cell-plate">D 5678 ABC</span>
-                        </td>
-                        <td><span class="cell-service">Ganti Oli &amp; Filter</span></td>
-                        <td>
-                            <span class="cell-time">
-                                <i class="far fa-clock"></i> 11:30 WIB
-                            </span>
-                        </td>
-                        <td>
-                            <span class="status status--process">
-                                <span class="status__dot"></span>
-                                Proses Servis
-                            </span>
-                        </td>
-                        <td>
-                            <div class="cell-actions">
-                                <button class="action-btn action-btn--edit" title="Edit">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button class="action-btn action-btn--done" title="Selesai">
-                                    <i class="fas fa-check-double"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    {{-- Kolom Waktu --}}
+                    <td>
+                        <span class="cell-time">
+                            <i class="far fa-clock"></i>
+                            {{ \Carbon\Carbon::parse($rsv->waktu)->format('H:i') }} WIB
+                        </span>
+                    </td>
 
-                    {{-- Row 3 — Selesai --}}
-                    <tr>
-                        <td>
-                            <div class="cell-user">
-                                <div class="avatar" style="background:#fdf2f8; color:#db2777;">CK</div>
-                                <div>
-                                    <p class="cell-name">Citra Kirana</p>
-                                    <p class="cell-sub">0899-1122-3344</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="cell-vehicle-name">Mitsubishi Xpander</p>
-                            <span class="cell-plate">F 9988 DEF</span>
-                        </td>
-                        <td><span class="cell-service">Pengecekan Rem</span></td>
-                        <td>
-                            <span class="cell-time">
-                                <i class="far fa-clock"></i> 14:00 WIB
-                            </span>
-                        </td>
-                        <td>
-                            <span class="status status--done">
-                                <span class="status__dot"></span>
-                                Selesai
-                            </span>
-                        </td>
-                        <td>
-                            <div class="cell-actions">
-                                <button class="action-btn action-btn--view" title="Lihat Detail">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    {{-- Kolom Status --}}
+                    <td>
+                        @php
+                            $statusClass = match($rsv->status) {
+                                'pending'    => 'status--waiting',
+                                'diproses'   => 'status--process',
+                                'selesai'    => 'status--done',
+                                'dibatalkan' => 'status--cancel',
+                                default      => 'status--waiting',
+                            };
+                            $statusLabel = match($rsv->status) {
+                                'pending'    => 'Menunggu',
+                                'diproses'   => 'Proses Servis',
+                                'selesai'    => 'Selesai',
+                                'dibatalkan' => 'Dibatalkan',
+                                default      => $rsv->status,
+                            };
+                        @endphp
+                        <span class="status {{ $statusClass }}">
+                            <span class="status__dot"></span>
+                            {{ $statusLabel }}
+                        </span>
+                    </td>
 
+                    {{-- Kolom Aksi --}}
+                    <td>
+                        <div class="cell-actions">
+                            <a href="{{ route('admin-cabang.reservasi-detail', $rsv->id) }}"
+                               class="action-btn action-btn--view">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="text-center text-slate-400 py-8">
+                        Tidak ada reservasi hari ini.
+                    </td>
+                </tr>
+                @endforelse
                 </tbody>
             </table>
         </div>
-    </div>{{-- /table-section --}}
-
-</div>{{-- /dash-page --}}
-
-{{-- ── JavaScript ── --}}
+    </div>
+</div>
 <script src="{{ asset('js/admin-cabang-dashboard.js') }}"></script>
 
 @endsection

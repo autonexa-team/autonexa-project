@@ -52,7 +52,7 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Layanan Aktif di Cabang</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="18">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="{{ $totalAktif }}">0</h3>
             </div>
             <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-emerald-100">
                 <i class="fas fa-check-circle"></i>
@@ -66,7 +66,7 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Layanan Nonaktif</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="6">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="{{ $totalNonaktif }}">0</h3>
             </div>
             <div class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-slate-100">
                 <i class="fas fa-pause-circle"></i>
@@ -130,7 +130,7 @@
 
                 <td class="p-5">
                     <p class="font-bold text-slate-800">
-                        Rp {{ number_format($layanan->harga_dasar, 0, ',', '.') }}
+                        Rp {{ number_format($layanan->harga, 0, ',', '.') }}
                     </p>
                 </td>
 

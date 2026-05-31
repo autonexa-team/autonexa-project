@@ -201,9 +201,15 @@ class AdminCabangController extends Controller
 
         $layanans = Layanan::all();
 
+        $totalAktif    = $bengkel->layanan->count();
+        $totalNonaktif = $layanans->count() - $totalAktif;
+
         return view('admin-cabang.layanan', compact(
             'layanans',
-            'bengkel'
+            'bengkel',
+            // manbah ini
+            'totalAktif',
+            'totalNonaktif'
         ));
     }  
 

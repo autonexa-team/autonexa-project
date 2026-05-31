@@ -1,375 +1,260 @@
 'use strict';
 
 const COLOR = {
-    brand:      '#ff6a00',
-    brandDark:  '#e65c00',
-    brandLight: '#fff7ed',
-    emerald:    '#059669',
-    emeraldBg:  '#d1fae5',
-    amber:      '#d97706',
-    amberBg:    '#fef3c7',
-    red:        '#dc2626',
-    redBg:      '#fee2e2',
-    slate800:   '#1e293b',
-    slate500:   '#64748b',
-    slate200:   '#e2e8f0',
-    white:      '#ffffff',
-    rowEven:    '#fff7ed',
-    rowOdd:     '#ffffff',
+    brand:     '#ff6a00',
+    brandDark: '#e65c00',
+    brandLight:'#fff7ed',
+    emerald:   '#059669',
+    emeraldBg: '#d1fae5',
+    amber:     '#d97706',
+    amberBg:   '#fef3c7',
+    red:       '#dc2626',
+    redBg:     '#fee2e2',
+    slate800:  '#1e293b',
+    slate500:  '#64748b',
+    slate200:  '#e2e8f0',
+    white:     '#ffffff',
 };
 
 function getTodayString() {
-    const now = new Date();
-    const y   = now.getFullYear();
-    const m   = String(now.getMonth() + 1).padStart(2, '0');
-    const d   = String(now.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-function cssKopJudul() {
-    return `
-        font-size: 26px;
-        font-weight: bold;
-        color: ${COLOR.brand};
-        padding: 16px 0 4px 0;
-        border: none;
-        background: none;
-    `;
-}
-
-function cssKopSub() {
-    return `
-        font-size: 14px;
-        color: ${COLOR.slate500};
-        padding: 4px 0;
-        border: none;
-        background: none;
-    `;
-}
-
-function cssSectionTitle() {
-    return `
-        font-size: 16px;
-        font-weight: bold;
-        color: ${COLOR.brand};
-        padding: 20px 0 8px 0;
-        border: none;
-        background: none;
-    `;
-}
-
-function cssInfoLabel() {
-    return `
-        font-size: 13px;
-        font-weight: bold;
-        color: ${COLOR.slate500};
-        padding: 5px 16px 5px 0;
-        border: none;
-        background: none;
-        white-space: nowrap;
-    `;
-}
-
-function cssInfoValue() {
-    return `
-        font-size: 13px;
-        color: ${COLOR.slate800};
-        padding: 5px 0;
-        border: none;
-        background: none;
-    `;
+function fmt(num) {
+    return 'Rp ' + Number(num).toLocaleString('id-ID');
 }
 
 function cssHeader() {
-    return `
-        background-color: ${COLOR.brand};
-        color: ${COLOR.white};
-        font-weight: bold;
-        font-size: 14px;
-        text-align: center;
-        vertical-align: middle;
-        padding: 14px 18px;
-        border: 1px solid ${COLOR.brandDark};
-        white-space: nowrap;
-    `;
-    // ]tambah padding teks agar kolom otomatis lebar
-    function pad(text, spaces = 8) {
-        const sp = '&nbsp;'.repeat(spaces);
-        return `${sp}${text}${sp}`;
-    }
+    return `background-color:${COLOR.brand};color:#fff;font-weight:bold;font-size:13px;
+            text-align:center;padding:12px 16px;border:1px solid ${COLOR.brandDark};white-space:nowrap;`;
 }
 
 function cssData(isEven = false, extra = '') {
-    return `
-        background-color: ${isEven ? COLOR.rowEven : COLOR.rowOdd};
-        font-size: 13px;
-        padding: 12px 18px;
-        vertical-align: middle;
-        border: 1px solid ${COLOR.slate200};
-        ${extra}
-    `;
+    return `background-color:${isEven ? COLOR.brandLight : COLOR.white};font-size:12px;
+            padding:10px 16px;border:1px solid ${COLOR.slate200};${extra}`;
 }
 
 function cssTotal(extra = '') {
-    return `
-        background-color: ${COLOR.brandLight};
-        font-size: 13px;
-        font-weight: bold;
-        color: ${COLOR.brand};
-        padding: 12px 18px;
-        vertical-align: middle;
-        border-top: 2px solid ${COLOR.brand};
-        border-bottom: 1px solid ${COLOR.slate200};
-        border-left: 1px solid ${COLOR.slate200};
-        border-right: 1px solid ${COLOR.slate200};
-        ${extra}
-    `;
+    return `background-color:${COLOR.brandLight};font-size:12px;font-weight:bold;color:${COLOR.brand};
+            padding:10px 16px;border-top:2px solid ${COLOR.brand};border:1px solid ${COLOR.slate200};${extra}`;
 }
 
-function cssDivider(colspan) {
-    return `<tr><td colspan="${colspan}" style="border:none;padding:10px 0;background:none;"></td></tr>`;
+function cssKop(size, color, extra = '') {
+    return `font-size:${size}px;font-weight:bold;color:${color};padding:8px 0;border:none;background:none;${extra}`;
 }
 
-function cssLine(colspan) {
-    return `<tr><td colspan="${colspan}" style="border:none;border-bottom:2px solid ${COLOR.brand};padding:0;background:none;"></td></tr>`;
+function cssInfo(bold = false) {
+    return `font-size:12px;${bold ? 'font-weight:bold;' : ''}color:${COLOR.slate500};
+            padding:4px 0;border:none;background:none;`;
 }
 
-function exportToExcel(userName, userRole, periode) {
-    const dicetak = `${userName} (${userRole})`;
-    const now     = new Date().toLocaleString('id-ID');
-    const COLS    = 5; 
+const statusMap = {
+    'pending':      { label: 'Menunggu',     color: COLOR.slate500, bg: '#f1f5f9' },
+    'dikonfirmasi': { label: 'Dikonfirmasi', color: '#1e40af',      bg: '#dbeafe' },
+    'in_progress':  { label: 'Dikerjakan',   color: COLOR.amber,    bg: COLOR.amberBg },
+    'done':         { label: 'Selesai',      color: COLOR.emerald,  bg: COLOR.emeraldBg },
+    'cancelled':    { label: 'Dibatalkan',   color: COLOR.red,      bg: COLOR.redBg },
+};
 
-    // ── STATUS COLOR ──
-    const statusStyle = {
-        'Selesai':    { color: COLOR.emerald, bg: COLOR.emeraldBg },
-        'Dikerjakan': { color: COLOR.amber,   bg: COLOR.amberBg   },
-        'Batal':      { color: COLOR.red,     bg: COLOR.redBg     },
-    };
+function exportToExcel() {
+    // Ambil data yang sudah di-inject dari blade
+    if (typeof laporanData === 'undefined') {
+        alert('Data laporan tidak tersedia.');
+        return;
+    }
 
-    // ════════════════════════════════════════
-    // KOP LAPORAN
-    // ════════════════════════════════════════
+    const d        = laporanData;
+    const periode  = `${d.dari} - ${d.sampai}`;
+    const dicetak  = document.querySelector('.print-footer strong')?.innerText ?? '-';
+    const now      = new Date().toLocaleString('id-ID');
+    const COLS     = 6;
+
+    const sukses = d.totalReservasi > 0
+        ? Math.round((d.selesai / d.totalReservasi) * 100)
+        : 0;
+
+    // ── KOP ──────────────────────────────────────────
     const kop = `
-        <tr>
-            <td colspan="${COLS}" style="${cssKopJudul()}">AUTONEXA</td>
-        </tr>
-        <tr>
-            <td colspan="${COLS}" style="${cssKopSub()}">Laporan Analisis Data Operasional Bengkel</td>
-        </tr>
-        ${cssLine(COLS)}
-        <tr>
-            <td style="${cssInfoLabel()}">Periode</td>
-            <td colspan="${COLS - 1}" style="${cssInfoValue()}">${periode}</td>
-        </tr>
-        <tr>
-            <td style="${cssInfoLabel()}">Dicetak oleh</td>
-            <td colspan="${COLS - 1}" style="${cssInfoValue()}">${dicetak}</td>
-        </tr>
-        <tr>
-            <td style="${cssInfoLabel()}">Tanggal Cetak</td>
-            <td colspan="${COLS - 1}" style="${cssInfoValue()}">${now}</td>
-        </tr>
-        ${cssDivider(COLS)}
+        <tr><td colspan="${COLS}" style="${cssKop(22, COLOR.brand)}">AUTONEXA</td></tr>
+        <tr><td colspan="${COLS}" style="${cssKop(13, COLOR.slate500)}">Laporan Operasional Bengkel — ${d.bengkel}</td></tr>
+        <tr><td colspan="${COLS}" style="border:none;border-bottom:2px solid ${COLOR.brand};padding:0;background:none;"></td></tr>
+        <tr><td style="${cssInfo(true)}">Bengkel</td>
+            <td colspan="${COLS-1}" style="${cssInfo()}">${d.bengkel}</td></tr>
+        <tr><td style="${cssInfo(true)}">Periode</td>
+            <td colspan="${COLS-1}" style="${cssInfo()}">${periode}</td></tr>
+        <tr><td style="${cssInfo(true)}">Dicetak oleh</td>
+            <td colspan="${COLS-1}" style="${cssInfo()}">${dicetak} (Admin Cabang)</td></tr>
+        <tr><td style="${cssInfo(true)}">Tanggal Cetak</td>
+            <td colspan="${COLS-1}" style="${cssInfo()}">${now}</td></tr>
+        <tr><td colspan="${COLS}" style="border:none;padding:8px;background:none;"></td></tr>
     `;
 
-    // ════════════════════════════════════════
-    // SECTION 1: RINGKASAN
-    // ════════════════════════════════════════
-    const ringkasanData = [
-        { metrik: 'Total Reservasi',   nilai: '1.248',          ket: '+14.5% vs bulan lalu', color: COLOR.slate800 },
-        { metrik: 'Reservasi Selesai', nilai: '1.102',          ket: 'Success Rate: 88%',    color: COLOR.emerald  },
-        { metrik: 'Total Pendapatan',  nilai: 'Rp 485.200.000', ket: '+8.2% vs bulan lalu',  color: COLOR.brand    },
-        { metrik: 'Rating Rata-rata',  nilai: '4.6 ★',          ket: 'Dari 842 ulasan',      color: COLOR.amber    },
+    // ── SECTION 1: RINGKASAN ─────────────────────────
+    const ringkasan = [
+        { metrik: 'Total Reservasi',   nilai: d.totalReservasi,                    ket: 'Periode ini',           color: COLOR.slate800 },
+        { metrik: 'Reservasi Selesai', nilai: d.selesai,                           ket: `Success Rate: ${sukses}%`, color: COLOR.emerald },
+        { metrik: 'Reservasi Dibatalkan', nilai: d.dibatalkan,                     ket: 'Periode ini',           color: COLOR.red },
+        { metrik: 'Total Pendapatan',  nilai: fmt(d.totalPendapatan),              ket: 'Dari reservasi selesai',color: COLOR.brand },
+        { metrik: 'Total Review',      nilai: d.totalReview,                       ket: 'Ulasan pelanggan',      color: COLOR.slate800 },
+        { metrik: 'Rating Rata-rata',  nilai: `${Number(d.avgRating).toFixed(1)} ★`, ket: `Dari ${d.totalReview} ulasan`, color: COLOR.amber },
     ];
 
-    const ringkasanRows = ringkasanData.map((r, i) => `
+    const ringkasanRows = ringkasan.map((r, i) => `
         <tr>
-            <td colspan="2" style="${cssData(i % 2 === 1, 'font-weight:bold;')}">${r.metrik}</td>
-            <td style="${cssData(i % 2 === 1, `text-align:center; font-weight:bold; font-size:14px; color:${r.color};`)}">${r.nilai}</td>
-            <td colspan="2" style="${cssData(i % 2 === 1)}">${r.ket}</td>
+            <td colspan="3" style="${cssData(i%2===1,'font-weight:bold;')}">${r.metrik}</td>
+            <td style="${cssData(i%2===1,`text-align:center;font-weight:bold;font-size:14px;color:${r.color};`)}">${r.nilai}</td>
+            <td colspan="2" style="${cssData(i%2===1)}">${r.ket}</td>
         </tr>
     `).join('');
 
-    const sectionRingkasan = `
+    const secRingkasan = `
+        <tr><td colspan="${COLS}" style="font-size:15px;font-weight:bold;color:${COLOR.brand};
+            padding:16px 0 8px;border:none;background:none;">📊 Ringkasan Periode</td></tr>
         <tr>
-            <td colspan="${COLS}" style="${cssSectionTitle()}">📊 Ringkasan Periode</td>
-        </tr>
-        <tr>
-            <th colspan="2" style="${cssHeader()} width:300px;">Metrik</th>
-            <th style="${cssHeader()} width:250px;">Nilai</th>
-            <th colspan="2" style="${cssHeader()} width:350px;">Keterangan</th>
+            <th colspan="3" style="${cssHeader()}">Metrik</th>
+            <th style="${cssHeader()}">Nilai</th>
+            <th colspan="2" style="${cssHeader()}">Keterangan</th>
         </tr>
         ${ringkasanRows}
-        ${cssDivider(COLS)}
+        <tr><td colspan="${COLS}" style="border:none;padding:8px;background:none;"></td></tr>
     `;
 
-    // ════════════════════════════════════════
-    // SECTION 2: PERFORMA CABANG
-    // ════════════════════════════════════════
-    const cabangData = [
-        { nama: 'AutoNexa Cabang Sudirman',      res: 542, selesai: 480, pendapatan: 'Rp 215.500.000', rating: '4.8 ★', rColor: COLOR.amber },
-        { nama: 'AutoNexa Cabang Kebon Jeruk',   res: 425, selesai: 380, pendapatan: 'Rp 165.250.000', rating: '4.5 ★', rColor: COLOR.amber },
-        { nama: 'AutoNexa Cabang Kelapa Gading', res: 281, selesai: 242, pendapatan: 'Rp 104.450.000', rating: '4.2 ★', rColor: COLOR.red   },
-    ];
-
-    const cabangRows = cabangData.map((c, i) => `
+    // ── SECTION 2: PERFORMA BENGKEL ──────────────────
+    const secPerforma = `
+        <tr><td colspan="${COLS}" style="font-size:15px;font-weight:bold;color:${COLOR.brand};
+            padding:16px 0 8px;border:none;background:none;">🏪 Ringkasan Performa Bengkel</td></tr>
         <tr>
-            <td colspan="2" style="${cssData(i % 2 === 1, 'font-weight:bold;')}">${c.nama}</td>
-            <td style="${cssData(i % 2 === 1, 'text-align:center;')}">${c.res}</td>
-            <td style="${cssData(i % 2 === 1, `text-align:center; font-weight:bold; color:${COLOR.emerald};`)}">${c.selesai}</td>
-            <td style="${cssData(i % 2 === 1, 'text-align:right; font-weight:bold;')}">${c.pendapatan}</td>
-        </tr>
-    `).join('');
-
-    // Baris rating terpisah agar tidak overflow
-    const cabangRating = cabangData.map((c, i) => `
-        <tr style="display:none"></tr>
-    `).join(''); 
-
-    const sectionPerforma = `
-        <tr>
-            <td colspan="${COLS}" style="${cssSectionTitle()}">🏪 Performa Cabang Bengkel</td>
+            <th colspan="2" style="${cssHeader()}">Nama Bengkel</th>
+            <th style="${cssHeader()}">Total Reservasi</th>
+            <th style="${cssHeader()}">Selesai</th>
+            <th style="${cssHeader()}">Dibatalkan</th>
+            <th style="${cssHeader()}">Total Pendapatan</th>
         </tr>
         <tr>
-            <th colspan="2" style="${cssHeader()} width:380px;">Nama Bengkel</th>
-            <th style="${cssHeader()} width:200px;">Total Reservasi</th>
-            <th style="${cssHeader()} width:220px;">Reservasi Selesai</th>
-            <th style="${cssHeader()} width:250px;">Total Pendapatan</th>
+            <td colspan="2" style="${cssData(false,'font-weight:bold;')}">${d.bengkel}</td>
+            <td style="${cssData(false,'text-align:center;')}">${d.totalReservasi}</td>
+            <td style="${cssData(false,`text-align:center;font-weight:bold;color:${COLOR.emerald};`)}">${d.selesai}</td>
+            <td style="${cssData(false,`text-align:center;font-weight:bold;color:${COLOR.red};`)}">${d.dibatalkan}</td>
+            <td style="${cssData(false,'text-align:right;font-weight:bold;')}">${fmt(d.totalPendapatan)}</td>
         </tr>
-        ${cabangRows}
-        <tr>
-            <td colspan="2" style="${cssTotal('text-align:right; font-size:12px;')}">TOTAL KESELURUHAN</td>
-            <td style="${cssTotal('text-align:center;')}">1.248</td>
-            <td style="${cssTotal(`text-align:center; color:${COLOR.emerald};`)}">1.102</td>
-            <td style="${cssTotal('text-align:right;')}">Rp 485.200.000</td>
-        </tr>
-        ${cssDivider(COLS)}
+        <tr><td colspan="${COLS}" style="border:none;padding:8px;background:none;"></td></tr>
     `;
 
-    // ════════════════════════════════════════
-    // SECTION 3: RESERVASI TERBARU
-    // ════════════════════════════════════════
-    const reservasiData = [
-        { nama: 'Andi Saputra',  cabang: 'Cab. Sudirman',      layanan: 'Servis Berkala', status: 'Selesai',    biaya: 'Rp 1.250.000' },
-        { nama: 'Budi Setiawan', cabang: 'Cab. Kebon Jeruk',   layanan: 'Ganti Oli',      status: 'Dikerjakan', biaya: '—'            },
-        { nama: 'Citra Kirana',  cabang: 'Cab. Kelapa Gading', layanan: 'Tune Up Plus',   status: 'Selesai',    biaya: 'Rp 850.000'   },
-    ];
+    // ── SECTION 3: RESERVASI ─────────────────────────
+    const resRows = d.reservasis.length
+        ? d.reservasis.map((r, i) => {
+            const st = statusMap[r.status] ?? { label: r.status, color: COLOR.slate500, bg: '#f1f5f9' };
+            return `
+                <tr>
+                    <td style="${cssData(i%2===1,'font-weight:bold;')}">${r.nama}</td>
+                    <td style="${cssData(i%2===1)}">${r.tanggal}</td>
+                    <td colspan="2" style="${cssData(i%2===1)}">${r.layanan}</td>
+                    <td style="${cssData(i%2===1,`text-align:center;font-weight:bold;color:${st.color};background-color:${st.bg};`)}">${st.label}</td>
+                    <td style="${cssData(i%2===1,'text-align:right;font-weight:bold;')}">${r.total_biaya > 0 ? fmt(r.total_biaya) : '—'}</td>
+                </tr>`;
+          }).join('')
+        : `<tr><td colspan="${COLS}" style="${cssData()} text-align:center;color:${COLOR.slate500};font-style:italic;">
+               Tidak ada data reservasi</td></tr>`;
 
-    const reservasiRows = reservasiData.map((r, i) => {
-        const st = statusStyle[r.status] ?? { color: COLOR.slate800, bg: COLOR.white };
-        return `
+    const totalBiaya = d.reservasis.reduce((s, r) => s + Number(r.total_biaya || 0), 0);
+
+    const secReservasi = `
+        <tr><td colspan="${COLS}" style="font-size:15px;font-weight:bold;color:${COLOR.brand};
+            padding:16px 0 8px;border:none;background:none;">📋 Data Reservasi</td></tr>
+        <tr>
+            <th style="${cssHeader()}">Pelanggan</th>
+            <th style="${cssHeader()}">Tanggal</th>
+            <th colspan="2" style="${cssHeader()}">Layanan</th>
+            <th style="${cssHeader()}">Status</th>
+            <th style="${cssHeader()}">Biaya</th>
+        </tr>
+        ${resRows}
+        <tr>
+            <td colspan="5" style="${cssTotal('text-align:right;')}">TOTAL PENDAPATAN</td>
+            <td style="${cssTotal('text-align:right;')}">${fmt(totalBiaya)}</td>
+        </tr>
+        <tr><td colspan="${COLS}" style="border:none;padding:8px;background:none;"></td></tr>
+    `;
+
+    // ── SECTION 4: PENDAPATAN HARIAN ─────────────────
+    const phRows = d.pendapatanHarian.length
+        ? d.pendapatanHarian.map((p, i) => `
             <tr>
-                <td style="${cssData(i % 2 === 1, 'font-weight:bold;')}">${r.nama}</td>
-                <td style="${cssData(i % 2 === 1, `color:${COLOR.slate500};`)}">${r.cabang}</td>
-                <td style="${cssData(i % 2 === 1)}">${r.layanan}</td>
-                <td style="${cssData(i % 2 === 1, `
-                    text-align:center;
-                    font-weight:bold;
-                    color:${st.color};
-                    background-color:${st.bg};
-                `)}">${r.status}</td>
-                <td style="${cssData(i % 2 === 1, `
-                    text-align:right;
-                    font-weight:bold;
-                    color:${r.biaya === '—' ? COLOR.slate500 : COLOR.slate800};
-                `)}">${r.biaya}</td>
-            </tr>
-        `;
-    }).join('');
+                <td colspan="2" style="${cssData(i%2===1)}">${p.tanggal}</td>
+                <td style="${cssData(i%2===1,'text-align:center;')}">${p.jumlah_transaksi} trx</td>
+                <td colspan="3" style="${cssData(i%2===1,'text-align:right;font-weight:bold;')}">${fmt(p.total)}</td>
+            </tr>`).join('')
+        : `<tr><td colspan="${COLS}" style="${cssData()} text-align:center;color:${COLOR.slate500};font-style:italic;">
+               Belum ada transaksi selesai</td></tr>`;
 
-    const sectionReservasi = `
+    const totalHarian = d.pendapatanHarian.reduce((s, p) => s + Number(p.total || 0), 0);
+
+    const secPendapatan = `
+        <tr><td colspan="${COLS}" style="font-size:15px;font-weight:bold;color:${COLOR.brand};
+            padding:16px 0 8px;border:none;background:none;">💰 Pendapatan Harian</td></tr>
         <tr>
-            <td colspan="${COLS}" style="${cssSectionTitle()}">📋 Sampel Reservasi Terbaru</td>
+            <th colspan="2" style="${cssHeader()}">Tanggal</th>
+            <th style="${cssHeader()}">Jumlah Transaksi</th>
+            <th colspan="3" style="${cssHeader()}">Total Pendapatan</th>
         </tr>
+        ${phRows}
         <tr>
-            <th style="${cssHeader()} width:220px;">Pelanggan</th>
-            <th style="${cssHeader()} width:250px;">Cabang</th>
-            <th style="${cssHeader()} width:220px;">Layanan</th>
-            <th style="${cssHeader()} width:180px;">Status</th>
-            <th style="${cssHeader()} width:220px;">Biaya (Rp)</th>
+            <td colspan="3" style="${cssTotal('text-align:right;')}">TOTAL</td>
+            <td colspan="3" style="${cssTotal('text-align:right;')}">${fmt(totalHarian)}</td>
         </tr>
-        ${reservasiRows}
+        <tr><td colspan="${COLS}" style="border:none;padding:8px;background:none;"></td></tr>
     `;
 
-    // ════════════════════════════════════════
-    // GABUNG JADI 1 SHEET
-    // ════════════════════════════════════════
-    const template = `
+    // ── SECTION 5: REVIEW ────────────────────────────
+    const rvRows = d.reviews.length
+        ? d.reviews.map((rv, i) => `
+            <tr>
+                <td style="${cssData(i%2===1,'font-weight:bold;')}">${rv.nama}</td>
+                <td style="${cssData(i%2===1,`text-align:center;font-weight:bold;color:${COLOR.amber};`)}">${rv.rating} ★</td>
+                <td colspan="3" style="${cssData(i%2===1)}">${rv.komentar}</td>
+                <td style="${cssData(i%2===1)}">${rv.tanggal}</td>
+            </tr>`).join('')
+        : `<tr><td colspan="${COLS}" style="${cssData()} text-align:center;color:${COLOR.slate500};font-style:italic;">
+               Belum ada review</td></tr>`;
+
+    const secReview = `
+        <tr><td colspan="${COLS}" style="font-size:15px;font-weight:bold;color:${COLOR.brand};
+            padding:16px 0 8px;border:none;background:none;">⭐ Review Pelanggan</td></tr>
+        <tr>
+            <th style="${cssHeader()}">Pelanggan</th>
+            <th style="${cssHeader()}">Rating</th>
+            <th colspan="3" style="${cssHeader()}">Komentar</th>
+            <th style="${cssHeader()}">Tanggal</th>
+        </tr>
+        ${rvRows}
+    `;
+
+    // ── GABUNG & DOWNLOAD ─────────────────────────────
+    const html = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office"
               xmlns:x="urn:schemas-microsoft-com:office:excel"
               xmlns="http://www.w3.org/TR/REC-html40">
         <head>
             <meta charset="UTF-8">
-            <!--[if gte mso 9]>
-            <xml>
-                <x:ExcelWorkbook>
-                    <x:ExcelWorksheets>
-                        <x:ExcelWorksheet>
-                            <x:Name>Laporan AutoNexa</x:Name>
-                            <x:WorksheetOptions>
-                                <x:Zoom>150</x:Zoom>
-                                <x:DisplayGridlines/>
-                            </x:WorksheetOptions>
-                            <x:PageSetup>
-                                <x:Scale>100</x:Scale>
-                                <x:Orientation>Landscape</x:Orientation>
-                            </x:PageSetup>
-                            <x:ColInfo>
-                                <x:Index>1</x:Index>
-                                <x:Width>8000</x:Width>
-                            </x:ColInfo>
-                            <x:ColInfo>
-                                <x:Index>2</x:Index>
-                                <x:Width>8000</x:Width>
-                            </x:ColInfo>
-                            <x:ColInfo>
-                                <x:Index>3</x:Index>
-                                <x:Width>7000</x:Width>
-                            </x:ColInfo>
-                            <x:ColInfo>
-                                <x:Index>4</x:Index>
-                                <x:Width>7000</x:Width>
-                            </x:ColInfo>
-                            <x:ColInfo>
-                                <x:Index>5</x:Index>
-                                <x:Width>7000</x:Width>
-                            </x:ColInfo>
-                        </x:ExcelWorksheet>
-                    </x:ExcelWorksheets>
-                </x:ExcelWorkbook>
-            </xml>
-            <![endif]-->
             <style>
-                body  { font-family: Calibri, Arial, sans-serif; }
-                table { border-collapse: collapse; min-width: 700px; }
-                td, th { mso-number-format: "@"; } /* paksa semua cell sebagai teks agar tidak auto-format */
+                body { font-family: Calibri, Arial, sans-serif; }
+                table { border-collapse: collapse; }
+                td, th { mso-number-format:"@"; }
             </style>
         </head>
         <body>
-            <table>
-                ${kop}
-                ${sectionRingkasan}
-                ${sectionPerforma}
-                ${sectionReservasi}
-            </table>
+            <table>${kop}${secRingkasan}${secPerforma}${secReservasi}${secPendapatan}${secReview}</table>
         </body>
-        </html>
-    `;
+        </html>`;
 
-    // ── Download ──
-    const blob = new Blob([template], {
-        type: 'application/vnd.ms-excel;charset=utf-8',
-    });
-
-    const url     = URL.createObjectURL(blob);
-    const link    = document.createElement('a');
-    link.href     = url;
-    link.download = `Laporan-AutoNexa-${getTodayString()}.xls`;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `Laporan-${laporanData.bengkel}-${getTodayString()}.xls`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
-    console.info(`[AutoNexa] Excel diexport: ${link.download}`);
 }

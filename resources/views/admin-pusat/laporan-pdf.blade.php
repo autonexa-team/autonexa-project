@@ -564,7 +564,7 @@
             @php
                 $statusMap = [
                     'pending'     => ['Menunggu',     'b-pending'],
-                    'confirmed'   => ['Dikonfirmasi', 'b-konfirm'],
+                    'dikonfirmasi'   => ['Dikonfirmasi', 'b-konfirm'],
                     'in_progress' => ['Dikerjakan',   'b-proses'],
                     'done'        => ['Selesai',       'b-selesai'],
                     'cancelled'   => ['Dibatalkan',   'b-batal'],

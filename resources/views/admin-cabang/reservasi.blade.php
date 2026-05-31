@@ -40,7 +40,7 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Total Reservasi</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="156">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight">{{ $totalReservasi }}</h3>
             </div>
             <div class="w-12 h-12 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-slate-100">
                 <i class="fas fa-list-ol"></i>
@@ -54,7 +54,7 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Reservasi Hari Ini</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="12">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight">{{ $hariIni }}</h3>
             </div>
             <div class="w-12 h-12 bg-orange-50 text-brand rounded-2xl flex items-center justify-center text-xl shadow-inner border border-orange-100">
                 <i class="fas fa-calendar-day"></i>
@@ -68,7 +68,7 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Sedang Dikerjakan</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="5">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight">{{ $sedangDikerjakan }}</h3>
             </div>
             <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-amber-100">
                 <i class="fas fa-tools"></i>
@@ -82,7 +82,7 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Selesai</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="8">0</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight">{{ $selesai }}</h3>
             </div>
             <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-emerald-100">
                 <i class="fas fa-check-double"></i>
@@ -137,186 +137,103 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50 text-sm">
-                <!-- Data Row 1 (Menunggu) -->
-                <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
-                    <td class="px-6 py-4 text-center font-semibold text-slate-600">1</td>
-                    <td class="px-6 py-4">
-                        <p class="font-bold text-slate-800">Andi Saputra</p>
-                    </td>
-                    <td class="px-6 py-4 text-slate-600 font-medium">Servis Berkala 10rb KM</td>
-                    <td class="px-6 py-4">
-                        <span class="font-bold text-slate-800 flex items-center gap-2">
-                            <i class="far fa-calendar-alt text-slate-400"></i> 18 Mei 2026
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 font-bold text-slate-800">Rp 850.000</td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Menunggu
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <a href="{{ route('admin-cabang.reservasi-detail', 1) }}"
-                            class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand bg-orange-50 hover:bg-brand hover:text-white transition-colors">
-                                Detail
-                            </a>
+                @if($reservasi->count() > 0)
+                    @foreach($reservasi as $key => $res)
+                        @php
+                            $statusColors = [
+                                'pending' => ['bg' => 'bg-slate-100', 'text' => 'text-slate-600', 'dot' => 'bg-slate-500', 'label' => 'Menunggu'],
+                                'dikonfirmasi' => ['bg' => 'bg-blue-50', 'text' => 'text-blue-600', 'dot' => 'bg-blue-500', 'label' => 'Dikonfirmasi'],
+                                'diproses' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600', 'dot' => 'bg-amber-500', 'label' => 'Dikerjakan'],
+                                'selesai' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-600', 'dot' => 'bg-emerald-500', 'label' => 'Selesai'],
+                                'dibatalkan' => ['bg' => 'bg-red-50', 'text' => 'text-red-600', 'dot' => 'bg-red-500', 'label' => 'Dibatalkan'],
+                            ];
+                            $status = $statusColors[$res->status] ?? $statusColors['pending'];
+                        @endphp
+                        <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
+                            <td class="px-6 py-4 text-center font-semibold text-slate-600">{{ ($reservasi->currentPage() - 1) * $reservasi->perPage() + $key + 1 }}</td>
+                            <td class="px-6 py-4">
+                                <p class="font-bold text-slate-800">{{ $res->user->name ?? '-' }}</p>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600 font-medium">{{ $res->layanan->nama ?? '-' }}</td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="far fa-calendar-alt text-slate-400"></i> {{ $res->tanggal->format('d M Y') }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 font-bold text-slate-800">{{ $res->total_biaya ? 'Rp ' . number_format($res->total_biaya, 0, ',', '.') : '-' }}</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold {{ $status['bg'] }} {{ $status['text'] }} border {{ str_replace('bg-', 'border-', $status['bg']) }}">
+                                    <span class="w-1.5 h-1.5 rounded-full {{ $status['dot'] }} {{ $res->status === 'diproses' ? 'animate-pulse' : '' }}"></span> {{ $status['label'] }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <a href="{{ route('admin-cabang.reservasi-detail', $res->id) }}"
+                                    class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand bg-orange-50 hover:bg-brand hover:text-white transition-colors">
+                                        Detail
+                                    </a>
 
-                            <button onclick="openStatusModal('Andi Saputra', 'Menunggu')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors">
-                                Ubah Status
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Data Row 2 (Dikonfirmasi) -->
-                <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
-                    <td class="px-6 py-4 text-center font-semibold text-slate-600">2</td>
-                    <td class="px-6 py-4">
-                        <p class="font-bold text-slate-800">Budi Setiawan</p>
-                    </td>
-                    <td class="px-6 py-4 text-slate-600 font-medium">Ganti Oli & Filter</td>
-                    <td class="px-6 py-4">
-                        <span class="font-bold text-slate-800 flex items-center gap-2">
-                            <i class="far fa-calendar-alt text-slate-400"></i> 18 Mei 2026
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 font-bold text-slate-800">Rp 450.000</td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Dikonfirmasi
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand bg-orange-50 hover:bg-brand hover:text-white transition-colors">
-                                Detail
-                            </button>
-                            <button onclick="openStatusModal('Budi Setiawan', 'Dikonfirmasi')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors">
-                                Ubah Status
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Data Row 3 (Dikerjakan) -->
-                <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
-                    <td class="px-6 py-4 text-center font-semibold text-slate-600">3</td>
-                    <td class="px-6 py-4">
-                        <p class="font-bold text-slate-800">Citra Kirana</p>
-                    </td>
-                    <td class="px-6 py-4 text-slate-600 font-medium">Pengecekan Rem & AC</td>
-                    <td class="px-6 py-4">
-                        <span class="font-bold text-slate-800 flex items-center gap-2">
-                            <i class="far fa-calendar-alt text-slate-400"></i> 18 Mei 2026
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 font-bold text-slate-800">-</td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-600 border border-amber-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Dikerjakan
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand bg-orange-50 hover:bg-brand hover:text-white transition-colors">
-                                Detail
-                            </button>
-                            <button onclick="openStatusModal('Citra Kirana', 'Dikerjakan')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors">
-                                Ubah Status
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Data Row 4 (Selesai) -->
-                <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
-                    <td class="px-6 py-4 text-center font-semibold text-slate-600">4</td>
-                    <td class="px-6 py-4">
-                        <p class="font-bold text-slate-800">Dimas Anggara</p>
-                    </td>
-                    <td class="px-6 py-4 text-slate-600 font-medium">Turun Mesin (Overhaul)</td>
-                    <td class="px-6 py-4">
-                        <span class="font-bold text-slate-800 flex items-center gap-2">
-                            <i class="far fa-calendar-alt text-slate-400"></i> 15 Mei 2026
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 font-bold text-slate-800">Rp 5.200.000</td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Selesai
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand bg-orange-50 hover:bg-brand hover:text-white transition-colors">
-                                Detail
-                            </button>
-                            <button onclick="openStatusModal('Dimas Anggara', 'Selesai')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors">
-                                Ubah Status
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Data Row 5 (Dibatalkan) -->
-                <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
-                    <td class="px-6 py-4 text-center font-semibold text-slate-600">5</td>
-                    <td class="px-6 py-4">
-                        <p class="font-bold text-slate-800">Eka Putri</p>
-                    </td>
-                    <td class="px-6 py-4 text-slate-600 font-medium">Spooring & Balancing</td>
-                    <td class="px-6 py-4">
-                        <span class="font-bold text-slate-800 flex items-center gap-2">
-                            <i class="far fa-calendar-alt text-slate-400"></i> 14 Mei 2026
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 font-bold text-slate-800">-</td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-600 border border-red-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Dibatalkan
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="px-3 py-1.5 rounded-lg text-xs font-bold text-brand bg-orange-50 hover:bg-brand hover:text-white transition-colors">
-                                Detail
-                            </button>
-                            <button onclick="openStatusModal('Eka Putri', 'Dibatalkan')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors">
-                                Ubah Status
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                                    <button onclick="openStatusModal({{ $res->id }}, '{{ $res->user->name }}', '{{ $status['label'] }}', {{ $key }})" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors">
+                                        Ubah Status
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
+                                    <i class="fas fa-box-open text-4xl text-slate-300"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-800">Belum ada reservasi</h3>
+                                <p class="text-slate-500 text-sm mt-1 max-w-sm">Data reservasi pelanggan akan muncul di sini.</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endif
             </tbody>
         </table>
     </div>
-    
-    <!-- Empty State (Hidden by default) -->
-    <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center">
-        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
-            <i class="fas fa-box-open text-4xl text-slate-300"></i>
-        </div>
-        <h3 class="text-lg font-bold text-slate-800">Belum ada reservasi</h3>
-        <p class="text-slate-500 text-sm mt-1 max-w-sm">Data reservasi pelanggan akan muncul di sini. Saat ini belum ada data yang sesuai dengan filter Anda.</p>
-    </div>
 
     <!-- Pagination -->
+    @if($reservasi->hasPages())
     <div class="px-6 py-4 border-t border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between bg-white">
-        <span class="text-sm text-slate-500 font-medium">Menampilkan 1-5 dari 156 data</span>
+        <span class="text-sm text-slate-500 font-medium">
+            Menampilkan {{ $reservasi->firstItem() ?? 0 }}-{{ $reservasi->lastItem() ?? 0 }} dari {{ $reservasi->total() }} data
+        </span>
         <div class="flex items-center gap-2">
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-400 hover:bg-slate-50 transition-colors disabled:opacity-50" disabled>
-                <i class="fas fa-chevron-left text-xs"></i>
-            </button>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center bg-brand text-white font-bold text-sm shadow-md shadow-brand/20">1</button>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors font-bold text-sm">2</button>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors font-bold text-sm">3</button>
-            <span class="text-slate-400">...</span>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-                <i class="fas fa-chevron-right text-xs"></i>
-            </button>
+            @if($reservasi->onFirstPage())
+                <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-400 cursor-not-allowed opacity-50">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>
+            @else
+                <a href="{{ $reservasi->previousPageUrl() }}" class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </a>
+            @endif
+            
+            @foreach($reservasi->getUrlRange(1, $reservasi->lastPage()) as $page => $url)
+                @if($page == $reservasi->currentPage())
+                    <button class="w-8 h-8 rounded-lg flex items-center justify-center bg-brand text-white font-bold text-sm shadow-md shadow-brand/20">{{ $page }}</button>
+                @else
+                    <a href="{{ $url }}" class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors font-bold text-sm">{{ $page }}</a>
+                @endif
+            @endforeach
+            
+            @if($reservasi->hasMorePages())
+                <a href="{{ $reservasi->nextPageUrl() }}" class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </a>
+            @else
+                <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-slate-200 text-slate-400 cursor-not-allowed opacity-50">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+            @endif
         </div>
     </div>
+    @endif
 </div>
 
 <!-- Modal Update Status -->
@@ -329,6 +246,10 @@
             </button>
         </div>
         <div class="p-6">
+            <!-- Hidden inputs to store reservation ID and row index -->
+            <input type="hidden" id="reservasiId" value="">
+            <input type="hidden" id="rowIndex" value="">
+
             <div class="mb-4">
                 <p class="text-sm font-medium text-slate-500 mb-1">Pelanggan</p>
                 <p id="modalCustomerName" class="font-bold text-slate-800 text-lg">Nama Pelanggan</p>
@@ -338,10 +259,10 @@
                 <label for="statusSelect" class="block text-sm font-medium text-slate-700 mb-2">Pilih Status Baru</label>
                 <div class="relative">
                     <select id="statusSelect" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand focus:border-brand block w-full p-3 outline-none font-medium appearance-none">
-                        <option value="Menunggu">Menunggu</option>
-                        <option value="Dikonfirmasi">Dikonfirmasi</option>
-                        <option value="Dikerjakan">Dikerjakan</option>
-                        <option value="Selesai">Selesai</option>
+                        <option value="Menunggu">Menunggu Konfirmasi</option>
+                        <option value="Dikonfirmasi">Dikonfirmasi (Approved)</option>
+                        <option value="Proses">Sedang Diproses (On-going)</option>
+                        <option value="Selesai">Selesai (Completed)</option>
                         <option value="Dibatalkan">Dibatalkan</option>
                     </select>
                     <!-- Custom dropdown arrow -->
@@ -355,8 +276,10 @@
                 <button onclick="closeStatusModal()" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">
                     Batal
                 </button>
-                <button onclick="saveStatus()" class="px-5 py-2.5 rounded-xl font-bold text-white bg-brand hover:bg-brand-dark transition-colors shadow-lg shadow-brand/20">
-                    Simpan Perubahan
+                <button onclick="saveStatus()" class="px-5 py-2.5 rounded-xl font-bold text-white bg-brand hover:bg-brand-dark transition-colors shadow-lg shadow-brand/20 flex items-center gap-2">
+                    <span id="btnText">Simpan Perubahan</span>
+                    <i id="btnIcon" class="fas fa-check-circle"></i>
+                    <i id="loadingIcon" class="fas fa-circle-notch fa-spin hidden"></i>
                 </button>
             </div>
         </div>
@@ -364,13 +287,34 @@
 </div>
 
 <script>
-    // Simple Modal Logic
-    function openStatusModal(customerName, currentStatus) {
+    // Status mapping
+    const statusMap = {
+        'Menunggu': 'pending',
+        'Dikonfirmasi': 'dikonfirmasi',
+        'Proses': 'diproses',
+        'Selesai': 'selesai',
+        'Dibatalkan': 'dibatalkan'
+    };
+
+    const statusColors = {
+        'pending': { bg: 'bg-slate-100', text: 'text-slate-600', dot: 'bg-slate-500', label: 'Menunggu' },
+        'dikonfirmasi': { bg: 'bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500', label: 'Dikonfirmasi' },
+        'diproses': { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500', label: 'Dikerjakan' },
+        'selesai': { bg: 'bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500', label: 'Selesai' },
+        'dibatalkan': { bg: 'bg-red-50', text: 'text-red-600', dot: 'bg-red-500', label: 'Dibatalkan' }
+    };
+
+    // Modal Logic
+    function openStatusModal(reservasiId, customerName, currentStatus, rowIndex) {
         const modal = document.getElementById('statusModal');
         const content = document.getElementById('statusModalContent');
         
+        document.getElementById('reservasiId').value = reservasiId;
+        document.getElementById('rowIndex').value = rowIndex;
         document.getElementById('modalCustomerName').textContent = customerName;
-        document.getElementById('statusSelect').value = currentStatus;
+        
+        // Set current status in dropdown
+        document.getElementById('statusSelect').value = currentStatus === 'Dikerjakan' ? 'Proses' : currentStatus;
         
         modal.classList.remove('hidden');
         // Trigger reflow
@@ -392,42 +336,115 @@
     }
     
     function saveStatus() {
-        alert('Status berhasil diubah (Dummy)');
-        closeStatusModal();
-    }
-</script>
-<!-- Custom Script for Number Animation -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const counters = document.querySelectorAll(".counter-value");
-    const duration = 1500; // 1.5 seconds
+        const reservasiId = document.getElementById('reservasiId').value;
+        const rowIndex = document.getElementById('rowIndex').value;
+        const statusDisplay = document.getElementById('statusSelect').value;
+        const statusDb = statusMap[statusDisplay];
 
-    counters.forEach(counter => {
-        const target = parseFloat(counter.getAttribute("data-target"));
-        const decimals = parseInt(counter.getAttribute("data-decimals")) || 0;
-        const prefix = counter.getAttribute("data-prefix") || "";
-        const suffix = counter.getAttribute("data-suffix") || "";
+        const btnSave = document.querySelector('button[onclick="saveStatus()"]');
+        const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
+        const loadingIcon = document.getElementById('loadingIcon');
         
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            
-            // easeOutExpo easing function
-            const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-            const current = easeProgress * target;
-            
-            counter.innerText = prefix + current.toFixed(decimals) + suffix;
-            
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
+        // Loading state
+        btnSave.disabled = true;
+        btnText.textContent = 'Memproses...';
+        btnIcon.classList.add('hidden');
+        loadingIcon.classList.remove('hidden');
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+                         Array.from(document.querySelectorAll('input')).find(i => i.name === '_token')?.value;
+
+        // Send API request
+        fetch(`/admin-cabang/reservasi/${reservasiId}/update-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ status: statusDb })
+        })
+        .then(response => response.json())
+        .then(result => {
+            btnSave.disabled = false;
+            btnText.textContent = 'Simpan Perubahan';
+            btnIcon.classList.remove('hidden');
+            loadingIcon.classList.add('hidden');
+
+            if (result.success) {
+                // Show success message
+                showToast('Status berhasil diubah', 'Perubahan status reservasi telah disimpan.');
+                
+                // Update table row - find the row and update status badge
+                const rows = document.querySelectorAll('table tbody tr');
+                if (rows.length > rowIndex) {
+                    const row = rows[rowIndex];
+                    const statusBadge = row.querySelector('td:nth-child(6)');
+                    
+                    if (statusBadge) {
+                        const newColor = statusColors[statusDb];
+                        const newBorder = newColor.bg.replace('bg-', 'border-');
+                        const pulseClass = statusDb === 'diproses' ? 'animate-pulse' : '';
+                        
+                        statusBadge.innerHTML = `
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold ${newColor.bg} ${newColor.text} border ${newBorder}">
+                                <span class="w-1.5 h-1.5 rounded-full ${newColor.dot} ${pulseClass}"></span> ${newColor.label}
+                            </span>
+                        `;
+                    }
+                }
+                
+                // Close modal after short delay
+                setTimeout(() => {
+                    closeStatusModal();
+                }, 1000);
             } else {
-                counter.innerText = prefix + target.toFixed(decimals) + suffix;
+                showToast('Gagal mengubah status', result.message || 'Silakan coba lagi.', 'error');
             }
-        };
+        })
+        .catch(error => {
+            btnSave.disabled = false;
+            btnText.textContent = 'Simpan Perubahan';
+            btnIcon.classList.remove('hidden');
+            loadingIcon.classList.add('hidden');
+
+            console.error('Error:', error);
+            showToast('Error', 'Terjadi kesalahan saat mengubah status', 'error');
+        });
+    }
+
+    // Toast notification helper
+    function showToast(title, msg, type = 'success') {
+        const toast = document.createElement('div');
+        const borderColor = type === 'error' ? 'border-red-500' : 'border-emerald-500';
+        const bgColor = type === 'error' ? 'bg-red-500/20' : 'bg-emerald-500/20';
+        const textColor = type === 'error' ? 'text-red-400' : 'text-emerald-400';
+        const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check';
         
-        window.requestAnimationFrame(step);
-    });
-});
+        toast.className = `fixed top-4 right-4 z-50 bg-slate-800 text-white p-4 rounded-xl shadow-2xl flex items-start gap-4 transform transition-all duration-500 ease-out translate-x-10 opacity-0 border-l-4 ${borderColor}`;
+        toast.innerHTML = `
+            <div class="w-8 h-8 rounded-full ${bgColor} ${textColor} flex items-center justify-center flex-shrink-0">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm text-white">${title}</h4>
+                <p class="text-xs text-slate-300 mt-1">${msg}</p>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Animate in
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-10', 'opacity-0');
+        });
+        
+        // Remove after 3s
+        setTimeout(() => {
+            toast.classList.add('translate-x-10', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
 </script>
 @endsection

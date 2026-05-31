@@ -1,6 +1,6 @@
 @extends('layout.app-clean')
 
-@section('title', 'Detail Reservasi #RV-2025-001 — AutoNexa')
+@section('title', 'Detail Reservasi #RV-{{ str_pad($reservasi->id, 7, "0", STR_PAD_LEFT) }} — AutoNexa')
 
 @section('content')
 
@@ -31,7 +31,7 @@
                 <h1 class="detail-header__title">Detail <em>Reservasi</em></h1>
                 <p class="detail-header__id">
                     <i class="fas fa-hashtag" style="font-size:.65rem; color:var(--brand);"></i>
-                    RV-2025-001 &nbsp;·&nbsp; Dibuat 10 Juli 2025, 09:15 WIB
+                    RV-{{ str_pad($reservasi->id, 7, '0', STR_PAD_LEFT) }} &nbsp;·&nbsp; Dibuat {{ $reservasi->created_at->translatedFormat('d F Y, H:i') }} WIB
                 </p>
             </div>
             <div class="detail-header__actions">
@@ -52,27 +52,41 @@
     {{-- ══════════════════════════════════════════
          STATUS HERO BANNER
     ══════════════════════════════════════════ --}}
+    @php
+        $statusColor = [
+            'pending'      => ['bar'=>'#f59e0b','icon_bg'=>'#fffbeb','icon'=>'#d97706','icon_bd'=>'#fde68a','badge'=>'status-badge--waiting','label'=>'Menunggu Konfirmasi'],
+            'dikonfirmasi' => ['bar'=>'#3b82f6','icon_bg'=>'#eff6ff','icon'=>'#2563eb','icon_bd'=>'#bfdbfe','badge'=>'status-badge--waiting','label'=>'Dikonfirmasi'],
+            'diproses'     => ['bar'=>'#3b82f6','icon_bg'=>'#eff6ff','icon'=>'#2563eb','icon_bd'=>'#bfdbfe','badge'=>'status-badge--process','label'=>'Sedang Diproses'],
+            'selesai'      => ['bar'=>'#10b981','icon_bg'=>'#ecfdf5','icon'=>'#059669','icon_bd'=>'#a7f3d0','badge'=>'status-badge--done','label'=>'Selesai'],
+            'dibatalkan'   => ['bar'=>'#ef4444','icon_bg'=>'#fef2f2','icon'=>'#dc2626','icon_bd'=>'#fecaca','badge'=>'status-badge--cancel','label'=>'Dibatalkan'],
+        ];
+        $sc = $statusColor[$reservasi->status] ?? $statusColor['pending'];
+    @endphp
     <div class="status-hero anim-up d1"
-         style="--c-bar:#3b82f6; --c-icon-bg:#eff6ff; --c-icon:#2563eb; --c-icon-border:#bfdbfe;">
+         style="--c-bar:{{ $sc['bar'] }}; --c-icon-bg:{{ $sc['icon_bg'] }}; --c-icon:{{ $sc['icon'] }}; --c-icon-border:{{ $sc['icon_bd'] }};">
         <div class="status-hero__bar"></div>
         <div class="status-hero__body">
             <div class="status-hero__icon-wrap">
                 <i class="fas fa-store-alt"></i>
             </div>
             <div class="status-hero__text">
-                <div class="status-hero__bengkel">AutoNexa Cabang Bandung</div>
+                <div class="status-hero__bengkel">{{ $reservasi->bengkel->nama ?? '-' }}</div>
                 <div class="status-hero__meta">
-                    <span><i class="fas fa-map-marker-alt"></i> Jl. Soekarno-Hatta No. 88, Bandung</span>
-                    <span><i class="fas fa-phone"></i> (022) 123-4567</span>
-                    <span><i class="fas fa-clock"></i> Buka 08:00 – 17:00</span>
+                    <span><i class="fas fa-map-marker-alt"></i> {{ $reservasi->bengkel->alamat ?? '-' }}</span>
+                    @if($reservasi->bengkel->telepon ?? null)
+                    <span><i class="fas fa-phone"></i> {{ $reservasi->bengkel->telepon }}</span>
+                    @endif
+                    @if(($reservasi->bengkel->jam_buka ?? null) && ($reservasi->bengkel->jam_tutup ?? null))
+                    <span><i class="fas fa-clock"></i> Buka {{ $reservasi->bengkel->jam_buka }} – {{ $reservasi->bengkel->jam_tutup }}</span>
+                    @endif
                 </div>
             </div>
             <div class="status-hero__right">
-                <span class="status-badge status-badge--process">
+                <span class="status-badge {{ $sc['badge'] }}">
                     <span class="status-dot"></span>
-                    Sedang Diproses
+                    {{ $sc['label'] }}
                 </span>
-                <span style="font-size:.72rem; color:var(--txt-3);">Update terakhir: 10 Jul 10:32</span>
+                <span style="font-size:.72rem; color:var(--txt-3);">Update terakhir: {{ $reservasi->updated_at->format('d M H:i') }}</span>
             </div>
         </div>
     </div>
@@ -141,48 +155,49 @@
                         <div class="info-item">
                             <div class="info-item__label">Nomor Reservasi</div>
                             <div class="info-item__val" style="font-family:monospace; letter-spacing:.04em;">
-                                #RV-2025-001
+                                #RV-{{ str_pad($reservasi->id, 7, '0', STR_PAD_LEFT) }}
                             </div>
                         </div>
                         <div class="info-item">
                             <div class="info-item__label">Status</div>
                             <div class="info-item__val">
-                                <span class="status-badge status-badge--process">
-                                    <span class="status-dot"></span> Diproses
+                                <span class="status-badge {{ $sc['badge'] }}">
+                                    <span class="status-dot"></span> {{ $sc['label'] }}
                                 </span>
                             </div>
                         </div>
                         <div class="info-item">
                             <div class="info-item__label">Tanggal Reservasi</div>
                             <div class="info-item__val">
-                                <i class="fas fa-calendar"></i> Kamis, 10 Juli 2025
+                                <i class="fas fa-calendar"></i> {{ \Carbon\Carbon::parse($reservasi->tanggal)->translatedFormat('l, d F Y') }}
                             </div>
                         </div>
                         <div class="info-item">
                             <div class="info-item__label">Jam Reservasi</div>
                             <div class="info-item__val">
-                                <i class="fas fa-clock"></i> 10:00 WIB
+                                <i class="fas fa-clock"></i> {{ $reservasi->waktu }} WIB
                             </div>
                         </div>
                         <div class="info-item">
                             <div class="info-item__label">Layanan Utama</div>
                             <div class="info-item__val">
-                                <i class="fas fa-tools"></i> Servis Berkala 10.000 KM
+                                <i class="fas fa-tools"></i> {{ $reservasi->layanan->nama ?? '-' }}
                             </div>
                         </div>
+                        @if($reservasi->layanan->durasi ?? null)
                         <div class="info-item">
                             <div class="info-item__label">Estimasi Durasi</div>
                             <div class="info-item__val">
-                                <i class="fas fa-hourglass-half"></i> 2 – 3 jam
+                                <i class="fas fa-hourglass-half"></i> ± {{ $reservasi->layanan->durasi }} menit
                             </div>
                         </div>
+                        @endif
                     </div>
 
                     <div class="info-item" style="padding-top:1rem; border-top:1.5px solid var(--bg-subtle);">
                         <div class="info-item__label">Keluhan / Catatan Pelanggan</div>
                         <div class="info-item__val info-item__val--muted" style="margin-top:.35rem; line-height:1.6; display:block;">
-                            "Mesin terasa kasar saat idle, oli sudah lama tidak diganti. Selain itu ada suara
-                            sedikit berdesir dari bagian bawah kap mesin saat RPM rendah."
+                            "{{ $reservasi->keluhan ?? '-' }}"
                         </div>
                     </div>
                 </div>
@@ -205,33 +220,14 @@
                         <div class="info-item">
                             <div class="info-item__label">Merk & Model</div>
                             <div class="info-item__val">
-                                <i class="fas fa-car-side"></i> Honda Brio
+                                <i class="fas fa-car-side"></i> {{ $reservasi->kendaraan ?? '-' }}
                             </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-item__label">Tahun</div>
-                            <div class="info-item__val"><i class="fas fa-calendar-days"></i> 2020</div>
                         </div>
                         <div class="info-item">
                             <div class="info-item__label">Plat Nomor</div>
                             <div class="info-item__val">
-                                <span class="plate-chip">B 1234 XYZ</span>
+                                <span class="plate-chip">{{ $reservasi->plat ?? '-' }}</span>
                             </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-item__label">Transmisi</div>
-                            <div class="info-item__val"><i class="fas fa-gears"></i> Otomatis (CVT)</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-item__label">Warna</div>
-                            <div class="info-item__val">
-                                <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#e53e3e;border:1.5px solid rgba(0,0,0,.12);"></span>
-                                Merah
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-item__label">KM Terakhir</div>
-                            <div class="info-item__val"><i class="fas fa-gauge-high"></i> ±10.200 KM</div>
                         </div>
                     </div>
                 </div>
@@ -322,32 +318,30 @@
                     <div class="quick-stat">
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-hashtag"></i> No. Reservasi</span>
-                            <span class="qs-val" style="font-family:monospace; font-size:.75rem; letter-spacing:.04em;">RV-2025-001</span>
+                            <span class="qs-val" style="font-family:monospace; font-size:.75rem; letter-spacing:.04em;">RV-{{ str_pad($reservasi->id, 7, '0', STR_PAD_LEFT) }}</span>
                         </div>
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-store"></i> Bengkel</span>
-                            <span class="qs-val" style="font-size:.77rem; text-align:right; max-width:130px;">AutoNexa Bandung</span>
+                            <span class="qs-val" style="font-size:.77rem; text-align:right; max-width:130px;">{{ $reservasi->bengkel->nama ?? '-' }}</span>
                         </div>
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-car"></i> Kendaraan</span>
-                            <span class="qs-val">Honda Brio</span>
+                            <span class="qs-val">{{ $reservasi->kendaraan ?? '-' }}</span>
                         </div>
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-calendar"></i> Tanggal</span>
-                            <span class="qs-val">10 Jul 2025</span>
+                            <span class="qs-val">{{ \Carbon\Carbon::parse($reservasi->tanggal)->format('d M Y') }}</span>
                         </div>
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-clock"></i> Jam</span>
-                            <span class="qs-val">10:00 WIB</span>
+                            <span class="qs-val">{{ $reservasi->waktu }} WIB</span>
                         </div>
-                        <div class="quick-stat-row">
-                            <span class="qs-label"><i class="fas fa-user-gear"></i> Mekanik</span>
-                            <span class="qs-val">Rizky Pratama</span>
-                        </div>
+                        @if($reservasi->layanan->durasi ?? null)
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-hourglass"></i> Estimasi</span>
-                            <span class="qs-val">± 45 menit</span>
+                            <span class="qs-val">± {{ $reservasi->layanan->durasi }} menit</span>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -365,34 +359,26 @@
                     </div>
                 </div>
                 <div class="sec-card__body">
+                    @if($reservasi->layanan ?? null)
                     <div class="invoice-rows">
                         <div class="invoice-row">
-                            <span class="invoice-row__label">Servis Berkala 10rb KM</span>
-                            <span class="invoice-row__val">Rp 250.000</span>
-                        </div>
-                        <div class="invoice-row">
-                            <span class="invoice-row__label">Oli Mesin (1L)</span>
-                            <span class="invoice-row__val">Rp 85.000</span>
-                        </div>
-                        <div class="invoice-row">
-                            <span class="invoice-row__label">Filter Oli</span>
-                            <span class="invoice-row__val">Rp 45.000</span>
-                        </div>
-                        <div class="invoice-row">
-                            <span class="invoice-row__label">Jasa Servis</span>
-                            <span class="invoice-row__val">Rp 75.000</span>
-                        </div>
-                        <div class="invoice-row">
-                            <span class="invoice-row__label" style="color:var(--c-done);">Diskon Member</span>
-                            <span class="invoice-row__val invoice-row__val--brand">- Rp 25.000</span>
+                            <span class="invoice-row__label">{{ $reservasi->layanan->nama }}</span>
+                            <span class="invoice-row__val">Rp {{ number_format($reservasi->layanan->harga, 0, ',', '.') }}</span>
                         </div>
                     </div>
-
                     <div class="invoice-total">
                         <span class="invoice-total__label">Total Estimasi</span>
-                        <span class="invoice-total__amount">Rp 430.000</span>
+                        <span class="invoice-total__amount">
+                            @if($reservasi->total_biaya)
+                                Rp {{ number_format($reservasi->total_biaya, 0, ',', '.') }}
+                            @else
+                                Rp {{ number_format($reservasi->layanan->harga, 0, ',', '.') }}
+                            @endif
+                        </span>
                     </div>
-
+                    @else
+                    <p style="font-size:.85rem; color:var(--txt-3);">Data layanan tidak tersedia.</p>
+                    @endif
                     <p style="font-size:.72rem; color:var(--txt-4); margin-top:.7rem; line-height:1.5; text-align:center;">
                         * Harga final ditentukan setelah servis selesai
                     </p>
@@ -411,18 +397,24 @@
                     </div>
                 </div>
                 <div class="sec-card__body" style="display:flex; flex-direction:column; gap:.65rem;">
-                    <a href="tel:022-1234567" class="btn btn--outline btn--full">
+                    @if($reservasi->bengkel->telepon ?? null)
+                    <a href="tel:{{ $reservasi->bengkel->telepon }}" class="btn btn--outline btn--full">
                         <i class="fas fa-phone"></i> Hubungi Bengkel
                     </a>
-                    <a href="https://wa.me/6281234567890" class="btn btn--outline btn--full" target="_blank">
+                    @endif
+                    @if($reservasi->bengkel->whatsapp ?? null)
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $reservasi->bengkel->whatsapp) }}" class="btn btn--outline btn--full" target="_blank">
                         <i class="fab fa-whatsapp" style="color:#25d366;"></i> Chat via WhatsApp
                     </a>
+                    @endif
                     <a href="{{ route('pelanggan.reservasi') }}" class="btn btn--primary btn--full">
                         <i class="fas fa-plus"></i> Reservasi Baru
                     </a>
+                    @if(!in_array($reservasi->status, ['selesai','dibatalkan']))
                     <button class="btn btn--danger btn--full" id="cancelBtn">
                         <i class="fas fa-times-circle"></i> Batalkan Reservasi
                     </button>
+                    @endif
                 </div>
             </div>
 
@@ -442,21 +434,27 @@
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-map-marker-alt"></i> Alamat</span>
                             <span class="qs-val" style="font-size:.75rem; text-align:right; max-width:150px; line-height:1.4;">
-                                Jl. Soekarno-Hatta No. 88, Bandung
+                                {{ $reservasi->bengkel->alamat ?? '-' }}
                             </span>
                         </div>
+                        @if($reservasi->bengkel->telepon ?? null)
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-phone"></i> Telepon</span>
-                            <span class="qs-val">(022) 123-4567</span>
+                            <span class="qs-val">{{ $reservasi->bengkel->telepon }}</span>
                         </div>
+                        @endif
+                        @if(($reservasi->bengkel->jam_buka ?? null) && ($reservasi->bengkel->jam_tutup ?? null))
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-clock"></i> Jam Buka</span>
-                            <span class="qs-val">08:00 – 17:00</span>
+                            <span class="qs-val">{{ $reservasi->bengkel->jam_buka }} – {{ $reservasi->bengkel->jam_tutup }}</span>
                         </div>
+                        @endif
+                        @if($reservasi->bengkel->reviews_avg_rating ?? null)
                         <div class="quick-stat-row">
                             <span class="qs-label"><i class="fas fa-star"></i> Rating</span>
-                            <span class="qs-val" style="color:#fbbf24;">4.8 / 5.0</span>
+                            <span class="qs-val" style="color:#fbbf24;">{{ number_format($reservasi->bengkel->reviews_avg_rating, 1) }} / 5.0</span>
                         </div>
+                        @endif
                     </div>
                     <a href="#" class="btn btn--outline btn--full" style="margin-top:.75rem; font-size:.78rem;">
                         <i class="fas fa-map"></i> Lihat di Peta
@@ -502,7 +500,7 @@
                 Batalkan Reservasi?
             </h3>
             <p style="font-size:.85rem; color:var(--txt-3); line-height:1.6;">
-                Kamu yakin ingin membatalkan reservasi <strong>#RV-2025-001</strong>?
+                Kamu yakin ingin membatalkan reservasi <strong>#RV-{{ str_pad($reservasi->id, 7, '0', STR_PAD_LEFT) }}</strong>?
                 Tindakan ini tidak dapat dibatalkan.
             </p>
         </div>
@@ -526,21 +524,9 @@
     'use strict';
 
     /* ══════════════════════════
-       DUMMY DATA (sinkron dengan riwayat.blade.php)
+       DATA DARI DATABASE
     ══════════════════════════ */
-    const RESERVATION = {
-        id: 'RV-2025-001',
-        status: 'process',
-        step: 3,
-        timeline: [
-            { time: '10 Jul 2025 · 09:15 WIB', title: 'Reservasi Dibuat',        desc: 'Kamu berhasil membuat reservasi secara online melalui platform AutoNexa.', state: 'done' },
-            { time: '10 Jul 2025 · 09:45 WIB', title: 'Reservasi Dikonfirmasi',  desc: 'Admin bengkel AutoNexa Bandung telah mengkonfirmasi reservasimu.', state: 'done' },
-            { time: '10 Jul 2025 · 10:10 WIB', title: 'Kendaraan Diterima',      desc: 'Kendaraan Honda Brio B 1234 XYZ sudah tiba di bengkel dan sedang diperiksa oleh mekanik.', state: 'done' },
-            { time: 'Sedang berlangsung',       title: 'Proses Servis',           desc: 'Mekanik Rizky Pratama sedang mengerjakan servis berkala pada kendaraanmu.', state: 'active' },
-            { time: '—',                        title: 'Quality Check',           desc: 'Pengecekan akhir kualitas dan keamanan kendaraan sebelum diserahkan.', state: 'idle' },
-            { time: '—',                        title: 'Selesai',                 desc: 'Kendaraan siap diambil. Terima kasih telah menggunakan AutoNexa!', state: 'idle' },
-        ]
-    };
+    const RESERVATION = @json($reservasiJs);
 
     const STEPS = [
         { icon: 'fa-hourglass-start', label: 'Menunggu Konfirmasi' },

@@ -10,7 +10,7 @@ use App\Models\Bengkel;
 
 class SparepartController extends Controller
 {
-    // ──────────────────────── INDEX ──────────────────────────
+    // INDEX 
     public function index()
     {
 
@@ -149,7 +149,7 @@ class SparepartController extends Controller
     abort(403);
     }
 
-    // ──────────────────────── STORE ──────────────────────────
+    //  STORE
     public function store(Request $request)
     {
         // Proteksi role
@@ -184,7 +184,7 @@ class SparepartController extends Controller
             ->with('success', 'Sparepart berhasil ditambahkan');
     }
 
-    // ──────────────────────── UPDATE ──────────────────────────
+    //  UPDATE
     public function update(Request $request, int $id)
     {
         // Proteksi role
@@ -206,7 +206,6 @@ class SparepartController extends Controller
                         ->with('success', 'Sparepart berhasil diperbarui');
     }
 
-    // ──────────────────────── DESTROY ──────────────────────────
     public function destroy(int $id)
     {
         // Proteksi role

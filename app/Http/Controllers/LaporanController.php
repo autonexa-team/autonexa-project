@@ -133,7 +133,7 @@ class LaporanController extends Controller
         return [$reservasis, $pendapatanHarian, $reviews];
     }
 
-    // ── ADMIN PUSAT — Halaman laporan ──────────────────────────────
+    // ADMIN PUSAT — Halaman laporan 
     public function index(Request $request)
     {
         [$dari, $sampai] = $this->parsePeriode($request);
@@ -156,7 +156,7 @@ class LaporanController extends Controller
         ));
     }
 
-    // ── ADMIN PUSAT — Export PDF ───────────────────────────────────
+    // ADMIN PUSAT — Export PDF 
     public function exportPdf(Request $request)
     {
         [$dari, $sampai] = $this->parsePeriode($request);
@@ -195,7 +195,7 @@ class LaporanController extends Controller
         return $pdf->stream('laporan-autonexa-' . now()->format('Ymd-Hi') . '.pdf');
     }
 
-    // ── ADMIN CABANG — Halaman laporan ────────────────────────────
+    // ADMIN CABANG — Halaman laporan
     public function indexCabang(Request $request)
     {
         $user    = Auth::user();
@@ -223,7 +223,7 @@ class LaporanController extends Controller
         ));
     }
 
-    // ── ADMIN CABANG — Export PDF ─────────────────────────────────
+    // ADMIN CABANG — Export PDF
     public function exportPdfCabang(Request $request)
     {
         $bengkel = Bengkel::where('admin_id', '=', Auth::id())->firstOrFail();

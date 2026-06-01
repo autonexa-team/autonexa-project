@@ -9,7 +9,7 @@
 @section('content')
 
 {{-- ===== PAGE HEADER ===== --}}
-<div class="dash-hea{{ number_format($totalPelanggan ?? 0) }}der">
+<div class="dash-header">
     <div>
         <h1 class="dash-title">Dashboard</h1>
         <p class="dash-sub">Selamat datang kembali, <strong>{{ auth()->user()->name ?? 'Admin' }}</strong> · Terakhir diperbarui {{ now()->format('d M Y, H:i') }} WIB</p>
@@ -37,7 +37,14 @@
         <div class="stat-icon-wrap si-orange">
             <i class="bi bi-calendar-check"></i>
         </div>
-
+        <div class="stat-body">
+            <div class="stat-label">Total Reservasi</div>
+            <div class="stat-value">{{ $totalReservasi ?? 0 }}</div>
+            <div class="stat-trend trend-neutral">
+                <i class="bi bi-calendar3"></i>
+                Semua bengkel
+            </div>
+        </div>
     </div>
 
     <div class="stat-card">
@@ -102,11 +109,7 @@
         </div>
         <div class="stat-body">
             <div class="stat-label">Total Pelanggan</div>
-            <div class="stat-value">
-                'totalPelanggan' => DB::table('users')
-                ->where('role', 'pelanggan')
-                ->count(),
-            </div>
+            <div class="stat-value">{{ $totalPelanggan ?? 0 }}</div>
             <div class="stat-trend {{ ($trendPelanggan ?? 0) >= 0 ? 'trend-up' : 'trend-down' }}">
                 <i class="bi bi-arrow-{{ ($trendPelanggan ?? 0) >= 0 ? 'up' : 'down' }}-short"></i>
                 {{ abs($trendPelanggan ?? 0) }}% bulan ini
@@ -200,7 +203,7 @@
                         <td class="td-nominal">Rp {{ number_format($t->total ?? 0, 0, ',', '.') }}</td>
                         <td class="td-date">{{ \Carbon\Carbon::parse($t->created_at)->format('d M Y') }}</td>
                         <td>
-                            <a href="{{ route('admin-pusat.transaksi.show', $t->id) }}" class="btn-aksi-detail">
+                            <a href="{{ route('admin-pusat.reservasi') }}" class="btn-aksi-detail">
                                 <i class="bi bi-eye"></i> Detail
                             </a>
                         </td>

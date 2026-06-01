@@ -68,7 +68,7 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Sedang Dikerjakan</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight">{{ $sedangDikerjakan }}</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight" id="card-diproses">{{ $sedangDikerjakan }}</h3>
             </div>
             <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-amber-100">
                 <i class="fas fa-tools"></i>
@@ -82,7 +82,7 @@
         <div class="flex justify-between items-start relative z-10">
             <div>
                 <p class="text-slate-500 text-sm font-semibold mb-1">Selesai</p>
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight">{{ $selesai }}</h3>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight" id="card-selesai">{{ $selesai }}</h3>
             </div>
             <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-emerald-100">
                 <i class="fas fa-check-double"></i>
@@ -149,7 +149,7 @@
                             ];
                             $status = $statusColors[$res->status] ?? $statusColors['pending'];
                         @endphp
-                        <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group">
+                        <tr class="hover:bg-slate-50 transition-colors duration-300 ease-out group" data-status="{{ $res->status }}">
                             <td class="px-6 py-4 text-center font-semibold text-slate-600">{{ ($reservasi->currentPage() - 1) * $reservasi->perPage() + $key + 1 }}</td>
                             <td class="px-6 py-4">
                                 <p class="font-bold text-slate-800">{{ $res->user->name ?? '-' }}</p>
@@ -287,7 +287,6 @@
 </div>
 
 <script>
-    // Status mapping
     const statusMap = {
         'Menunggu': 'pending',
         'Dikonfirmasi': 'dikonfirmasi',
@@ -297,27 +296,22 @@
     };
 
     const statusColors = {
-        'pending': { bg: 'bg-slate-100', text: 'text-slate-600', dot: 'bg-slate-500', label: 'Menunggu' },
-        'dikonfirmasi': { bg: 'bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500', label: 'Dikonfirmasi' },
-        'diproses': { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500', label: 'Dikerjakan' },
-        'selesai': { bg: 'bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500', label: 'Selesai' },
-        'dibatalkan': { bg: 'bg-red-50', text: 'text-red-600', dot: 'bg-red-500', label: 'Dibatalkan' }
+        'pending':      { bg: 'bg-slate-100', text: 'text-slate-600', dot: 'bg-slate-500', label: 'Menunggu' },
+        'dikonfirmasi': { bg: 'bg-blue-50',   text: 'text-blue-600',  dot: 'bg-blue-500',  label: 'Dikonfirmasi' },
+        'diproses':     { bg: 'bg-amber-50',  text: 'text-amber-600', dot: 'bg-amber-500', label: 'Dikerjakan' },
+        'selesai':      { bg: 'bg-emerald-50',text: 'text-emerald-600',dot: 'bg-emerald-500',label: 'Selesai' },
+        'dibatalkan':   { bg: 'bg-red-50',    text: 'text-red-600',   dot: 'bg-red-500',   label: 'Dibatalkan' }
     };
 
-    // Modal Logic
     function openStatusModal(reservasiId, customerName, currentStatus, rowIndex) {
-        const modal = document.getElementById('statusModal');
-        const content = document.getElementById('statusModalContent');
-        
         document.getElementById('reservasiId').value = reservasiId;
         document.getElementById('rowIndex').value = rowIndex;
         document.getElementById('modalCustomerName').textContent = customerName;
-        
-        // Set current status in dropdown
         document.getElementById('statusSelect').value = currentStatus === 'Dikerjakan' ? 'Proses' : currentStatus;
-        
+
+        const modal = document.getElementById('statusModal');
+        const content = document.getElementById('statusModalContent');
         modal.classList.remove('hidden');
-        // Trigger reflow
         void modal.offsetWidth;
         modal.classList.remove('opacity-0');
         content.classList.remove('scale-95');
@@ -326,37 +320,30 @@
     function closeStatusModal() {
         const modal = document.getElementById('statusModal');
         const content = document.getElementById('statusModalContent');
-        
         modal.classList.add('opacity-0');
         content.classList.add('scale-95');
-        
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
+        setTimeout(() => modal.classList.add('hidden'), 300);
     }
-    
-    function saveStatus() {
-        const reservasiId = document.getElementById('reservasiId').value;
-        const rowIndex = document.getElementById('rowIndex').value;
-        const statusDisplay = document.getElementById('statusSelect').value;
-        const statusDb = statusMap[statusDisplay];
 
-        const btnSave = document.querySelector('button[onclick="saveStatus()"]');
-        const btnText = document.getElementById('btnText');
-        const btnIcon = document.getElementById('btnIcon');
-        const loadingIcon = document.getElementById('loadingIcon');
-        
-        // Loading state
+    function saveStatus() {
+        const reservasiId   = document.getElementById('reservasiId').value;
+        const rowIndex      = parseInt(document.getElementById('rowIndex').value);
+        const statusDisplay = document.getElementById('statusSelect').value;
+        const statusDb      = statusMap[statusDisplay];
+
+        const btnSave    = document.querySelector('button[onclick="saveStatus()"]');
+        const btnText    = document.getElementById('btnText');
+        const btnIcon    = document.getElementById('btnIcon');
+        const loadingIcon= document.getElementById('loadingIcon');
+
         btnSave.disabled = true;
         btnText.textContent = 'Memproses...';
         btnIcon.classList.add('hidden');
         loadingIcon.classList.remove('hidden');
 
-        // Get CSRF token
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
-                         Array.from(document.querySelectorAll('input')).find(i => i.name === '_token')?.value;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+                          Array.from(document.querySelectorAll('input')).find(i => i.name === '_token')?.value;
 
-        // Send API request
         fetch(`/admin-cabang/reservasi/${reservasiId}/update-status`, {
             method: 'POST',
             headers: {
@@ -366,7 +353,7 @@
             },
             body: JSON.stringify({ status: statusDb })
         })
-        .then(response => response.json())
+        .then(r => r.json())
         .then(result => {
             btnSave.disabled = false;
             btnText.textContent = 'Simpan Perubahan';
@@ -374,32 +361,46 @@
             loadingIcon.classList.add('hidden');
 
             if (result.success) {
-                // Show success message
-                showToast('Status berhasil diubah', 'Perubahan status reservasi telah disimpan.');
-                
-                // Update table row - find the row and update status badge
+                // ── 1. Baca status lama dari badge tabel ──
                 const rows = document.querySelectorAll('table tbody tr');
-                if (rows.length > rowIndex) {
-                    const row = rows[rowIndex];
-                    const statusBadge = row.querySelector('td:nth-child(6)');
-                    
-                    if (statusBadge) {
-                        const newColor = statusColors[statusDb];
-                        const newBorder = newColor.bg.replace('bg-', 'border-');
-                        const pulseClass = statusDb === 'diproses' ? 'animate-pulse' : '';
-                        
-                        statusBadge.innerHTML = `
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold ${newColor.bg} ${newColor.text} border ${newBorder}">
-                                <span class="w-1.5 h-1.5 rounded-full ${newColor.dot} ${pulseClass}"></span> ${newColor.label}
-                            </span>
-                        `;
-                    }
+                let statusLama = null;
+                if (rows[rowIndex]) {
+                    statusLama = rows[rowIndex].getAttribute('data-status');
+                    // Update data-status ke status baru supaya ubah status berikutnya juga benar
+                    rows[rowIndex].setAttribute('data-status', statusDb);
                 }
-                
-                // Close modal after short delay
-                setTimeout(() => {
-                    closeStatusModal();
-                }, 1000);
+
+                // ── 2. Update badge tabel ──
+                if (rows[rowIndex]) {
+                    const statusCell = rows[rowIndex].querySelector('td:nth-child(6)');
+                    const newColor   = statusColors[statusDb];
+                    const newBorder  = newColor.bg.replace('bg-', 'border-');
+                    const pulse      = statusDb === 'diproses' ? 'animate-pulse' : '';
+                    statusCell.innerHTML = `
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold ${newColor.bg} ${newColor.text} border ${newBorder}">
+                            <span class="w-1.5 h-1.5 rounded-full ${newColor.dot} ${pulse}"></span> ${newColor.label}
+                        </span>`;
+                }
+
+                // ── 3. Update stat cards ──
+                const cardSelesai  = document.getElementById('card-selesai');
+                const cardDiproses = document.getElementById('card-diproses');
+
+                // Kurangi card lama
+                if (statusLama === 'diproses' && cardDiproses)
+                    cardDiproses.textContent = Math.max(0, parseInt(cardDiproses.textContent) - 1);
+                if (statusLama === 'selesai' && cardSelesai)
+                    cardSelesai.textContent = Math.max(0, parseInt(cardSelesai.textContent) - 1);
+
+                // Tambah card baru
+                if (statusDb === 'selesai' && cardSelesai)
+                    cardSelesai.textContent = parseInt(cardSelesai.textContent) + 1;
+                if (statusDb === 'diproses' && cardDiproses)
+                    cardDiproses.textContent = parseInt(cardDiproses.textContent) + 1;
+
+                showToast('Status berhasil diubah', 'Perubahan status reservasi telah disimpan.');
+                setTimeout(() => closeStatusModal(), 1000);
+
             } else {
                 showToast('Gagal mengubah status', result.message || 'Silakan coba lagi.', 'error');
             }
@@ -409,20 +410,18 @@
             btnText.textContent = 'Simpan Perubahan';
             btnIcon.classList.remove('hidden');
             loadingIcon.classList.add('hidden');
-
             console.error('Error:', error);
             showToast('Error', 'Terjadi kesalahan saat mengubah status', 'error');
         });
     }
 
-    // Toast notification helper
     function showToast(title, msg, type = 'success') {
-        const toast = document.createElement('div');
         const borderColor = type === 'error' ? 'border-red-500' : 'border-emerald-500';
-        const bgColor = type === 'error' ? 'bg-red-500/20' : 'bg-emerald-500/20';
-        const textColor = type === 'error' ? 'text-red-400' : 'text-emerald-400';
-        const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check';
-        
+        const bgColor     = type === 'error' ? 'bg-red-500/20'  : 'bg-emerald-500/20';
+        const textColor   = type === 'error' ? 'text-red-400'   : 'text-emerald-400';
+        const icon        = type === 'error' ? 'fa-exclamation-circle' : 'fa-check';
+
+        const toast = document.createElement('div');
         toast.className = `fixed top-4 right-4 z-50 bg-slate-800 text-white p-4 rounded-xl shadow-2xl flex items-start gap-4 transform transition-all duration-500 ease-out translate-x-10 opacity-0 border-l-4 ${borderColor}`;
         toast.innerHTML = `
             <div class="w-8 h-8 rounded-full ${bgColor} ${textColor} flex items-center justify-center flex-shrink-0">
@@ -431,16 +430,9 @@
             <div>
                 <h4 class="font-bold text-sm text-white">${title}</h4>
                 <p class="text-xs text-slate-300 mt-1">${msg}</p>
-            </div>
-        `;
+            </div>`;
         document.body.appendChild(toast);
-        
-        // Animate in
-        requestAnimationFrame(() => {
-            toast.classList.remove('translate-x-10', 'opacity-0');
-        });
-        
-        // Remove after 3s
+        requestAnimationFrame(() => toast.classList.remove('translate-x-10', 'opacity-0'));
         setTimeout(() => {
             toast.classList.add('translate-x-10', 'opacity-0');
             setTimeout(() => toast.remove(), 500);

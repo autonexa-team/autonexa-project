@@ -7,11 +7,12 @@ use App\Models\Reservasi;
 use App\Models\Layanan;
 use App\Models\User;
 use App\Models\Sparepart;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class ReservasiController extends Controller
 {
@@ -559,8 +560,42 @@ class ReservasiController extends Controller
 
     public function profile()
     {
-        return view('pelanggan.profile');
-    }
+        $user = Auth::user();
+
+        $reservasis = Reservasi::with('bengkel')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $reviews = Review::with('bengkel')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $stats = [
+            'total_reservasi' => Reservasi::where('user_id', $user->id)->count(),
+
+            'reservasi_selesai' => Reservasi::where('user_id', $user->id)
+                ->where('status', 'selesai')
+                ->count(),
+
+            'reservasi_aktif' => Reservasi::where('user_id', $user->id)
+                ->where('status', 'diproses')
+                ->count(),
+
+            'total_review' => Review::where('user_id', $user->id)
+                ->count(),
+        ];
+
+        return view('pelanggan.profile', compact(
+            'user',
+            'reservasis',
+            'reviews',
+            'stats'
+        ));
+}
 
     public function riwayatDetail(int $id)
     {
@@ -620,68 +655,5 @@ class ReservasiController extends Controller
         }
 
         return $this->index();
-    }    
-
-    // update catatan service    
-    public function updateHasilService(Request $request, $id)
-    {
-        $request->validate([
-            'hasil_service' => 'nullable|string'
-        ]);
-
-        $reservasi = Reservasi::findOrFail($id);
-
-        $reservasi->update([
-            'hasil_service' => $request->hasil_service
-        ]);
-
-        return back()->with(
-            'success',
-            'Catatan servis berhasil disimpan'
-        );
-    }    
-
-    public function tambahSparepart(Request $request, $id)
-    {
-        $request->validate([
-            'sparepart_id' => 'required|exists:sparepart,id',
-            'qty' => 'required|integer|min:1'
-        ]);
-
-        $reservasi = Reservasi::findOrFail($id);
-
-        $sparepart = Sparepart::findOrFail(
-            $request->sparepart_id
-        );
-
-        $reservasi->spareparts()->attach(
-            $sparepart->id,
-            [
-                'qty' => $request->qty,
-                'harga' => $sparepart->harga
-            ]
-        );
-
-        $reservasi->increment(
-            'total_biaya',
-            $sparepart->harga * $request->qty
-        );
-
-        return back()->with(
-            'success',
-            'Sparepart berhasil ditambahkan'
-        );
-    }    
-
-    public function hapusSparepart($reservasiId, $sparepartId)
-    {
-        $reservasi = Reservasi::findOrFail($reservasiId);
-
-        $reservasi->spareparts()->detach($sparepartId);
-
-        return back()->with(
-            'success',
-            'Sparepart berhasil dihapus'
-        );
     }    
 }

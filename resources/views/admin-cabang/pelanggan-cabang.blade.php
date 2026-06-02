@@ -2,43 +2,25 @@
 
 @section('content')
 
-<!-- Custom Styles for Animations & Utilities -->
 <style>
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    .animate-fade {
-        animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    
-    /* Custom CSS Tooltip */
-    .tooltip-container .tooltip-text {
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        transform: translateY(5px);
-    }
-    .tooltip-container:hover .tooltip-text {
-        visibility: visible;
-        opacity: 1;
-        transform: translateY(0);
-    }
+    .animate-fade { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .tooltip-container .tooltip-text { visibility: hidden; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; transform: translateY(5px); }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; transform: translateY(0); }
 </style>
 
-<!-- Header Section -->
+<!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 animate-fade">
     <div>
         <h2 class="text-3xl font-bold text-slate-800 tracking-tight">Pelanggan Bengkel</h2>
-        <p class="text-slate-500 mt-2 text-sm font-medium">Daftar pelanggan yang terdaftar dan pernah melakukan reservasi di cabang Anda</p>
+        <p class="text-slate-500 mt-2 text-sm font-medium">Daftar pelanggan yang pernah melakukan reservasi di cabang Anda (Real-time)</p>
     </div>
-    
-    <button class="bg-brand hover:bg-brand-dark text-white px-5 py-2.5 rounded-xl shadow-md shadow-brand/20 hover:shadow-lg hover:-translate-y-0.5 transition-all font-bold text-sm flex items-center gap-2">
-        <i class="fas fa-user-plus"></i> Tambah Pelanggan
-    </button>
 </div>
 
-<!-- Statistic Cards -->
+<!-- Stats Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade" style="animation-delay: 100ms; opacity: 0;">
     <!-- Card 1: Total -->
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 group hover:shadow-md hover:-translate-y-1 transition-all duration-300">
@@ -50,13 +32,13 @@
             <div class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center text-xl border border-slate-100 group-hover:bg-slate-100 group-hover:scale-110 transition-all duration-300">
                 <i class="fas fa-users"></i>
             </div>
+            <div class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center text-xl border border-slate-100 group-hover:scale-110 transition-all"><i class="fas fa-users"></i></div>
         </div>
     </div>
 
-    <!-- Card 2: Aktif -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 group hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-        <div class="absolute inset-0 bg-emerald-500/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
-        <div class="relative z-10 flex justify-between items-start">
+    <!-- Aktif -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 group hover:shadow-md hover:-translate-y-1 transition-all">
+        <div class="flex justify-between items-start">
             <div>
                 <p class="text-slate-500 text-sm font-bold mb-1 group-hover:text-emerald-700 transition-colors">Pelanggan Aktif</p>
                 <h3 class="text-3xl font-black text-slate-800 tracking-tight counter-value" data-target="{{ $totalAktif }}">0</h3>
@@ -64,12 +46,13 @@
             <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-xl border border-emerald-100 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                 <i class="fas fa-user-check"></i>
             </div>
+            <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-xl border border-emerald-100 group-hover:scale-110 transition-all"><i class="fas fa-user-check"></i></div>
         </div>
-        <div class="mt-3 text-xs text-slate-400 font-bold relative z-10">Lebih dari 1x reservasi</div>
+        <div class="mt-3 text-xs text-slate-400 font-bold">Lebih dari 1x reservasi</div>
     </div>
 
-    <!-- Card 3: Baru -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 group hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+    <!-- Baru -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 group hover:shadow-md hover:-translate-y-1 transition-all">
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-slate-500 text-sm font-bold mb-1 group-hover:text-blue-600 transition-colors">Pelanggan Baru</p>
@@ -78,12 +61,13 @@
             <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center text-xl border border-blue-100 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
                 <i class="fas fa-user-plus"></i>
             </div>
+            <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center text-xl border border-blue-100 group-hover:scale-110 transition-all"><i class="fas fa-user-plus"></i></div>
         </div>
         <div class="mt-3 text-xs text-slate-400 font-bold">Bergabung bulan ini</div>
     </div>
 
-    <!-- Card 4: Tidak Aktif -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 group hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+    <!-- Tidak Aktif -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 group hover:shadow-md hover:-translate-y-1 transition-all">
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-slate-500 text-sm font-bold mb-1 group-hover:text-slate-700 transition-colors">Tidak Aktif</p>
@@ -92,12 +76,13 @@
             <div class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center text-xl border border-slate-100 group-hover:bg-slate-200 transition-all duration-300">
                 <i class="fas fa-user-clock"></i>
             </div>
+            <div class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center text-xl border border-slate-100 group-hover:scale-110 transition-all"><i class="fas fa-user-clock"></i></div>
         </div>
         <div class="mt-3 text-xs text-slate-400 font-bold">> 3 bulan tanpa reservasi</div>
     </div>
 </div>
 
-<!-- Main Table Section -->
+<!-- Table -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-fade" style="animation-delay: 200ms; opacity: 0;">
     
     <!-- Filter Bar -->

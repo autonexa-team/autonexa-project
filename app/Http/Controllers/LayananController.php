@@ -19,7 +19,8 @@ class LayananController extends Controller
     // FORM TAMBAH
     public function create()
     {
-        return view('admin-pusat.layanan.create');
+        $layanans = Layanan::all();
+        return view('admin-pusat.layanan', compact('layanans'));
     }
 
     // SIMPAN DATA
@@ -40,14 +41,15 @@ class LayananController extends Controller
     }
 
     // FORM EDIT
-    public function edit($id)
+    public function edit(int $id)
     {
-        $layanan = Layanan::findOrFail($id);
-        return view('admin-pusat.layanan.edit', compact('layanan'));
+        $layanan  = Layanan::findOrFail($id);
+        $layanans = Layanan::all();
+        return view('admin-pusat.layanan', compact('layanans', 'layanan'));
     }
 
     // UPDATE
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
@@ -65,7 +67,7 @@ class LayananController extends Controller
     }
 
     // DELETE
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $layanan = Layanan::findOrFail($id);
         $layanan->delete();
@@ -74,7 +76,7 @@ class LayananController extends Controller
     }
 
     // TOGGLE STATUS (AKTIF / NONAKTIF)
-    public function toggleStatus($id)
+    public function toggleStatus(int $id)
     {
         $layanan = Layanan::findOrFail($id);
         $layanan->status = $layanan->status === 'aktif' ? 'nonaktif' : 'aktif';

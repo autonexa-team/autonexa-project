@@ -1,6 +1,6 @@
 @extends('layout.app-clean')
 
-@section('title', 'Detail Reservasi #RV-{{ str_pad($reservasi->id, 7, "0", STR_PAD_LEFT) }} — AutoNexa')
+@section('title', 'Detail Reservasi #RV-' . str_pad($reservasi->id, 7, '0', STR_PAD_LEFT) . ' — AutoNexa')
 
 @section('content')
 
@@ -31,7 +31,7 @@
                 <h1 class="detail-header__title">Detail <em>Reservasi</em></h1>
                 <p class="detail-header__id">
                     <i class="fas fa-hashtag" style="font-size:.65rem; color:var(--brand);"></i>
-                    RV-{{ str_pad($reservasi->id, 7, '0', STR_PAD_LEFT) }} &nbsp;·&nbsp; Dibuat {{ $reservasi->created_at->translatedFormat('d F Y, H:i') }} WIB
+                   RV-{{ str_pad($reservasi->id, 7, '0', STR_PAD_LEFT) }}&nbsp;·&nbsp;Dibuat {{ $reservasi->created_at ? $reservasi->created_at->translatedFormat('d F Y, H:i') . ' WIB' : '-' }}
                 </p>
             </div>
             <div class="detail-header__actions">

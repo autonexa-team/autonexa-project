@@ -638,11 +638,14 @@ class ReservasiController extends Controller
             'jam'       => $reservasi->waktu . ' WIB',
             'keluhan'   => $reservasi->keluhan ?? '',
             'biaya'     => $reservasi->total_biaya ? 'Rp ' . number_format($reservasi->total_biaya, 0, ',', '.') : null,
-            'created_at'=> $reservasi->created_at->format('d F Y, H:i') . ' WIB',
+            'created_at'=> $reservasi->created_at? $reservasi->created_at->format('d F Y, H:i') . ' WIB': '-',
+
             'timeline'  => [
-                ['time' => $reservasi->created_at->format('d M Y · H:i') . ' WIB', 'title' => 'Reservasi Dibuat', 'desc' => 'Reservasi berhasil dibuat secara online.', 'state' => 'done'],
+                [
+                    'time' => $reservasi->created_at? $reservasi->created_at->format('d M Y · H:i') . ' WIB': '-','title' => 'Reservasi Dibuat','desc' => 'Reservasi berhasil dibuat secara online.','state' => 'done'
+                ],
             ],
-        ];
+            ];
 
         return view('pelanggan.riwayat-detail', compact('reservasi', 'reservasiJs'));
     }    

@@ -176,48 +176,84 @@ class ReservasiController extends Controller
     /**
      * Display reservasi untuk admin cabang dari database
      */
-    public function getReservasiCabang()
+    public function getReservasiCabang(Request $request)
     {
-        $user = Auth::user();
         
+        $user = Auth::user();
+
         if (!$user || !$user->isAdminCabang()) {
             return redirect()->route('login');
         }
 
         $bengkel = $user->bengkel;
+
         if (!$bengkel) {
             abort(404, 'Bengkel tidak ditemukan');
         }
 
-        // Get reservasi dari database
-        $reservasi = Reservasi::query()
+        $query = Reservasi::query()
             ->where('bengkel_id', $bengkel->id)
-            ->with(['user', 'layanan'])
-            ->orderBy('tanggal', 'desc')
-            ->paginate(15);
+            ->with(['user', 'layanan']);
 
-        // Count statistic
-        $totalReservasi = Reservasi::query()->where('bengkel_id', $bengkel->id)->count();
-        $hariIni = Reservasi::query()
-            ->where('bengkel_id', $bengkel->id)
+        // filter pelanggan
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $reservasi = $query
+            ->orderBy('tanggal', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+            // filter status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // filter tanggal
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal', $request->tanggal);
+        }
+
+        // filter nama pelanggan (search)
+        if ($request->filled('search')) {
+            $query->whereHas('user', fn($q) =>
+                $q->where('name', 'like', '%' . $request->search . '%')
+            );
+        }
+
+        // statistik
+        $totalReservasi = Reservasi::where('bengkel_id', $bengkel->id)->count();
+
+        $hariIni = Reservasi::where('bengkel_id', $bengkel->id)
             ->whereDate('tanggal', Carbon::today())
             ->count();
-        $sedangDikerjakan = Reservasi::query()
-            ->where('bengkel_id', $bengkel->id)
+
+        $sedangDikerjakan = Reservasi::where('bengkel_id', $bengkel->id)
             ->where('status', 'diproses')
             ->count();
-        $selesai = Reservasi::query()
-            ->where('bengkel_id', $bengkel->id)
+
+        $selesai = Reservasi::where('bengkel_id', $bengkel->id)
             ->where('status', 'selesai')
             ->count();
 
-        return view('admin-cabang.reservasi', compact(
-            'reservasi',
-            'totalReservasi',
-            'hariIni',
-            'sedangDikerjakan',
-            'selesai'
-        ));
+        $pelangganDipilih = null;
+
+        if ($request->filled('user_id')) {
+            $pelangganDipilih = User::find($request->user_id);
+        }
+
+        return view(
+            'admin-cabang.reservasi',
+            compact(
+                'reservasi',
+                'totalReservasi',
+                'hariIni',
+                'sedangDikerjakan',
+                'selesai',
+                'pelangganDipilih'
+            )
+        );
     }
 
     /**

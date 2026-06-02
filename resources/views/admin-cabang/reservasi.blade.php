@@ -32,6 +32,29 @@
     </a>
 </div>
 
+@if(isset($pelangganDipilih) && $pelangganDipilih)
+<div class="mb-6 bg-blue-50 border border-blue-200 rounded-2xl p-5 animate-fade-slide-up">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+            <h3 class="font-bold text-blue-800 text-lg">
+                Riwayat Reservasi Pelanggan
+            </h3>
+
+            <p class="text-blue-600 text-sm mt-1">
+                {{ $pelangganDipilih->name }}
+                • {{ $reservasi->total() }} reservasi ditemukan
+            </p>
+        </div>
+
+        <a href="{{ route('admin-cabang.reservasi') }}"
+           class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-blue-200 rounded-xl text-sm font-semibold text-blue-700 hover:bg-blue-100 transition">
+            <i class="fas fa-arrow-left"></i>
+            Lihat Semua Reservasi
+        </a>
+    </div>
+</div>
+@endif
+
 <!-- Statistic Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Card 1 -->

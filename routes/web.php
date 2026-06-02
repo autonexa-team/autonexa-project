@@ -347,9 +347,11 @@ Route::middleware(['auth', 'role:admin_cabang'])
     })->name('review.detail');
 
     // PELANGGAN
-    Route::get('/pelanggan', function () {
-        return view('admin-cabang.pelanggan-cabang');
-    })->name('pelanggan-cabang');
+    Route::get('/pelanggan', [AdminCabangController::class, 'pelangganCabang'])
+        ->name('pelanggan-cabang');
+
+    Route::get('/api/pelanggan-reservasi', [AdminCabangController::class, 'getPelangganReservasi'])
+        ->name('api.pelanggan-reservasi');
 
     // LAPORAN
     Route::get('/laporan', function () {

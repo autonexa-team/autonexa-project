@@ -225,6 +225,94 @@ class AdminCabangController extends Controller
             $bengkel->layanan()->attach($id);
         }
         return back()->with('success', 'Status layanan berhasil diubah');
-    }    
+    }
+
+    /**
+     * Halaman Pelanggan
+     */
+    public function pelangganCabang()
+    {
+        return view('admin-cabang.pelanggan-cabang');
+    }
+
+    /**
+     * API: Get Pelanggan yang sudah reservasi di bengkel ini
+     */
+    public function getPelangganReservasi()
+    {
+        try {
+            $user = Auth::user();
+            if (!$user || !$user->isAdminCabang()) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $bengkel = $user->bengkel;
+            if (!$bengkel) {
+                return response()->json(['error' => 'Bengkel tidak ditemukan'], 404);
+            }
+
+            // Get pelanggan yang sudah melakukan reservasi di bengkel ini
+            $pelanggan = User::where('role', 'pelanggan')
+                ->whereHas('reservasi', function ($q) use ($bengkel) {
+                    $q->where('bengkel_id', $bengkel->id);
+                })
+                ->withCount(['reservasi' => function ($q) use ($bengkel) {
+                    $q->where('bengkel_id', $bengkel->id);
+                }])
+                ->with(['reservasi' => function ($q) use ($bengkel) {
+                    $q->where('bengkel_id', $bengkel->id)
+                        ->latest()
+                        ->limit(1)
+                        ->select('id', 'user_id', 'tanggal');
+                }])
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($user) {
+                    $lastReservasi = $user->reservasi->first();
+                    $daysDiff = $lastReservasi ? now()->diffInDays($lastReservasi->tanggal) : null;
+
+                    // Hitung status
+                    if ($user->reservasi_count >= 2) {
+                        $status = 'aktif';
+                    } elseif ($user->created_at->diffInDays(now()) <= 30) {
+                        $status = 'baru';
+                    } else {
+                        $status = 'tidak-aktif';
+                    }
+
+                    return [
+                        'id' => $user->id,
+                        'nama' => $user->name,
+                        'phone' => $user->phone ?? '-',
+                        'email' => $user->email,
+                        'total_reservasi' => $user->reservasi_count,
+                        'terakhir_reservasi' => $lastReservasi?->tanggal?->format('d M Y') ?? '-',
+                        'terakhir_reservasi_date' => $lastReservasi?->tanggal ?? null,
+                        'status' => $status,
+                        'terdaftar' => $user->created_at->format('d M Y'),
+                    ];
+                });
+
+            // Hitung statistik
+            $total = $pelanggan->count();
+            $aktif = $pelanggan->where('status', 'aktif')->count();
+            $baru = $pelanggan->where('status', 'baru')->count();
+            $tidakAktif = $pelanggan->where('status', 'tidak-aktif')->count();
+
+            return response()->json([
+                'pelanggan' => $pelanggan,
+                'statistik' => [
+                    'total' => $total,
+                    'aktif' => $aktif,
+                    'baru' => $baru,
+                    'tidak_aktif' => $tidakAktif,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Gagal memuat data pelanggan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     
 }

@@ -33,6 +33,15 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/admincabang-dashboard.css') }}">
+
+    <style>
+        @page {
+            /* Kosongkan margin agar header/footer browser tidak muncul */
+            /* Catatan: ini hanya bekerja di beberapa browser */
+            margin-top: 15mm;
+            margin-bottom: 20mm;
+        }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800">
 
@@ -69,12 +78,12 @@
             
             <!-- reservasi -->
             <a href="{{ route('admin-cabang.reservasi') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group
-            {{ request()->routeIs('admin-cabang.reservasi')
+            {{ request()->routeIs('admin-cabang.reservasi*')
                     ? 'bg-brand text-white shadow-md shadow-brand/20'
                     : 'text-slate-500 hover:bg-orange-50 hover:text-brand' }}">
 
                 <i class="fas fa-calendar-alt w-5 text-lg
-                    {{ request()->routeIs('admin-cabang.reservasi')
+                    {{ request()->routeIs('admin-cabang.reservasi*')
                         ? 'text-white'
                         : 'text-slate-400 group-hover:text-brand' }}"></i>
 
@@ -276,6 +285,21 @@
         </div>
     </main>
 
+    <script>
+        // Hilangkan header/footer browser saat print
+        // dengan mengosongkan title dan inject style khusus
+        window.addEventListener('beforeprint', function () {
+            // Simpan title asli
+            window._originalTitle = document.title;
+            // Kosongkan title → header browser jadi kosong
+            document.title = '';
+        });
+
+        window.addEventListener('afterprint', function () {
+            // Kembalikan title setelah selesai print
+            document.title = window._originalTitle;
+        });
+    </script>
 </body>
 
 <script>

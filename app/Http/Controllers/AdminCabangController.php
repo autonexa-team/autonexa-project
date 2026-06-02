@@ -204,9 +204,15 @@ class AdminCabangController extends Controller
 
         $layanans = Layanan::all();
 
+        $totalAktif    = $bengkel->layanan->count();
+        $totalNonaktif = $layanans->count() - $totalAktif;
+
         return view('admin-cabang.layanan', compact(
             'layanans',
-            'bengkel'
+            'bengkel',
+            // manbah ini
+            'totalAktif',
+            'totalNonaktif'
         ));
     }  
 
@@ -225,94 +231,83 @@ class AdminCabangController extends Controller
             $bengkel->layanan()->attach($id);
         }
         return back()->with('success', 'Status layanan berhasil diubah');
-    }
+    }    
 
-    /**
-     * Halaman Pelanggan
-     */
-    public function pelangganCabang()
+    public function pelangganCabang(Request $request)
     {
-        return view('admin-cabang.pelanggan-cabang');
-    }
+        $user = auth()->user();
+        $bengkel = $user->bengkel;
 
-    /**
-     * API: Get Pelanggan yang sudah reservasi di bengkel ini
-     */
-    public function getPelangganReservasi()
-    {
-        try {
-            $user = Auth::user();
-            if (!$user || !$user->isAdminCabang()) {
-                return response()->json(['error' => 'Unauthorized'], 401);
-            }
+        $query = User::where('role', 'pelanggan')
+            ->whereHas('reservasis', function ($q) use ($bengkel) {
+                $q->where('bengkel_id', $bengkel->id);
+            })
+            ->withCount(['reservasis as total_reservasi' => function ($q) use ($bengkel) {
+                $q->where('bengkel_id', $bengkel->id);
+            }])
+            ->withMax(['reservasis as terakhir_reservasi' => function ($q) use ($bengkel) {
+                $q->where('bengkel_id', $bengkel->id);
+            }], 'tanggal');  // ← pakai 'tanggal'
 
-            $bengkel = $user->bengkel;
-            if (!$bengkel) {
-                return response()->json(['error' => 'Bengkel tidak ditemukan'], 404);
-            }
-
-            // Get pelanggan yang sudah melakukan reservasi di bengkel ini
-            $pelanggan = User::where('role', 'pelanggan')
-                ->whereHas('reservasi', function ($q) use ($bengkel) {
-                    $q->where('bengkel_id', $bengkel->id);
-                })
-                ->withCount(['reservasi' => function ($q) use ($bengkel) {
-                    $q->where('bengkel_id', $bengkel->id);
-                }])
-                ->with(['reservasi' => function ($q) use ($bengkel) {
-                    $q->where('bengkel_id', $bengkel->id)
-                        ->latest()
-                        ->limit(1)
-                        ->select('id', 'user_id', 'tanggal');
-                }])
-                ->orderBy('created_at', 'desc')
-                ->get()
-                ->map(function ($user) {
-                    $lastReservasi = $user->reservasi->first();
-                    $daysDiff = $lastReservasi ? now()->diffInDays($lastReservasi->tanggal) : null;
-
-                    // Hitung status
-                    if ($user->reservasi_count >= 2) {
-                        $status = 'aktif';
-                    } elseif ($user->created_at->diffInDays(now()) <= 30) {
-                        $status = 'baru';
-                    } else {
-                        $status = 'tidak-aktif';
-                    }
-
-                    return [
-                        'id' => $user->id,
-                        'nama' => $user->name,
-                        'phone' => $user->phone ?? '-',
-                        'email' => $user->email,
-                        'total_reservasi' => $user->reservasi_count,
-                        'terakhir_reservasi' => $lastReservasi?->tanggal?->format('d M Y') ?? '-',
-                        'terakhir_reservasi_date' => $lastReservasi?->tanggal ?? null,
-                        'status' => $status,
-                        'terdaftar' => $user->created_at->format('d M Y'),
-                    ];
-                });
-
-            // Hitung statistik
-            $total = $pelanggan->count();
-            $aktif = $pelanggan->where('status', 'aktif')->count();
-            $baru = $pelanggan->where('status', 'baru')->count();
-            $tidakAktif = $pelanggan->where('status', 'tidak-aktif')->count();
-
-            return response()->json([
-                'pelanggan' => $pelanggan,
-                'statistik' => [
-                    'total' => $total,
-                    'aktif' => $aktif,
-                    'baru' => $baru,
-                    'tidak_aktif' => $tidakAktif,
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Gagal memuat data pelanggan: ' . $e->getMessage()
-            ], 500);
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('phone', 'like', '%' . $request->search . '%');
+            });
         }
+
+        $status = $request->get('status', 'semua');
+
+        if ($status === 'aktif') {
+            $query->having('total_reservasi', '>', 1);
+        } elseif ($status === 'baru') {
+            $query->whereHas('reservasis', function ($q) use ($bengkel) {
+                $q->where('bengkel_id', $bengkel->id)
+                ->where('tanggal', '>=', now()->startOfMonth()->toDateString()); // ← 'tanggal'
+            });
+        } elseif ($status === 'tidak_aktif') {
+            $query->where(function ($q) use ($bengkel) {
+                $q->whereDoesntHave('reservasis', function ($r) use ($bengkel) {
+                    $r->where('bengkel_id', $bengkel->id)
+                    ->where('tanggal', '>=', now()->subMonths(3)->toDateString()); // ← 'tanggal'
+                });
+            });
+        }
+
+        $pelanggan = $query->latest('created_at')->paginate(15)->withQueryString();
+
+        // Statistik
+        $totalPelanggan = User::where('role', 'pelanggan')
+            ->whereHas('reservasis', fn($q) => $q->where('bengkel_id', $bengkel->id))
+            ->count();
+
+        $totalAktif = User::where('role', 'pelanggan')
+            ->whereHas('reservasis', fn($q) => $q->where('bengkel_id', $bengkel->id))
+            ->withCount(['reservasis as total_reservasi' => fn($q) => $q->where('bengkel_id', $bengkel->id)])
+            ->having('total_reservasi', '>', 1)
+            ->count();
+
+        $totalBaru = User::where('role', 'pelanggan')
+            ->whereHas('reservasis', function ($q) use ($bengkel) {
+                $q->where('bengkel_id', $bengkel->id)
+                ->where('tanggal', '>=', now()->startOfMonth()->toDateString()); // ← 'tanggal'
+            })->count();
+
+        $totalTidakAktif = User::where('role', 'pelanggan')
+            ->whereHas('reservasis', fn($q) => $q->where('bengkel_id', $bengkel->id))
+            ->whereDoesntHave('reservasis', function ($q) use ($bengkel) {
+                $q->where('bengkel_id', $bengkel->id)
+                ->where('tanggal', '>=', now()->subMonths(3)->toDateString()); // ← 'tanggal'
+            })->count();
+
+        return view('admin-cabang.pelanggan-cabang', compact(
+            'pelanggan',
+            'totalPelanggan',
+            'totalAktif',
+            'totalBaru',
+            'totalTidakAktif',
+            'status'
+        ));
     }
     
 }

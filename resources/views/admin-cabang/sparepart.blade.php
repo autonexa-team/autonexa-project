@@ -21,7 +21,8 @@
 
 {{-- dita nmbh ini --}}
 @if(session('success'))
-<div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl">
+<div id="successAlert"
+    class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl transition-opacity duration-500 opacity-100">
     {{ session('success') }}
 </div>
 @endif
@@ -597,6 +598,22 @@ searchInput.addEventListener('input', function () {
     });
 
     countLabel.innerHTML = `Menampilkan <b>${visible}</b> sparepart`;
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const alert = document.getElementById('successAlert');
+
+    if (alert) {
+        setTimeout(() => {
+            alert.style.opacity = '0';
+
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
+        }, 3000);
+    }
 });
 </script>
 @endsection

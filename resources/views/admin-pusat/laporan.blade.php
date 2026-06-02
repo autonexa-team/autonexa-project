@@ -8,59 +8,6 @@
 
 @section('content')
 
-{{-- ── DUMMY DATA (hapus saat pakai model nyata) ──────────────── --}}
-@php
-    $dari   = request('dari',   now()->startOfMonth()->format('Y-m-d'));
-    $sampai = request('sampai', now()->format('Y-m-d'));
-
-    // Reservasi
-    $reservasis = collect([
-        (object)['user' => (object)['name' => 'Budi Santoso'],    'bengkel' => (object)['nama' => 'Bengkel Maju Jaya'],   'layanan' => 'Ganti Oli',      'tanggal' => '2026-05-01', 'status' => 'done',        'total_biaya' => 120000],
-        (object)['user' => (object)['name' => 'Siti Rahayu'],     'bengkel' => (object)['nama' => 'Bengkel Prima Motor'], 'layanan' => 'Tune Up',        'tanggal' => '2026-05-02', 'status' => 'done',        'total_biaya' => 250000],
-        (object)['user' => (object)['name' => 'Andi Wijaya'],     'bengkel' => (object)['nama' => 'Bengkel Cepat Beres'], 'layanan' => 'Ganti Ban',      'tanggal' => '2026-05-03', 'status' => 'in_progress', 'total_biaya' => 180000],
-        (object)['user' => (object)['name' => 'Dewi Lestari'],    'bengkel' => (object)['nama' => 'Bengkel Maju Jaya'],   'layanan' => 'Servis Rem',     'tanggal' => '2026-05-04', 'status' => 'confirmed',   'total_biaya' => 95000],
-        (object)['user' => (object)['name' => 'Rudi Hermawan'],   'bengkel' => (object)['nama' => 'Bengkel Prima Motor'], 'layanan' => 'Ganti Rantai',   'tanggal' => '2026-05-05', 'status' => 'done',        'total_biaya' => 145000],
-        (object)['user' => (object)['name' => 'Maya Putri'],      'bengkel' => (object)['nama' => 'Bengkel Cepat Beres'], 'layanan' => 'Ganti Busi',     'tanggal' => '2026-05-06', 'status' => 'pending',     'total_biaya' => 55000],
-        (object)['user' => (object)['name' => 'Agus Pramono'],    'bengkel' => (object)['nama' => 'Bengkel Setia Kawan'], 'layanan' => 'Ganti Kampas',   'tanggal' => '2026-05-07', 'status' => 'done',        'total_biaya' => 110000],
-        (object)['user' => (object)['name' => 'Rina Kusuma'],     'bengkel' => (object)['nama' => 'Bengkel Maju Jaya'],   'layanan' => 'Tune Up',        'tanggal' => '2026-05-08', 'status' => 'cancelled',   'total_biaya' => 0],
-        (object)['user' => (object)['name' => 'Hendra Gunawan'],  'bengkel' => (object)['nama' => 'Bengkel Prima Motor'], 'layanan' => 'Servis Karbu',   'tanggal' => '2026-05-09', 'status' => 'done',        'total_biaya' => 200000],
-        (object)['user' => (object)['name' => 'Fitriani'],        'bengkel' => (object)['nama' => 'Bengkel Setia Kawan'], 'layanan' => 'Ganti Oli',      'tanggal' => '2026-05-10', 'status' => 'done',        'total_biaya' => 120000],
-    ]);
-
-    // Pendapatan harian
-    $pendapatanHarian = collect([
-        (object)['tanggal' => '2026-05-01', 'bengkel' => 'Bengkel Maju Jaya',   'jumlah_transaksi' => 3, 'total' => 360000],
-        (object)['tanggal' => '2026-05-02', 'bengkel' => 'Bengkel Prima Motor', 'jumlah_transaksi' => 5, 'total' => 875000],
-        (object)['tanggal' => '2026-05-03', 'bengkel' => 'Bengkel Cepat Beres', 'jumlah_transaksi' => 2, 'total' => 330000],
-        (object)['tanggal' => '2026-05-04', 'bengkel' => 'Bengkel Setia Kawan', 'jumlah_transaksi' => 4, 'total' => 520000],
-        (object)['tanggal' => '2026-05-05', 'bengkel' => 'Bengkel Maju Jaya',   'jumlah_transaksi' => 6, 'total' => 940000],
-        (object)['tanggal' => '2026-05-06', 'bengkel' => 'Bengkel Prima Motor', 'jumlah_transaksi' => 3, 'total' => 450000],
-        (object)['tanggal' => '2026-05-07', 'bengkel' => 'Bengkel Cepat Beres', 'jumlah_transaksi' => 4, 'total' => 610000],
-    ]);
-
-    // Performa bengkel
-    $performaBengkel = collect([
-        (object)['nama' => 'Bengkel Maju Jaya',   'total_reservasi' => 42, 'total_pendapatan' => 5250000, 'rating' => 4.8],
-        (object)['nama' => 'Bengkel Prima Motor',  'total_reservasi' => 38, 'total_pendapatan' => 4720000, 'rating' => 4.6],
-        (object)['nama' => 'Bengkel Cepat Beres',  'total_reservasi' => 31, 'total_pendapatan' => 3890000, 'rating' => 4.5],
-        (object)['nama' => 'Bengkel Setia Kawan',  'total_reservasi' => 27, 'total_pendapatan' => 3100000, 'rating' => 4.3],
-    ]);
-
-    // Review
-    $reviews = collect([
-        (object)['bengkel' => 'Bengkel Maju Jaya',   'jumlah_review' => 38, 'rating_avg' => 4.8],
-        (object)['bengkel' => 'Bengkel Prima Motor',  'jumlah_review' => 31, 'rating_avg' => 4.6],
-        (object)['bengkel' => 'Bengkel Cepat Beres',  'jumlah_review' => 25, 'rating_avg' => 4.5],
-        (object)['bengkel' => 'Bengkel Setia Kawan',  'jumlah_review' => 19, 'rating_avg' => 4.3],
-    ]);
-
-    // Agregat
-    $totalReservasi  = $reservasis->count();
-    $selesai         = $reservasis->where('status', 'done')->count();
-    $totalPendapatan = $reservasis->sum('total_biaya');
-    $avgRating       = $reviews->avg('rating_avg');
-@endphp
-
 {{-- ── HEADER ──────────────────────────────────────────────────── --}}
 <div class="lp-header">
     <div>
@@ -214,7 +161,7 @@
                         </div>
                     </td>
                     <td class="td-bengkel">{{ $r->bengkel->nama ?? '-' }}</td>
-                    <td>{{ $r->layanan ?? '-' }}</td>
+                    <td>{{ $r->layanan->nama ?? '-' }}</td>
                     <td class="td-date">
                         {{ \Carbon\Carbon::parse($r->tanggal)->format('d/m/Y') }}
                     </td>
@@ -222,10 +169,10 @@
                         @php
                             $sMap = [
                                 'pending'     => ['Menunggu',     'badge-pending'],
-                                'confirmed'   => ['Dikonfirmasi', 'badge-confirmed'],
+                                'dikonfirmasi'   => ['Dikonfirmasi', 'badge-confirmed'],
                                 'in_progress' => ['Dikerjakan',   'badge-progress'],
-                                'done'        => ['Selesai',      'badge-done'],
-                                'cancelled'   => ['Dibatalkan',   'badge-cancel'],
+                                'selesai'        => ['Selesai',      'badge-done'],
+                                'dibatalkan'   => ['Dibatalkan',   'badge-cancel'],
                             ];
                             [$label, $cls] = $sMap[$r->status] ?? [ucfirst($r->status), 'badge-pending'];
                         @endphp

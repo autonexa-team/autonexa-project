@@ -28,7 +28,7 @@ class LayananController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'harga_dasar' => 'required|numeric|min:0',
+            'harga' => 'required|numeric|min:0',
             'durasi' => 'required|integer|min:1',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:aktif,nonaktif',
@@ -53,7 +53,7 @@ class LayananController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'harga_dasar' => 'required|numeric|min:0',
+            'harga' => 'required|numeric|min:0',
             'durasi' => 'required|integer|min:1',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:aktif,nonaktif',

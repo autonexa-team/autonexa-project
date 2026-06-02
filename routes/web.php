@@ -12,6 +12,7 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\DashboardController;
 use App\Models\Review;
 use App\Models\Bengkel;
 use Illuminate\Http\Request;
@@ -123,9 +124,8 @@ Route::middleware(['auth', 'role:admin_pusat'])
     ->name('admin-pusat.')
     ->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('admin-pusat.dashboard');
-    })->name('dashboard');    
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');   
 
     Route::get('/sparepart', [SparepartController::class, 'index'])
         ->name('sparepart');    
@@ -156,51 +156,10 @@ Route::middleware(['auth', 'role:admin_pusat'])
     Route::get('/user', [AdminCabangController::class, 'index'])
         ->name('user');
 
-    // masih dummy jadi dibuat seperti ini 
-    Route::get('/review', function () {
-
-        $totalReview = 128;
-        $avgRating = 4.5;
-        $reviewHariIni = 12;
-
-        $reviews = collect([
-            (object)[
-                'user' => (object)['name' => 'Budi'],
-                'bengkel' => (object)['nama' => 'Bengkel Jaya Motor'],
-                'rating' => 5,
-                'komentar' => 'Pelayanan sangat bagus dan cepat!',
-                'created_at' => now()
-            ],
-            (object)[
-                'user' => (object)['name' => 'Andi'],
-                'bengkel' => (object)['nama' => 'Bengkel Makmur'],
-                'rating' => 3,
-                'komentar' => 'Lumayan, tapi agak lama.',
-                'created_at' => now()->subDays(1)
-            ],
-            (object)[
-                'user' => (object)['name' => 'Siti'],
-                'bengkel' => (object)['nama' => 'Bengkel Sejahtera'],
-                'rating' => 4,
-                'komentar' => 'Cukup puas dengan hasilnya.',
-                'created_at' => now()->subDays(2)
-            ],
-        ]);
-
-        $bengkels = collect([
-            (object)['id' => 1, 'nama' => 'Bengkel Jaya Motor'],
-            (object)['id' => 2, 'nama' => 'Bengkel Makmur'],
-            (object)['id' => 3, 'nama' => 'Bengkel Sejahtera'],
-        ]);        
-
-        return view('admin-pusat.review', compact(
-            'totalReview',
-            'avgRating',
-            'reviewHariIni',
-            'reviews',
-            'bengkels'
-        ));
-    }) -> name('review');
+    // REVIEW
+    Route::get('/review', [ReviewController::class, 'index'])->name('review');
+   Route::get('/review/export', [ReviewController::class, 'exportPusat'])->name('review.export');
+    Route::get('/review/{id}', [ReviewController::class, 'show'])->name('review.show');
 
     // kalo database riviewnya udah siap, pake ini 
     // $reviews = Review::with(['user','bengkel'])->paginate(10);
@@ -242,17 +201,14 @@ Route::middleware(['auth', 'role:admin_pusat'])
     Route::put('/user/{user}', [AdminCabangController::class, 'update'])
         ->name('user.update');    
 
-    // web.php
-    Route::get('/admin-pusat/review/{id}', [ReviewController::class, 'show'])
-        ->name('admin-pusat.review.show');        
-        
 });
 
 // ── API ENDPOINTS UNTUK RESERVASI ────
-Route::middleware(['auth', 'role:admin_cabang'])
-    ->prefix('api')
-    ->name('api.')
-    ->group(function () {
+    Route::middleware(['auth', 'role:admin_cabang'])
+        ->prefix('api')
+        ->name('api.')
+        ->group(function () {
+
     Route::get('/pelanggan-existing', [ReservasiController::class, 'getPelangganExisting'])
         ->name('pelanggan-existing');
     
@@ -269,11 +225,9 @@ Route::middleware(['auth', 'role:admin_cabang'])
     ->name('admin-cabang.')
     ->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('admin-cabang.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-    
     Route::get('/sparepart', [SparepartController::class, 'index'])
     ->name('sparepart');
 
@@ -337,26 +291,18 @@ Route::middleware(['auth', 'role:admin_cabang'])
     )->name('layanan.toggle');
     
     // REVIEW LIST
-    Route::get('/review', function () {
-        return view('admin-cabang.review');
-    })->name('review');
-
-    // DETAIL REVIEW
-    Route::get('/review/{id}', function ($id) {
-        return view('admin-cabang.review-detail', compact('id'));
-    })->name('review.detail');
-
+    Route::get('/review', [ReviewController::class, 'indexCabang'])->name('review');
+    Route::get('/review/export', [ReviewController::class, 'exportCabang'])->name('review.export');
+    Route::get('/review/export-pdf', [ReviewController::class, 'exportPdf'])->name('review.export-pdf'); // ← pindah ke sini
+    Route::get('/review/{id}', [ReviewController::class, 'showCabang'])->name('review.detail');
+    
     // PELANGGAN
     Route::get('/pelanggan', [AdminCabangController::class, 'pelangganCabang'])
-        ->name('pelanggan-cabang');
-
-    Route::get('/api/pelanggan-reservasi', [AdminCabangController::class, 'getPelangganReservasi'])
-        ->name('api.pelanggan-reservasi');
+    ->name('pelanggan-cabang');
 
     // LAPORAN
-    Route::get('/laporan', function () {
-        return view('admin-cabang.laporan');
-    })->name('laporan');    
+    Route::get('/laporan',     [LaporanController::class, 'indexCabang'])
+    ->name('laporan');
 
     // notifikasi
     Route::get('/notifikasi', function () {

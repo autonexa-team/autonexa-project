@@ -8,55 +8,6 @@
 
 @section('content')
 
-{{-- ── DUMMY DATA (hapus saat pakai model nyata) ─────────────── --}}
-@php
-    $review = (object)[
-        'id'         => 1,
-        'rating'     => 5,
-        'komentar'   => 'Servis sangat memuaskan! Mekaniknya ramah dan profesional. Oli diganti tepat waktu dan hasilnya motor jadi lebih enteng. Bengkelnya bersih, ruang tunggu nyaman ada AC dan TV. Harga juga transparan sesuai estimasi awal, tidak ada biaya tersembunyi. Sangat direkomendasikan untuk warga sekitar yang butuh bengkel terpercaya.',
-        'created_at' => now()->subHours(3),
-        'foto'       => null,
-        'user' => (object)[
-            'name'  => 'Budi Santoso',
-            'email' => 'budi.santoso@email.com',
-            'phone' => '0812-3456-7890',
-            'created_at' => now()->subMonths(8),
-        ],
-        'bengkel' => (object)[
-            'nama'    => 'Bengkel Maju Jaya',
-            'alamat'  => 'Jl. Raya Bogor No. 45, Jakarta Timur',
-            'telepon' => '021-8765-4321',
-        ],
-        'reservasi' => (object)[
-            'id'          => 'RSV-20260501-001',
-            'keluhan'     => 'Ganti Oli + Filter Udara',
-            'tanggal'     => '2026-05-01',
-            'status'      => 'done',
-            'total_biaya' => 120000,
-            'mekanik'     => (object)['name' => 'Agus Wijaya'],
-        ],
-    ];
-
-    // Review lain dari user yang sama (untuk riwayat)
-    $riwayatReview = collect([
-        (object)['id' => 3, 'rating' => 4, 'bengkel' => (object)['nama' => 'Bengkel Prima Motor'], 'komentar' => 'Servis bagus, mekanik responsif.', 'created_at' => now()->subDays(45)],
-        (object)['id' => 7, 'rating' => 5, 'bengkel' => (object)['nama' => 'Bengkel Maju Jaya'],  'komentar' => 'Selalu puas servis di sini.',      'created_at' => now()->subDays(120)],
-    ]);
-
-    $rating      = $review->rating;
-    $ratingClass = $rating >= 4 ? 'rating-hi' : ($rating >= 3 ? 'rating-mid' : 'rating-low');
-    $initials    = strtoupper(substr($review->user->name, 0, 1))
-                 . strtoupper(substr(explode(' ', $review->user->name)[1] ?? '', 0, 1));
-
-    $ratingLabel = match(true) {
-        $rating === 5 => 'Sangat Puas',
-        $rating === 4 => 'Puas',
-        $rating === 3 => 'Cukup',
-        $rating === 2 => 'Kurang Puas',
-        default       => 'Tidak Puas',
-    };
-@endphp
-
 {{-- ── BREADCRUMB + HEADER ─────────────────────────────────────── --}}
 <div class="rd-header">
     <div class="rd-header-left">

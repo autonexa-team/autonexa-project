@@ -261,20 +261,21 @@ class ReservasiController extends Controller
 
         // Get layanan yang aktif pada bengkel ini (via BengkelLayanan)
         $layanan = $bengkel->layanan()
-            ->where('status', 'aktif')
+            ->where('layanans.status', 'aktif')
             ->select('layanans.id', 'layanans.nama', 'layanans.harga', 'layanans.durasi', 'layanans.deskripsi')
-            ->get()
-            ->map(function ($l) {
-                return [
-                    'id' => $l->id,
-                    'nama' => $l->nama,
-                    'harga' => (int)$l->harga,
-                    'durasi' => $l->durasi,
-                    'deskripsi' => $l->deskripsi ?? ''
-                ];
-            });
+            ->get();
+            
+        if ($layanan->isEmpty()) {
+            $layanan = Layanan::where('status', 'aktif')->get();
+        }
 
-        return response()->json($layanan);
+        return response()->json($layanan->map(fn($l) => [
+            'id'        => $l->id,
+            'nama'      => $l->nama,
+            'harga'     => (int) $l->harga,
+            'durasi'    => $l->durasi,
+            'deskripsi' => $l->deskripsi ?? ''
+        ]));
     }
 
     /**

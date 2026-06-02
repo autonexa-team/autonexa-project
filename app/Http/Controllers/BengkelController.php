@@ -55,7 +55,7 @@ class BengkelController extends Controller
             'kotaList'      => Bengkel::distinct()->pluck('kota'),
             'totalAktif'    => Bengkel::where('status','aktif')->count(),
             'totalNonaktif' => Bengkel::where('status','nonaktif')->count(),
-            'totalKota'     => Bengkel::distinct('kota')->count(),
+            'totalKota'     => Bengkel::distinct()->count('kota'),
         ]);
     }
 
@@ -64,9 +64,7 @@ class BengkelController extends Controller
     {
         $bengkels = Bengkel::query()
             ->where('status', 'aktif') // ✅ hanya tampilkan aktif
-            ->withAvg(['review' => function($q){
-                $q->where('type','bengkel');
-            }], 'rating')
+            ->withAvg('review', 'rating')
             ->withCount(['review as reviews_count' => function($q){
                 $q->where('type','bengkel');
             }])
@@ -292,7 +290,7 @@ class BengkelController extends Controller
         ->withAvg('reviews', 'rating')
         ->findOrFail($id);
 
-        return view('pelanggan.detail-bengkel', [
+        return view('pelanggan.bengkel-detail', [
             'bengkel' => $bengkel
         ]);
     }    

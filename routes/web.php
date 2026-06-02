@@ -264,7 +264,21 @@ Route::middleware(['auth', 'role:admin_cabang'])
         ->name('reservasi.toggle-status');
 
     // SEARCH SPAREPART DITA NAMBAH INI
-    Route::get('/admin-cabang/sparepart/search', [SparepartController::class, 'search']);
+    Route::get('/sparepart/search', [SparepartController::class, 'search'])
+        ->name('sparepart.search');
+
+    // ── SPAREPART CRUD (Real-time via AJAX) ────
+    Route::get('/reservasi/{id}/sparepart', [ReservasiController::class, 'sparepartIndex'])
+        ->name('reservasi.sparepart.index');
+    
+    Route::post('/reservasi/{id}/sparepart', [ReservasiController::class, 'sparepartStore'])
+        ->name('reservasi.sparepart.store');
+    
+    Route::patch('/reservasi/{id}/sparepart/{spId}', [ReservasiController::class, 'sparepartUpdate'])
+        ->name('reservasi.sparepart.update');
+    
+    Route::delete('/reservasi/{id}/sparepart/{spId}', [ReservasiController::class, 'sparepartDestroy'])
+        ->name('reservasi.sparepart.destroy');
 
 
     // LAYANAN
@@ -304,11 +318,6 @@ Route::middleware(['auth', 'role:admin_cabang'])
     })->name('profile');
 
     Route::put('/profile', [AdminCabangController::class, 'updateProfile']) ->name('profile.update');
-
-    Route::post(
-        '/reservasi/{id}/sparepart',
-        [ReservasiController::class, 'tambahSparepart']
-    )->name('reservasi.tambah-sparepart');    
 
     Route::post(
         '/reservasi/{id}/hasil-service',

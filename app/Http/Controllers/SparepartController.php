@@ -35,7 +35,7 @@ class SparepartController extends Controller
             ->withQueryString();
 
         // Hitung hanya data yang belum dihapus
-        $totalSparepart = Sparepart::count();
+        $totalSparepart = Sparepart::query()->count('id');
 
         $avgHarga = Sparepart::avg('harga') ?? 0;
 
@@ -92,7 +92,7 @@ class SparepartController extends Controller
 
         $spareparts = $query->paginate(10)->withQueryString();
 
-        $totalJenis = $bengkel->spareparts()->count();
+        $totalJenis = $bengkel->spareparts()->count('sparepart.id');
 
         $totalStok = $bengkel->spareparts->sum(fn($item) => $item->pivot->stok);
 
@@ -251,7 +251,13 @@ class SparepartController extends Controller
             abort(403);
         }
 
-        $bengkel = \App\Models\Bengkel::where('admin_id', $user->id)->firstOrFail();
+        // Gunakan relasi hasOne di model User (konsisten dengan controller lain)
+        $bengkel = $user->bengkel ?? \App\Models\Bengkel::where('admin_id', $user->id)->first();
+
+        if (!$bengkel) {
+            return response()->json([]);
+        }
+
         $search = $request->search;
 
         $spareparts = $bengkel->spareparts()
@@ -261,12 +267,13 @@ class SparepartController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => $item->id,
-                    'nama' => $item->nama,
-                    'stok' => $item->pivot->stok,
+                    'id'    => $item->id,
+                    'nama'  => $item->nama,
+                    'stok'  => $item->pivot->stok,
                     'harga' => $item->harga,
                 ];
             });
+
         return response()->json($spareparts);
     }
 }

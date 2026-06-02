@@ -8,6 +8,7 @@ use App\Models\Bengkel;
 use Illuminate\Http\Request;
 use App\Models\Layanan;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 
 class AdminCabangController extends Controller
@@ -134,7 +135,8 @@ class AdminCabangController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         $bengkel = $user->bengkel;
 
@@ -195,7 +197,8 @@ class AdminCabangController extends Controller
     // ================== layanan =============================
     public function layanan()
     {
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         $bengkel = $user->bengkel()->with('layanan')->first();
 
@@ -213,9 +216,10 @@ class AdminCabangController extends Controller
         ));
     }  
 
-    public function toggleLayanan($id)
+    public function toggleLayanan(int $id)
     {
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
         $bengkel = $user->bengkel;
 
         // cek apakah layanan aktif

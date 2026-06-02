@@ -156,7 +156,7 @@
                     {{-- Harga --}}
                     <td>
                         <div class="td-harga">
-                            Rp {{ number_format($layanan->harga_dasar ?? 0, 0, ',', '.') }}
+                            Rp {{ number_format($layanan->harga ?? 0, 0, ',', '.') }}
                         </div>
                         <div class="td-harga-note">*estimasi</div>
                     </td>
@@ -189,7 +189,7 @@
                                     {{ $layanan->id }},
                                     '{{ addslashes($layanan->nama) }}',
                                     '{{ addslashes($layanan->deskripsi ?? '') }}',
-                                    {{ $layanan->harga_dasar ?? 0 }},
+                                    {{ $layanan->harga ?? 0 }},
                                     {{ $layanan->durasi ?? 0 }},
                                     '{{ $layanan->status }}'
                                 )">
@@ -309,7 +309,7 @@
                             <input
                                 type="number"
                                 id="mHarga"
-                                name="harga_dasar"
+                                name="harga"
                                 class="finput"
                                 placeholder="85000"
                                 min="0"

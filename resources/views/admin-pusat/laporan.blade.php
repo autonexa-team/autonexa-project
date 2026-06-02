@@ -161,7 +161,7 @@
                         </div>
                     </td>
                     <td class="td-bengkel">{{ $r->bengkel->nama ?? '-' }}</td>
-                    <td>{{ $r->layanan ?? '-' }}</td>
+                    <td>{{ $r->layanan->nama ?? '-' }}</td>
                     <td class="td-date">
                         {{ \Carbon\Carbon::parse($r->tanggal)->format('d/m/Y') }}
                     </td>
@@ -171,8 +171,8 @@
                                 'pending'     => ['Menunggu',     'badge-pending'],
                                 'dikonfirmasi'   => ['Dikonfirmasi', 'badge-confirmed'],
                                 'in_progress' => ['Dikerjakan',   'badge-progress'],
-                                'done'        => ['Selesai',      'badge-done'],
-                                'cancelled'   => ['Dibatalkan',   'badge-cancel'],
+                                'selesai'        => ['Selesai',      'badge-done'],
+                                'dibatalkan'   => ['Dibatalkan',   'badge-cancel'],
                             ];
                             [$label, $cls] = $sMap[$r->status] ?? [ucfirst($r->status), 'badge-pending'];
                         @endphp

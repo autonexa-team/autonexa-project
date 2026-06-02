@@ -566,8 +566,8 @@
                     'pending'     => ['Menunggu',     'b-pending'],
                     'dikonfirmasi'   => ['Dikonfirmasi', 'b-konfirm'],
                     'in_progress' => ['Dikerjakan',   'b-proses'],
-                    'done'        => ['Selesai',       'b-selesai'],
-                    'cancelled'   => ['Dibatalkan',   'b-batal'],
+                    'selesai'        => ['Selesai',       'b-selesai'],
+                    'dibatalkan'   => ['Dibatalkan',   'b-batal'],
                 ];
                 [$statusLbl, $statusCls] = $statusMap[$r->status]
                     ?? [ucfirst($r->status), 'b-pending'];
@@ -576,7 +576,20 @@
                 <td class="td-mono td-c">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</td>
                 <td class="td-bld">{{ $r->user->name ?? '-' }}</td>
                 <td>{{ $r->kendaraan ?? '-' }}</td>
-                <td>{{ $r->layanan ?? $r->keluhan ?? '-' }}</td>
+                <td>
+                    @php
+                        $layananRaw = $r->layanan ?? null;
+                        if (is_string($layananRaw)) {
+                            $decoded = json_decode($layananRaw, true);
+                            $layananNama = is_array($decoded) ? ($decoded['nama'] ?? $decoded['name'] ?? '-') : $layananRaw;
+                        } elseif (is_object($layananRaw)) {
+                            $layananNama = $layananRaw->nama ?? $layananRaw->name ?? '-';
+                        } else {
+                            $layananNama = $r->keluhan ?? '-';
+                        }
+                    @endphp
+                    {{ $layananNama }}
+                </td>
                 <td>{{ $r->bengkel->nama ?? '-' }}</td>
                 <td class="td-dt td-c">
                     {{ \Carbon\Carbon::parse($r->tanggal)->format('d/m/y') }}

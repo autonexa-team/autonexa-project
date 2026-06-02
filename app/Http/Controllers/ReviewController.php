@@ -41,7 +41,7 @@ class ReviewController extends Controller
 
         $reviews = $query->paginate(10)->withQueryString();
 
-        return view('admin-pusat.review.index', [
+        return view('admin-pusat.review', [
             'reviews'       => $reviews,
             'bengkels'      => Bengkel::orderBy('nama')->get(),
             'totalReview'   => Review::count(),

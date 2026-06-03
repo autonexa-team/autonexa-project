@@ -9,110 +9,140 @@ use App\Models\Bengkel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class AdminCabangReservasiController extends Controller
 {
     /**
-     * GET /admin-cabang/reservasi
-     * List semua reservasi untuk bengkel admin cabang
+     * Ambil bengkel milik admin yang sedang login.
+     * Mencoba dua cara:
+     *  1. Relasi $user->bengkel (hasOne di model User) — dipakai ReservasiController
+     *  2. Fallback: Bengkel::where('admin_id', $user->id) — jika relasi belum ada di model User
      */
+    private function getBengkel(): Bengkel
+    {
+        $user = Auth::user();
+
+        // Cara 1: via relasi hasOne di model User
+        if (method_exists($user, 'bengkel')) {
+            $bengkel = $user->bengkel;
+            if ($bengkel instanceof Bengkel) {
+                return $bengkel;
+            }
+        }
+
+        // Cara 2: fallback query langsung (jika kolom admin_id ada di tabel bengkels)
+        $bengkel = Bengkel::query()->where('admin_id', $user->id)->first();
+        if ($bengkel instanceof Bengkel) {
+            return $bengkel;
+        }
+
+        abort(404, 'Bengkel untuk akun ini tidak ditemukan. Pastikan akun admin cabang sudah terhubung ke bengkel.');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // INDEX — GET /admin-cabang/reservasi
+    // ─────────────────────────────────────────────────────────────
     public function index()
     {
-        $admin = Auth::user();
-        $bengkel = Bengkel::where('admin_id', $admin->id)->firstOrFail();
-        
-        $reservasi = Reservasi::where('bengkel_id', $bengkel->id)
-            ->with('user', 'bengkel')
+        $bengkel = $this->getBengkel();
+
+        $reservasi = Reservasi::query()
+            ->where('bengkel_id', $bengkel->id)
+            ->with('user', 'bengkel', 'layanan')
             ->orderBy('tanggal', 'desc')
             ->orderBy('waktu', 'desc')
             ->paginate(10);
 
-        return view('admin-cabang.reservasi', compact('reservasi', 'bengkel'));
+        $totalReservasi   = Reservasi::query()->where('bengkel_id', $bengkel->id)->count();
+        $hariIni          = Reservasi::query()->where('bengkel_id', $bengkel->id)
+                                ->whereDate('tanggal', Carbon::today())
+                                ->count();
+        $sedangDikerjakan = Reservasi::query()->where('bengkel_id', $bengkel->id)
+                                ->where('status', 'diproses')
+                                ->count();
+        $selesai          = Reservasi::query()->where('bengkel_id', $bengkel->id)
+                                ->where('status', 'selesai')
+                                ->count();
+
+        return view('admin-cabang.reservasi', compact(
+            'reservasi',
+            'bengkel',
+            'totalReservasi',
+            'hariIni',
+            'sedangDikerjakan',
+            'selesai'
+        ));
     }
 
-    /**
-     * GET /admin-cabang/reservasi/create
-     * Form untuk membuat reservasi baru
-     */
+    // ─────────────────────────────────────────────────────────────
+    // CREATE — GET /admin-cabang/reservasi/create
+    // ─────────────────────────────────────────────────────────────
     public function create()
     {
-        $admin = Auth::user();
-        $bengkel = Bengkel::where('admin_id', $admin->id)->firstOrFail();
-        
-        // Get pelanggan existing
+        $bengkel   = $this->getBengkel();
         $pelanggan = User::where('role', 'pelanggan')->orderBy('name', 'asc')->get();
-        
-        // Get layanan for this bengkel - use layanan() not layanans()
-        $layanans = $bengkel->layanan()->get();
-        
+        $layanans  = $bengkel->layanan()->get();
+
         return view('admin-cabang.reservasi-create', compact('bengkel', 'pelanggan', 'layanans'));
     }
 
-    /**
-     * POST /admin-cabang/reservasi
-     * Store new reservation
-     */
+    // ─────────────────────────────────────────────────────────────
+    // STORE — POST /admin-cabang/reservasi
+    // ─────────────────────────────────────────────────────────────
     public function store(Request $request)
     {
-        $admin = Auth::user();
-        $bengkel = Bengkel::where('admin_id', $admin->id)->firstOrFail();
+        $bengkel = $this->getBengkel();
 
         $validated = $request->validate([
-            'user_id' => 'nullable|integer',
-            'nama_pelanggan' => 'required|string|max:255',
-            'hp_pelanggan' => 'required|string|max:20',
+            'user_id'         => 'nullable|integer',
+            'nama_pelanggan'  => 'required|string|max:255',
+            'hp_pelanggan'    => 'required|string|max:20',
             'email_pelanggan' => 'nullable|email|max:255',
-            'plat_kendaraan' => 'required|string|max:20',
-            'layanan_id' => 'required|integer',
-            'tanggal' => 'required|date|after_or_equal:today',
-            'waktu' => 'required|date_format:H:i',
-            'status' => 'in:pending,dikonfirmasi,diproses,selesai,dibatalkan',
-            'keluhan' => 'nullable|string',
+            'plat_kendaraan'  => 'required|string|max:20',
+            'layanan_id'      => 'required|integer',
+            'tanggal'         => 'required|date|after_or_equal:today',
+            'waktu'           => 'required|date_format:H:i',
+            'status'          => 'nullable|in:pending,dikonfirmasi,diproses,selesai,dibatalkan',
+            'keluhan'         => 'nullable|string',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Jika tidak ada user_id (customer baru), buat user baru
-            $userId = $validated['user_id'];
+            $userId = $validated['user_id'] ?? null;
+
             if (!$userId) {
-                $user = User::create([
-                    'name' => $validated['nama_pelanggan'],
-                    'email' => $validated['email_pelanggan'] ?? 'pelanggan_' . time() . '@autonexa.local',
-                    'phone' => $validated['hp_pelanggan'],
-                    'password' => bcrypt('default123'), // default password
-                    'role' => 'pelanggan',
+                $newUser = User::create([
+                    'name'     => $validated['nama_pelanggan'],
+                    'email'    => $validated['email_pelanggan'] ?? 'pelanggan_' . time() . '@autonexa.local',
+                    'phone'    => $validated['hp_pelanggan'],
+                    'password' => bcrypt('default123'),
+                    'role'     => 'pelanggan',
                 ]);
-                $userId = $user->id;
+                $userId = $newUser->id;
             } else {
-                // Update data pelanggan existing jika ada perubahan
-                $user = User::find($userId);
-                $user->update([
-                    'phone' => $validated['hp_pelanggan'],
-                ]);
+                $existingUser = User::query()->find((int) $userId);
+                if ($existingUser) {
+                    $existingUser->update(['phone' => $validated['hp_pelanggan']]);
+                }
             }
 
-            // Get layanan details
             $layanan = Layanan::findOrFail($validated['layanan_id']);
 
-            // Hitung estimasi durasi (dalam menit, default 60)
-            $durasi = (int) filter_var($layanan->durasi, FILTER_SANITIZE_NUMBER_INT) ?: 60;
-
-            // Create reservasi
             $reservasi = Reservasi::create([
-                'user_id' => $userId,
-                'bengkel_id' => $bengkel->id,
-                'kendaraan' => $validated['plat_kendaraan'], // bisa ditambah field tipe kendaraan jika ada
-                'plat' => $validated['plat_kendaraan'],
-                'tanggal' => $validated['tanggal'],
-                'waktu' => $validated['waktu'],
-                'keluhan' => $validated['keluhan'] ?? '',
-                'status' => $validated['status'] ?? 'pending',
+                'user_id'     => $userId,
+                'bengkel_id'  => $bengkel->id,
+                'layanan_id'  => $layanan->id,
+                'kendaraan'   => $validated['plat_kendaraan'],
+                'plat'        => $validated['plat_kendaraan'],
+                'tanggal'     => $validated['tanggal'],
+                'waktu'       => $validated['waktu'],
+                'keluhan'     => $validated['keluhan'] ?? '',
+                'status'      => $validated['status'] ?? 'pending',
                 'total_biaya' => $layanan->harga ?? 0,
             ]);
-
-            // Attach layanan ke reservasi (jika ada relasi many-to-many)
-            // $reservasi->layanans()->attach($layanan->id);
 
             DB::commit();
 
@@ -128,59 +158,66 @@ class AdminCabangReservasiController extends Controller
         }
     }
 
-    /**
-     * GET /admin-cabang/reservasi/{id}
-     * Show detail reservasi
-     */
+    // ─────────────────────────────────────────────────────────────
+    // SHOW — GET /admin-cabang/reservasi/{id}
+    // ─────────────────────────────────────────────────────────────
     public function show(int $id)
     {
-        $admin = Auth::user();
-        $bengkel = Bengkel::where('admin_id', $admin->id)->firstOrFail();
-        
-        $reservasi = Reservasi::where('bengkel_id', $bengkel->id)
-            ->with('user', 'bengkel')
+        $bengkel = $this->getBengkel();
+
+        $reservasi = Reservasi::query()
+            ->with([
+                'user',
+                'layanan',
+                'bengkel',
+                'spareparts',
+            ])
+            ->where('bengkel_id', $bengkel->id)
             ->findOrFail($id);
 
-        return view('admin-cabang.reservasi-detail', compact('reservasi', 'bengkel'));
+        $sparepartsAktif = $bengkel->spareparts()
+            ->wherePivot('stok', '>', 0)
+            ->get();
+
+        return view('admin-cabang.reservasi-detail', compact(
+            'reservasi',
+            'bengkel',
+            'sparepartsAktif'
+        ));
     }
 
-    /**
-     * GET /admin-cabang/reservasi/{id}/edit
-     * Show edit form
-     */
+    // ─────────────────────────────────────────────────────────────
+    // EDIT — GET /admin-cabang/reservasi/{id}/edit
+    // ─────────────────────────────────────────────────────────────
     public function edit(int $id)
     {
-        $admin = Auth::user();
-        $bengkel = Bengkel::where('admin_id', $admin->id)->firstOrFail();
-        
-        $reservasi = Reservasi::where('bengkel_id', $bengkel->id)
-            ->with('user')
+        $bengkel   = $this->getBengkel();
+        $reservasi = Reservasi::query()
+            ->where('bengkel_id', $bengkel->id)
+            ->with('user', 'layanan')
             ->findOrFail($id);
 
         $pelanggan = User::where('role', 'pelanggan')->orderBy('name', 'asc')->get();
-        $layanans = $bengkel->layanan()->get();
+        $layanans  = $bengkel->layanan()->get();
 
         return view('admin-cabang.reservasi-edit', compact('reservasi', 'bengkel', 'pelanggan', 'layanans'));
     }
 
-    /**
-     * PATCH /admin-cabang/reservasi/{id}
-     * Update reservasi
-     */
+    // ─────────────────────────────────────────────────────────────
+    // UPDATE — PATCH /admin-cabang/reservasi/{id}
+    // ─────────────────────────────────────────────────────────────
     public function update(Request $request, int $id)
     {
-        $admin = Auth::user();
-        $bengkel = Bengkel::where('admin_id', $admin->id)->firstOrFail();
-        
-        $reservasi = Reservasi::where('bengkel_id', $bengkel->id)->findOrFail($id);
+        $bengkel   = $this->getBengkel();
+        $reservasi = Reservasi::query()->where('bengkel_id', $bengkel->id)->findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'required|in:pending,dikonfirmasi,diproses,selesai,dibatalkan',
-            'keluhan' => 'nullable|string',
+            'status'        => 'required|in:pending,dikonfirmasi,diproses,selesai,dibatalkan',
+            'keluhan'       => 'nullable|string',
             'hasil_service' => 'nullable|string',
-            'total_biaya' => 'nullable|numeric|min:0',
-            'tanggal' => 'nullable|date',
-            'waktu' => 'nullable|date_format:H:i',
+            'total_biaya'   => 'nullable|numeric|min:0',
+            'tanggal'       => 'nullable|date',
+            'waktu'         => 'nullable|date_format:H:i',
         ]);
 
         try {
@@ -189,6 +226,7 @@ class AdminCabangReservasiController extends Controller
             return redirect()
                 ->route('admin-cabang.reservasi-detail', $reservasi->id)
                 ->with('success', 'Reservasi berhasil diperbarui');
+
         } catch (\Exception $e) {
             return back()
                 ->withInput()
@@ -196,32 +234,29 @@ class AdminCabangReservasiController extends Controller
         }
     }
 
-    /**
-     * DELETE /admin-cabang/reservasi/{id}
-     * Delete reservasi
-     */
+    // ─────────────────────────────────────────────────────────────
+    // DESTROY — DELETE /admin-cabang/reservasi/{id}
+    // ─────────────────────────────────────────────────────────────
     public function destroy(int $id)
     {
-        $admin = Auth::user();
-        $bengkel = Bengkel::where('admin_id', $admin->id)->firstOrFail();
-        
-        $reservasi = Reservasi::where('bengkel_id', $bengkel->id)->findOrFail($id);
+        $bengkel   = $this->getBengkel();
+        $reservasi = Reservasi::query()->where('bengkel_id', $bengkel->id)->findOrFail($id);
 
         try {
-            $reservasi->delete();
+            $reservasi->deleteOrFail();
 
             return redirect()
                 ->route('admin-cabang.reservasi')
                 ->with('success', 'Reservasi berhasil dihapus');
+
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal menghapus reservasi: ' . $e->getMessage());
         }
     }
 
-    /**
-     * GET /admin-cabang/reservasi/api/pelanggan
-     * API endpoint untuk get semua pelanggan (untuk autocomplete/select)
-     */
+    // ─────────────────────────────────────────────────────────────
+    // API — GET /admin-cabang/reservasi/api/pelanggan
+    // ─────────────────────────────────────────────────────────────
     public function getPelanggan()
     {
         $pelanggan = User::where('role', 'pelanggan')
@@ -232,38 +267,32 @@ class AdminCabangReservasiController extends Controller
         return response()->json($pelanggan);
     }
 
-    /**
-     * GET /admin-cabang/reservasi/api/slot
-     * API endpoint untuk check available time slots
-     */
+    // ─────────────────────────────────────────────────────────────
+    // API — GET /admin-cabang/reservasi/api/slot
+    // ─────────────────────────────────────────────────────────────
     public function getTimeSlots(Request $request)
     {
         $tanggal = $request->query('tanggal');
-        $admin = Auth::user();
-        $bengkel = Bengkel::where('admin_id', $admin->id)->firstOrFail();
 
         if (!$tanggal) {
             return response()->json(['error' => 'Tanggal harus disediakan'], 400);
         }
 
-        // Working hours default
+        $bengkel      = $this->getBengkel();
         $workingHours = ['08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+        $maxSlot      = $bengkel->kuota_slot['max_per_slot'] ?? 5;
 
-        // Get existing reservasi count per jam
         $slots = [];
         foreach ($workingHours as $jam) {
-            $count = Reservasi::where('bengkel_id', $bengkel->id)
+            $count = Reservasi::query()
+                ->where('bengkel_id', $bengkel->id)
                 ->where('tanggal', $tanggal)
                 ->where('waktu', $jam)
                 ->count();
-
-            $maxSlot = $bengkel->kuota_slot['max_per_slot'] ?? 5;
-            $isFull = $count >= $maxSlot;
-
             $slots[] = [
-                'jam' => $jam,
-                'tersedia' => $maxSlot - $count,
-                'penuh' => $isFull,
+                'jam'      => $jam,
+                'tersedia' => max(0, $maxSlot - $count),
+                'penuh'    => $count >= $maxSlot,
             ];
         }
 

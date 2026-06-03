@@ -98,11 +98,7 @@
                 <div>
                     <p class="stat-card__label">Pendapatan Hari Ini</p>
                     <h3 class="stat-card__value stat-card__value--md">
-                        <span class="counter-value" 
-                            data-target="{{ number_format($pendapatanHariIni / 1000000, 1, '.', '') }}" 
-                            data-decimals="1"
-                            data-prefix="Rp " 
-                            data-suffix="M">Rp 0.0M</span>
+                        Rp {{ number_format($pendapatanHariIni, 0, ',', '.') }}
                     </h3>
                 </div>
                 <div class="stat-card__icon">

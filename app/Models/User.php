@@ -54,7 +54,7 @@ class User extends Authenticatable
     }
 
     // RELASI
-    public function reservasis(): HasMany
+    public function reservasi(): HasMany
     {
         return $this->hasMany(Reservasi::class);
     }

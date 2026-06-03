@@ -62,7 +62,6 @@ class Bengkel extends Model
     {
         return $this->belongsToMany(Sparepart::class, 'bengkel_spareparts')
                     ->withPivot('stok')
-                    //dita nambah ini 
                     ->withTimestamps();
     }   
 

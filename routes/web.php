@@ -128,9 +128,8 @@ Route::middleware(['auth', 'role:admin_pusat'])
     ->name('admin-pusat.')
     ->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('admin-pusat.dashboard');
-    })->name('dashboard');    
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');   
 
     Route::get('/sparepart', [SparepartController::class, 'index'])
         ->name('sparepart');    
@@ -269,7 +268,21 @@ Route::middleware(['auth', 'role:admin_cabang'])
         ->name('reservasi.toggle-status');
 
     // SEARCH SPAREPART DITA NAMBAH INI
-    Route::get('/admin-cabang/sparepart/search', [SparepartController::class, 'search']);
+    Route::get('/sparepart/search', [SparepartController::class, 'search'])
+        ->name('sparepart.search');
+
+    // ── SPAREPART CRUD (Real-time via AJAX) ────
+    Route::get('/reservasi/{id}/sparepart', [ReservasiController::class, 'sparepartIndex'])
+        ->name('reservasi.sparepart.index');
+    
+    Route::post('/reservasi/{id}/sparepart', [ReservasiController::class, 'sparepartStore'])
+        ->name('reservasi.sparepart.store');
+    
+    Route::patch('/reservasi/{id}/sparepart/{spId}', [ReservasiController::class, 'sparepartUpdate'])
+        ->name('reservasi.sparepart.update');
+    
+    Route::delete('/reservasi/{id}/sparepart/{spId}', [ReservasiController::class, 'sparepartDestroy'])
+        ->name('reservasi.sparepart.destroy');
 
 
     // LAYANAN
@@ -288,9 +301,8 @@ Route::middleware(['auth', 'role:admin_cabang'])
     Route::get('/review/{id}', [ReviewController::class, 'showCabang'])->name('review.detail');
     
     // PELANGGAN
-    Route::get('/pelanggan', function () {
-        return view('admin-cabang.pelanggan-cabang');
-    })->name('pelanggan-cabang');
+    Route::get('/pelanggan', [AdminCabangController::class, 'pelangganCabang'])
+    ->name('pelanggan-cabang');
 
     // LAPORAN
     Route::get('/laporan',     [LaporanController::class, 'indexCabang'])
@@ -308,11 +320,6 @@ Route::middleware(['auth', 'role:admin_cabang'])
     })->name('profile');
 
     Route::put('/profile', [AdminCabangController::class, 'updateProfile']) ->name('profile.update');
-
-    Route::post(
-        '/reservasi/{id}/sparepart',
-        [ReservasiController::class, 'tambahSparepart']
-    )->name('reservasi.tambah-sparepart');    
 
     Route::post(
         '/reservasi/{id}/hasil-service',

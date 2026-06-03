@@ -19,14 +19,13 @@ class BengkelController extends Controller
 
     public function index()
     {
-        // 🔒 proteksi role
         if (Auth::user()->role !== 'admin_pusat') {
             abort(403);
         }
 
         $query = Bengkel::with('layanan')
-            ->withCount(['reservasis'])
-            ->withAvg('review as reviews_avg_rating', 'rating');
+            ->withCount(['reservasis as reservasi_count'])
+            ->withAvg('review as avg_rating', 'rating');
 
         // Apply filter status jika ada
         if (request('status')) {
@@ -55,7 +54,7 @@ class BengkelController extends Controller
             'kotaList'      => Bengkel::distinct()->pluck('kota'),
             'totalAktif'    => Bengkel::where('status','aktif')->count(),
             'totalNonaktif' => Bengkel::where('status','nonaktif')->count(),
-            'totalKota'     => Bengkel::distinct('kota')->count(),
+            'totalKota'     => Bengkel::distinct()->count('kota'),
         ]);
     }
 
@@ -63,7 +62,7 @@ class BengkelController extends Controller
     public function pelangganIndex()
     {
         $bengkels = Bengkel::query()
-            ->where('status', 'aktif') // ✅ hanya tampilkan aktif
+            ->where('status', 'aktif') 
             ->withAvg(['review' => function($q){
                 $q->where('type','bengkel');
             }], 'rating')
@@ -107,12 +106,10 @@ class BengkelController extends Controller
 
     public function store(Request $request)
     {
-        // 🔒 proteksi role
         if (Auth::user()->role !== 'admin_pusat') {
             abort(403);
         }
 
-        // ✅ Validasi
         $validated = $request->validate([
             'nama'      => 'required|string|max:255',
             'admin_id'  => 'nullable|exists:users,id',
@@ -125,7 +122,6 @@ class BengkelController extends Controller
             'foto'      => 'nullable|image|mimes:jpeg,png,webp|max:2048',
         ]);
 
-        // 📸 Handle foto upload
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -141,7 +137,6 @@ class BengkelController extends Controller
             $validated['foto'] = 'bengkels/' . $filename;
         }
 
-        // 💾 Simpan ke database
         Bengkel::create($validated);
 
         return redirect()->route('admin-pusat.bengkel.index')
@@ -150,71 +145,32 @@ class BengkelController extends Controller
 
     public function show(int $id)
     {
-        $bengkel = Bengkel::withCount(['reservasis', 'layanan', 'review'])
-                        ->withAvg('review', 'rating')
-                        ->with(['adminCabang', 'layanan'])
-                        ->findOrFail($id);
+        $bengkel = Bengkel::withCount([
+                    'reservasis as reservasi_count',  
+                    'layanan as layanan_count',
+                    'review as reviews_count',
+                ])
+                ->withAvg('review as avg_rating', 'rating')
+                ->with(['adminCabang', 'layanan', 'spareparts'])
+                ->findOrFail($id);
 
-        return view('admin-pusat.detail-bengkel', [
-            'bengkel'               => $bengkel,
-            'reservasiTerbaru'      => $bengkel->reservasis()
-                                            ->with('user')
-                                            ->latest('tanggal')
-                                            ->take(5)
-                                            ->get(),
-            'reservasiHariIni'      => $bengkel->reservasis()->whereDate('tanggal', today())->count(),
-            'reservasiSelesaiHariIni' => $bengkel->reservasis()->whereDate('tanggal', today())->where('status', 'done')->count(),
-            'reservasiProsesHariIni'  => $bengkel->reservasis()->whereDate('tanggal', today())->where('status', 'in_progress')->count(),
-            'reservasiBulanIni'     => $bengkel->reservasis()->whereMonth('tanggal', now()->month)->count(),
-        ]);
-    }
-
-    public function destroy(int $id)
-    {
-        // proteksi role
-        if (Auth::user()->role !== 'admin_pusat') {
-            abort(403);
-        }
-
-        $bengkel = Bengkel::findOrFail($id);
-
-        // Hapus foto jika ada
-        if ($bengkel->foto) {
-            $fotoPath = public_path('assets/' . $bengkel->foto);
-            if (file_exists($fotoPath)) {
-                unlink($fotoPath);
-            }
-        }
-
-        // Hapus bengkel dari database
-        $bengkel->delete();
-
-        return redirect()->route('admin-pusat.bengkel.index')
-                        ->with('success', 'Bengkel berhasil dihapus');
-    }
-
-    public function edit(int $id)
-    {
-        //proteksi role
-        if (Auth::user()->role !== 'admin_pusat') {
-            abort(403);
-        }
-
-        $bengkel = Bengkel::findOrFail($id);
-
-        // Ambil admin cabang: yang sekarang + yang belum memiliki bengkel
-        $adminCabang = \App\Models\User::query()
-            ->where('role', 'admin_cabang')
-            ->where('is_active', true)
-            ->where(function($query) use ($bengkel) {
-                $query->whereDoesntHave('bengkel')
-                      ->orWhere('id', $bengkel->admin_id);
-            })
+        $semuaReservasiHariIni = $bengkel->reservasis()
+            ->whereDate('tanggal', now()->toDateString())
             ->get();
 
-        return view('admin-pusat.edit-bengkel', [
-            'bengkel' => $bengkel,
-            'adminCabang' => $adminCabang
+        return view('admin-pusat.detail-bengkel', [
+            'bengkel'                 => $bengkel,
+            'reservasiTerbaru'        => $bengkel->reservasis()
+                                            ->with('user')
+                                            ->latest('created_at')
+                                            ->take(5)
+                                            ->get(),
+            'reservasiHariIni'        => $semuaReservasiHariIni->count(),
+            'reservasiSelesaiHariIni' => $semuaReservasiHariIni->where('status', 'selesai')->count(),
+            'reservasiProsesHariIni'  => $semuaReservasiHariIni->where('status', 'diproses')->count(), 
+            'reservasiBulanIni'       => $bengkel->reservasis()->whereMonth('tanggal', now()->month)->count(),
+            'spareparts'              => $bengkel->spareparts,
+            'sparepartKritis'         => $bengkel->spareparts->filter(fn($sp) => ($sp->pivot->stok ?? 0) == 0)->count(),
         ]);
     }
 
@@ -292,7 +248,7 @@ class BengkelController extends Controller
         ->withAvg('reviews', 'rating')
         ->findOrFail($id);
 
-        return view('pelanggan.detail-bengkel', [
+        return view('pelanggan.bengkel-detail', [
             'bengkel' => $bengkel
         ]);
     }    

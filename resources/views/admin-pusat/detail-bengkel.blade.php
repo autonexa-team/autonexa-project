@@ -186,7 +186,7 @@
         @forelse($bengkel->layanan ?? [] as $layanan)
         <div class="layanan-card">
             <div class="layanan-name">{{ $layanan->nama }}</div>
-            <div class="layanan-price">Rp {{ number_format($layanan->harga_dasar ?? 0, 0, ',', '.') }}</div>
+            <div class="layanan-price">Rp {{ number_format($layanan->harga ?? 0, 0, ',', '.') }}</div>
             <div class="layanan-dur">
                 <i class="bi bi-clock"></i>
                 {{ $layanan->durasi ?? 0 }} menit
@@ -233,17 +233,18 @@
             <tbody>
                 @forelse($spareparts ?? [] as $sp)
                 @php
-                    $pct     = $sp->stok_max > 0 ? min(100, ($sp->stok / $sp->stok_max) * 100) : 0;
-                    $isKritis = $sp->stok === 0;
-                    $isWarn   = !$isKritis && $pct <= 30;
-                    $isOk     = !$isKritis && !$isWarn;
-                    $barColor = $isKritis ? '#dc2626' : ($isWarn ? '#ca8a04' : '#16a34a');
+                    $stok      = $sp->pivot->stok ?? 0;
+                    $stokMax   = 100; 
+                    $pct       = min(100, ($stok / $stokMax) * 100); 
+                    $isKritis  = $stok == 0;
+                    $isWarn    = !$isKritis && $stok <= 5;
+                    $barColor  = $isKritis ? '#dc2626' : ($isWarn ? '#ca8a04' : '#16a34a');
                     $pillClass = $isKritis ? 'pill-crit' : ($isWarn ? 'pill-warn' : 'pill-ok');
-                    $pillLabel = $isKritis ? ($sp->stok === 0 ? 'Habis' : 'Kritis') : ($isWarn ? 'Hampir habis' : 'Aman');
+                    $pillLabel = $isKritis ? 'Habis' : ($isWarn ? 'Hampir habis' : 'Aman');
                 @endphp
                 <tr>
                     <td class="td-sparepart-name">{{ $sp->nama }}</td>
-                    <td>{{ number_format($sp->stok) }} {{ $sp->satuan ?? 'pcs' }}</td>
+                    <td>{{ number_format($stok) }} {{ $sp->satuan ?? 'pcs' }}</td>
                     <td>
                         <div class="stok-bar-wrap">
                             <div class="stok-bar-track">
@@ -265,7 +266,7 @@
         </table>
     </div>
     <div class="section-card-footer">
-        <a href="{{ route('admin-cabang.sparepart', ['bengkel' => $bengkel->id]) }}"
+        <a href="{{ route('admin-pusat.sparepart', ['bengkel' => $bengkel->id]) }}"
            class="btn-secondary" style="font-size:12px;padding:7px 14px;">
             <i class="bi bi-box-seam"></i> Lihat &amp; Kelola Stok
         </a>
@@ -313,7 +314,7 @@
                     <td>
                         <div class="td-user">
                             <div class="td-avatar">{{ strtoupper(substr($r->user->name ?? 'U', 0, 1)) }}</div>
-                            {{ $r->user->name ?? '-' }}
+                            {{ $r->user_id }} — {{ $r->user->name ?? 'NULL' }}
                         </div>
                     </td>
                     <td>{{ $r->keluhan ?? '-' }}</td>

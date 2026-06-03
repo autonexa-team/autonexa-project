@@ -182,7 +182,7 @@ class ReservasiController extends Controller
     /**
      * Display reservasi untuk admin cabang dari database
      */
-    public function getReservasiCabang()
+    public function getReservasiCabang(Request $request)
     {
         $user = Auth::user();
         
@@ -195,34 +195,39 @@ class ReservasiController extends Controller
             abort(404, 'Bengkel tidak ditemukan');
         }
 
-        // Get reservasi dari database
-        $reservasi = Reservasi::query()
+        $query = Reservasi::query()
             ->where('bengkel_id', $bengkel->id)
             ->with(['user', 'layanan'])
-            ->orderBy('tanggal', 'desc')
-            ->paginate(15);
+            ->orderBy('tanggal', 'desc');
 
-        // Count statistic
-        $totalReservasi = Reservasi::query()->where('bengkel_id', $bengkel->id)->count();
-        $hariIni = Reservasi::query()
-            ->where('bengkel_id', $bengkel->id)
-            ->whereDate('tanggal', Carbon::today())
-            ->count();
-        $sedangDikerjakan = Reservasi::query()
-            ->where('bengkel_id', $bengkel->id)
-            ->where('status', 'diproses')
-            ->count();
-        $selesai = Reservasi::query()
-            ->where('bengkel_id', $bengkel->id)
-            ->where('status', 'selesai')
-            ->count();
+        // Filter untuk menangkap user ID, jadi nampilin ID itu saja
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $reservasi = $query->paginate(15)->withQueryString();
+
+        // Stat cards dengan filter
+        $statQuery = Reservasi::query()->where('bengkel_id', $bengkel->id);
+        if ($request->filled('user_id')) {
+            $statQuery->where('user_id', $request->user_id);
+        }
+
+        $totalReservasi   = (clone $statQuery)->count();
+        $hariIni          = (clone $statQuery)->whereDate('tanggal', Carbon::today())->count();
+        $sedangDikerjakan = (clone $statQuery)->where('status', 'diproses')->count();
+        $selesai          = (clone $statQuery)->where('status', 'selesai')->count();
+
+        // setelah filter, ambil dsta pelanggan
+        $pelangganDipilih = $request->filled('user_id') ? User::find($request->user_id) : null;
 
         return view('admin-cabang.reservasi', compact(
             'reservasi',
             'totalReservasi',
             'hariIni',
             'sedangDikerjakan',
-            'selesai'
+            'selesai',
+            'pelangganDipilih',
         ));
     }
 

@@ -239,13 +239,13 @@ class AdminCabangController extends Controller
         $bengkel = $user->bengkel;
 
         $query = User::where('role', 'pelanggan')
-            ->whereHas('reservasis', function ($q) use ($bengkel) {
+            ->whereHas('reservasi', function ($q) use ($bengkel) {
                 $q->where('bengkel_id', $bengkel->id);
             })
-            ->withCount(['reservasis as total_reservasi' => function ($q) use ($bengkel) {
+            ->withCount(['reservasi as total_reservasi' => function ($q) use ($bengkel) {
                 $q->where('bengkel_id', $bengkel->id);
             }])
-            ->withMax(['reservasis as terakhir_reservasi' => function ($q) use ($bengkel) {
+            ->withMax(['reservasi as terakhir_reservasi' => function ($q) use ($bengkel) {
                 $q->where('bengkel_id', $bengkel->id);
             }], 'tanggal');  // ← pakai 'tanggal'
 
@@ -261,13 +261,13 @@ class AdminCabangController extends Controller
         if ($status === 'aktif') {
             $query->having('total_reservasi', '>', 1);
         } elseif ($status === 'baru') {
-            $query->whereHas('reservasis', function ($q) use ($bengkel) {
+            $query->whereHas('reservasi', function ($q) use ($bengkel) {
                 $q->where('bengkel_id', $bengkel->id)
                 ->where('tanggal', '>=', now()->startOfMonth()->toDateString()); // ← 'tanggal'
             });
         } elseif ($status === 'tidak_aktif') {
             $query->where(function ($q) use ($bengkel) {
-                $q->whereDoesntHave('reservasis', function ($r) use ($bengkel) {
+                $q->whereDoesntHave('reservasi', function ($r) use ($bengkel) {
                     $r->where('bengkel_id', $bengkel->id)
                     ->where('tanggal', '>=', now()->subMonths(3)->toDateString()); // ← 'tanggal'
                 });
@@ -278,24 +278,24 @@ class AdminCabangController extends Controller
 
         // Statistik
         $totalPelanggan = User::where('role', 'pelanggan')
-            ->whereHas('reservasis', fn($q) => $q->where('bengkel_id', $bengkel->id))
+            ->whereHas('reservasi', fn($q) => $q->where('bengkel_id', $bengkel->id))
             ->count();
 
         $totalAktif = User::where('role', 'pelanggan')
-            ->whereHas('reservasis', fn($q) => $q->where('bengkel_id', $bengkel->id))
-            ->withCount(['reservasis as total_reservasi' => fn($q) => $q->where('bengkel_id', $bengkel->id)])
+            ->whereHas('reservasi', fn($q) => $q->where('bengkel_id', $bengkel->id))
+            ->withCount(['reservasi as total_reservasi' => fn($q) => $q->where('bengkel_id', $bengkel->id)])
             ->having('total_reservasi', '>', 1)
             ->count();
 
         $totalBaru = User::where('role', 'pelanggan')
-            ->whereHas('reservasis', function ($q) use ($bengkel) {
+            ->whereHas('reservasi', function ($q) use ($bengkel) {
                 $q->where('bengkel_id', $bengkel->id)
                 ->where('tanggal', '>=', now()->startOfMonth()->toDateString()); // ← 'tanggal'
             })->count();
 
         $totalTidakAktif = User::where('role', 'pelanggan')
-            ->whereHas('reservasis', fn($q) => $q->where('bengkel_id', $bengkel->id))
-            ->whereDoesntHave('reservasis', function ($q) use ($bengkel) {
+            ->whereHas('reservasi', fn($q) => $q->where('bengkel_id', $bengkel->id))
+            ->whereDoesntHave('reservasi', function ($q) use ($bengkel) {
                 $q->where('bengkel_id', $bengkel->id)
                 ->where('tanggal', '>=', now()->subMonths(3)->toDateString()); // ← 'tanggal'
             })->count();

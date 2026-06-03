@@ -247,7 +247,7 @@
             <div class="flex items-center gap-5">
 
                 {{-- NOTIFIKASI --}}
-                <a href="{{ route('admin-cabang.notifikasi') }}"
+                <a href="{{ route('admin-cabang.dashboard') }}"
                 class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-brand transition-colors relative">
 
                     <i class="far fa-bell text-xl"></i>

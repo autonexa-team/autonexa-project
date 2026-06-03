@@ -252,4 +252,23 @@ class BengkelController extends Controller
             'bengkel' => $bengkel
         ]);
     }    
+
+    public function edit(int $id)
+    {
+        if (Auth::user()->role !== 'admin_pusat') {
+            abort(403);
+        }
+
+        $bengkel = Bengkel::findOrFail($id);
+
+        $adminCabang = \App\Models\User::query()
+            ->where('role', 'admin_cabang')
+            ->where('is_active', true)
+            ->get();
+
+        return view('admin-pusat.edit-bengkel', [
+            'bengkel' => $bengkel,
+            'adminCabang' => $adminCabang,
+        ]);
+    }    
 }

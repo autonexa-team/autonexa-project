@@ -235,7 +235,7 @@ class AdminCabangController extends Controller
 
     public function pelangganCabang(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $bengkel = $user->bengkel;
 
         $query = User::where('role', 'pelanggan')

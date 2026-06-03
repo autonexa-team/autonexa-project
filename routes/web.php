@@ -13,6 +13,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Pelanggan\ProfileController;
 use App\Models\Review;
 use App\Models\Bengkel;
 use Illuminate\Http\Request;
@@ -109,7 +110,10 @@ Route::middleware(['auth', 'role:pelanggan'])
         ->name('riwayat-detail');        
 
     Route::get('/profile', [ReservasiController::class, 'profile'])
-        ->name('profile');   
+        ->name('profile'); 
+    
+     Route::put('/profile/update', [ReservasiController::class, 'updateProfile'])
+        ->name('profile.update');
         
     Route::get('/dashboard', function () {
         return view('pelanggan.dashboard');
@@ -305,16 +309,14 @@ Route::middleware(['auth', 'role:admin_cabang'])
     ->name('laporan');
 
     // notifikasi
-    Route::get('/notifikasi', function () {
-        return view('admin-cabang.notifikasi');
-    })->name('notifikasi');
-
-    // profile    
     Route::get('/profile', function () {
-        $bengkel = Auth::user()->bengkel()->with('layanan')->first();
+        $user = Auth::user();
+        $bengkel = $user?->bengkel?->load('layanan');
+
         return view('admin-cabang.profile', [
             'bengkel' => $bengkel
         ]);
+
     })->name('profile');
 
     Route::put('/profile', [AdminCabangController::class, 'updateProfile']) ->name('profile.update');

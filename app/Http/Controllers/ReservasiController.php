@@ -8,6 +8,10 @@ use App\Models\Layanan;
 use App\Models\ReservasiSparepart;
 use App\Models\User;
 use App\Models\Sparepart;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -575,8 +579,42 @@ class ReservasiController extends Controller
 
     public function profile()
     {
-        return view('pelanggan.profile');
-    }
+        $user = Auth::user();
+
+        $reservasis = Reservasi::with('bengkel')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $reviews = Review::with('bengkel')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $stats = [
+            'total_reservasi' => Reservasi::where('user_id', $user->id)->count(),
+
+            'reservasi_selesai' => Reservasi::where('user_id', $user->id)
+                ->where('status', 'selesai')
+                ->count(),
+
+            'reservasi_aktif' => Reservasi::where('user_id', $user->id)
+                ->where('status', 'diproses')
+                ->count(),
+
+            'total_review' => Review::where('user_id', $user->id)
+                ->count(),
+        ];
+
+        return view('pelanggan.profile', compact(
+            'user',
+            'reservasis',
+            'reviews',
+            'stats'
+        ));
+}
 
     public function riwayatDetail(int $id)
     {
@@ -619,11 +657,14 @@ class ReservasiController extends Controller
             'jam'       => $reservasi->waktu . ' WIB',
             'keluhan'   => $reservasi->keluhan ?? '',
             'biaya'     => $reservasi->total_biaya ? 'Rp ' . number_format($reservasi->total_biaya, 0, ',', '.') : null,
-            'created_at'=> $reservasi->created_at->format('d F Y, H:i') . ' WIB',
+            'created_at'=> $reservasi->created_at? $reservasi->created_at->format('d F Y, H:i') . ' WIB': '-',
+
             'timeline'  => [
-                ['time' => $reservasi->created_at->format('d M Y · H:i') . ' WIB', 'title' => 'Reservasi Dibuat', 'desc' => 'Reservasi berhasil dibuat secara online.', 'state' => 'done'],
+                [
+                    'time' => $reservasi->created_at? $reservasi->created_at->format('d M Y · H:i') . ' WIB': '-','title' => 'Reservasi Dibuat','desc' => 'Reservasi berhasil dibuat secara online.','state' => 'done'
+                ],
             ],
-        ];
+            ];
 
         return view('pelanggan.riwayat-detail', compact('reservasi', 'reservasiJs'));
     }    

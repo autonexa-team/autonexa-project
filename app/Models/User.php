@@ -14,6 +14,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordNotification;
 use App\Models\Bengkel;
+use App\Models\Reservasi;
+use App\Models\Review;
 
 /**
  * @method static Builder where(string $column, mixed $operator = null, mixed $value = null)

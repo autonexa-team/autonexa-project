@@ -85,9 +85,9 @@
         </div>
         
         <div class="w-full md:w-auto flex gap-2">
-            <button class="bg-slate-800 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-900 transition-colors">Semua</button>
-            <button class="bg-white border border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 px-5 py-2 rounded-xl text-sm font-bold transition-colors">Aktif</button>
-            <button class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-xl text-sm font-bold transition-colors">Nonaktif</button>
+            <button data-filter="semua" class="filter-btn bg-slate-800 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-900 transition-colors">Semua</button>
+            <button data-filter="aktif" class="filter-btn bg-white border border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 px-5 py-2 rounded-xl text-sm font-bold transition-colors">Aktif</button>
+            <button data-filter="nonaktif" class="filter-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2 rounded-xl text-sm font-bold transition-colors">Nonaktif</button>
         </div>
     </div>
 
@@ -227,6 +227,54 @@ document.addEventListener("DOMContentLoaded", () => {
         
         window.requestAnimationFrame(step);
     });
+});
+
+// Filter Aktif/Nonaktif
+const filterBtns = document.querySelectorAll('.filter-btn');
+const rows = document.querySelectorAll('tbody tr');
+
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Update active button style
+        filterBtns.forEach(b => {
+            b.classList.remove('bg-slate-800', 'text-white');
+            b.classList.add('bg-white', 'border', 'border-slate-200', 'text-slate-600');
+        });
+        btn.classList.add('bg-slate-800', 'text-white');
+        btn.classList.remove('bg-white', 'border', 'border-slate-200', 'text-slate-600');
+
+        const filter = btn.dataset.filter;
+
+        rows.forEach(row => {
+            const badge = row.querySelector('td:nth-child(5) span');
+            const isAktif = badge?.textContent.trim().includes('Aktif');
+
+            if (filter === 'semua') row.style.display = '';
+            else if (filter === 'aktif') row.style.display = isAktif ? '' : 'none';
+            else if (filter === 'nonaktif') row.style.display = !isAktif ? '' : 'none';
+        });
+    });
+});
+
+// Filter Search
+const searchInput = document.querySelector('input[placeholder="Cari nama layanan..."]');
+
+searchInput.addEventListener('input', () => {
+    const keyword = searchInput.value.toLowerCase();
+
+    rows.forEach(row => {
+        const namaLayanan = row.querySelector('td:nth-child(2) h4')?.textContent.toLowerCase() ?? '';
+        const match = namaLayanan.includes(keyword);
+        row.style.display = match ? '' : 'none';
+    });
+
+    // Reset filter btn ke semua saat mengetik
+    filterBtns.forEach(b => {
+        b.classList.remove('bg-slate-800', 'text-white');
+        b.classList.add('bg-white', 'border', 'border-slate-200', 'text-slate-600');
+    });
+    document.querySelector('[data-filter="semua"]').classList.add('bg-slate-800', 'text-white');
+    document.querySelector('[data-filter="semua"]').classList.remove('bg-white', 'border', 'border-slate-200', 'text-slate-600');
 });
 </script>
 @endsection

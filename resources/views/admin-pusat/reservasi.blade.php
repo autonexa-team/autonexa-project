@@ -140,6 +140,7 @@
 
 .user-name {
     font-weight: 500;
+    color: #333;
 }
 
 .bengkel-name {

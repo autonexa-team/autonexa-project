@@ -32,7 +32,6 @@
             <div class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center text-xl border border-slate-100 group-hover:bg-slate-100 group-hover:scale-110 transition-all duration-300">
                 <i class="fas fa-users"></i>
             </div>
-            <div class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center text-xl border border-slate-100 group-hover:scale-110 transition-all"><i class="fas fa-users"></i></div>
         </div>
     </div>
 
@@ -46,7 +45,6 @@
             <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-xl border border-emerald-100 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                 <i class="fas fa-user-check"></i>
             </div>
-            <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-xl border border-emerald-100 group-hover:scale-110 transition-all"><i class="fas fa-user-check"></i></div>
         </div>
         <div class="mt-3 text-xs text-slate-400 font-bold">Lebih dari 1x reservasi</div>
     </div>
@@ -61,7 +59,6 @@
             <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center text-xl border border-blue-100 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
                 <i class="fas fa-user-plus"></i>
             </div>
-            <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center text-xl border border-blue-100 group-hover:scale-110 transition-all"><i class="fas fa-user-plus"></i></div>
         </div>
         <div class="mt-3 text-xs text-slate-400 font-bold">Bergabung bulan ini</div>
     </div>
@@ -76,7 +73,6 @@
             <div class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center text-xl border border-slate-100 group-hover:bg-slate-200 transition-all duration-300">
                 <i class="fas fa-user-clock"></i>
             </div>
-            <div class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center text-xl border border-slate-100 group-hover:scale-110 transition-all"><i class="fas fa-user-clock"></i></div>
         </div>
         <div class="mt-3 text-xs text-slate-400 font-bold">> 3 bulan tanpa reservasi</div>
     </div>
@@ -204,6 +200,8 @@
                                 <span class="tooltip-text absolute bottom-full right-0 mb-2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg whitespace-nowrap shadow-md">Lihat Detail</span>
                             </div>
                             <div class="tooltip-container relative inline-block">
+
+                                <!-- tombol aksi riwayat reservasi -->
                                 <a href="{{ route('admin-cabang.reservasi') }}?user_id={{ $p->id }}" 
                                     class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 transition-colors flex items-center justify-center shadow-sm">
                                     <i class="fas fa-history"></i>

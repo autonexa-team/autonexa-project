@@ -32,6 +32,7 @@
     </a>
 </div>
 
+<!-- sudah filter dan ambil data, nampilin banner riwayat reservasi aksi pelanggan -->
 @if(isset($pelangganDipilih) && $pelangganDipilih)
 <div class="mb-6 bg-blue-50 border border-blue-200 rounded-2xl p-5 animate-fade-slide-up">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -115,6 +116,7 @@
 </div>
 
 <!-- Filter Section -->
+@if(!request('user_id'))
 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center animate-fade-slide-up stagger-4">
     <div class="flex items-center bg-slate-50 rounded-xl px-4 py-2 w-full md:w-80 border border-slate-200 focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/20 transition-all">
         <i class="fas fa-search text-slate-400"></i>
@@ -143,6 +145,7 @@
         </button>
     </div>
 </div>
+@endif
 
 <!-- Table Section -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-fade-slide-up stagger-5">
@@ -461,5 +464,45 @@
             setTimeout(() => toast.remove(), 500);
         }, 3000);
     }
+
+    // ── Search & Filter Reservasi ──
+const searchReservasi = document.querySelector('input[placeholder="Cari nama pelanggan..."]');
+const statusSelect    = document.querySelector('select');
+const dateInput       = document.querySelector('input[type="date"]');
+const tableRows       = document.querySelectorAll('table tbody tr');
+
+function applyFilter() {
+    const keyword = searchReservasi?.value.toLowerCase() ?? '';
+    const status  = statusSelect?.value ?? '';
+    const date    = dateInput?.value ?? '';
+
+    tableRows.forEach(row => {
+        // Skip empty state row
+        if (row.querySelector('td[colspan]')) return;
+
+        const nama    = row.querySelector('td:nth-child(2) p')?.textContent.toLowerCase() ?? '';
+        const label   = row.querySelector('td:nth-child(6) span')?.textContent.trim() ?? '';
+        const tanggal = row.querySelector('td:nth-child(4) span')?.textContent.trim() ?? '';
+
+        const matchSearch = nama.includes(keyword);
+        const matchStatus = !status || status === 'Semua Status' || label.includes(status);
+
+        // Konversi tanggal filter (yyyy-mm-dd) ke format tampilan (dd MMM yyyy)
+        let matchDate = true;
+        if (date) {
+            const d = new Date(date);
+            const formatted = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            matchDate = tanggal.replace(/\s+/g, ' ').includes(formatted.replace(/\s+/g, ' '));
+        }
+
+        row.style.display = (matchSearch && matchStatus && matchDate) ? '' : 'none';
+    });
+}
+
+searchReservasi?.addEventListener('input', applyFilter);
+statusSelect?.addEventListener('change', applyFilter);
+dateInput?.addEventListener('change', applyFilter);
+
+document.querySelector('button.bg-slate-800')?.addEventListener('click', applyFilter);
 </script>
 @endsection

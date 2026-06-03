@@ -920,4 +920,19 @@ class ReservasiController extends Controller
             ], 500);
         }
     }
+
+    public function showAdminPusat($id)
+    {
+        $reservasi = Reservasi::with([
+            'user',
+            'bengkel',
+            'layanan',
+            'spareparts'
+        ])->findOrFail($id);
+
+        return view(
+            'admin-pusat.reservasi-detail',
+            compact('reservasi')
+        );
+    }    
 }

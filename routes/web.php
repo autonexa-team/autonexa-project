@@ -171,7 +171,12 @@ Route::middleware(['auth', 'role:admin_pusat'])
 
     // Route untuk reservasi
     Route::get('/reservasi', [ReservasiController::class, 'indexAdminPusat'])
-        ->name('reservasi');      
+        ->name('reservasi');  
+        
+    Route::get(
+        '/reservasi/{id}',
+        [ReservasiController::class, 'showAdminPusat']
+    )->name('reservasi.show');        
 
     Route::get('/laporan', [LaporanController::class, 'index'])
         ->name('laporan');

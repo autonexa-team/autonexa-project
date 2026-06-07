@@ -914,3 +914,86 @@ body {
     .fab                  { bottom: 1.25rem; right: 1.25rem; padding: .72rem 1.2rem; }
     .invoice-total        { flex-direction: column; align-items: flex-start; gap: .3rem; }
 }
+
+/* ── Foto Upload (Review) ────────────────────────────────────── */
+.foto-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .55rem 1.1rem;
+    border: 1.5px dashed var(--brand);
+    border-radius: var(--r-md);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--brand);
+    cursor: pointer;
+    transition: var(--t);
+}
+
+.foto-upload-label:hover {
+    background: var(--brand-light);
+}
+
+.foto-upload-wrap {
+    margin: 1rem 0;
+}
+
+.foto-upload-wrap label.foto-section-label {
+    font-size: .75rem;
+    font-weight: 700;
+    color: var(--txt-3);
+    display: block;
+    margin-bottom: .5rem;
+}
+
+.foto-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: .6rem;
+    margin-top: .75rem;
+}
+
+.foto-preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--r-sm);
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    background: var(--bg-subtle);
+}
+
+.foto-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.foto-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: .6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+}
+
+.foto-remove:hover {
+    background: var(--c-cancel);
+}
+
+.foto-error {
+    color: var(--c-cancel);
+    font-size: .75rem;
+    margin-top: .4rem;
+    display: none;
+}

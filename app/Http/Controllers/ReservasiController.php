@@ -9,6 +9,10 @@ use App\Models\ReservasiSparepart;
 use App\Models\User;
 use App\Models\Sparepart;
 use App\Models\Review;
+use App\Mail\ReservasiStatusMail;
+use App\Mail\ReservasiBaruMail;
+use App\Mail\ReservasiMasukAdminMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -138,9 +142,43 @@ class ReservasiController extends Controller
                 'total_biaya' => $totalBiaya,
             ]);
 
+            $reservasi->load([
+                'user',
+                'bengkel.adminCabang'
+            ]);
+
+            // email notifikasi ke pelanggan
+            Mail::to($reservasi->user->email)
+                ->send(new ReservasiBaruMail($reservasi));
+
+
+            // email notifikasi ke admin cabang
+            if (
+                $reservasi->bengkel &&
+                $reservasi->bengkel->adminCabang
+            ) {
+                Mail::to(
+                    $reservasi->bengkel->adminCabang->email
+                )->send(
+                    new ReservasiMasukAdminMail($reservasi)
+                );
+            }
+
+            // email notifikasi ke admin pusat (semua admin pusat)
+            $adminPusat = User::where('role', 'admin_pusat')->get();
+
+            foreach ($adminPusat as $admin) {
+                Mail::to($admin->email)
+                    ->send(new ReservasiBaruMail($reservasi));
+            }
+
             return redirect()
-                ->route('pelanggan.riwayat')
-                ->with('success', 'Reservasi berhasil dibuat! Nomor reservasi: #' . str_pad($reservasi->id, 6, '0', STR_PAD_LEFT));
+            ->route('pelanggan.riwayat')
+            ->with(
+                'success',
+                'Reservasi berhasil dibuat! Nomor reservasi: #' .
+                str_pad($reservasi->id, 6, '0', STR_PAD_LEFT)
+            );
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
@@ -387,7 +425,7 @@ class ReservasiController extends Controller
                 'keluhan' => $request->catatan ?? '',
                 'status' => $statusMap[$request->status ?? 'Menunggu'] ?? 'pending',
                 'total_biaya' => $totalBiaya,
-            ]);
+            ]);           
 
             return response()->json([
                 'success' => true,
@@ -411,37 +449,63 @@ class ReservasiController extends Controller
     {
         try {
             $user = Auth::user();
+
             if (!$user || !$user->isAdminCabang()) {
-                return response()->json(['success' => false, 'error' => 'Unauthorized'], 401);
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Unauthorized'
+                ], 401);
             }
 
-            $reservasi = Reservasi::findOrFail($id);
+            $reservasi = Reservasi::with(['user', 'bengkel'])
+                ->findOrFail($id);
 
             // Verify ownership
             if ($reservasi->bengkel_id !== $user->bengkel->id) {
-                return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Unauthorized'
+                ], 403);
             }
 
             $validated = $request->validate([
                 'status' => 'required|in:pending,dikonfirmasi,diproses,selesai,dibatalkan'
             ]);
 
+            // Simpan status lama
+            $oldStatus = $reservasi->status;
+
             $reservasi->update([
                 'status' => $validated['status']
             ]);
+
+            // Kirim email hanya jika status berubah
+            if (
+                $oldStatus !== $validated['status']
+                && $reservasi->user
+                && $reservasi->user->email
+            ) {
+
+                Mail::to($reservasi->user->email)
+                    ->send(new ReservasiStatusMail($reservasi));
+            }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Status berhasil diperbarui',
                 'status' => $reservasi->status
             ], 200);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal',
                 'errors' => $e->errors()
             ], 422);
+
         } catch (\Exception $e) {
+
             Log::error('Error updating reservasi status: ' . $e->getMessage(), [
                 'exception' => $e,
                 'reservasi_id' => $id

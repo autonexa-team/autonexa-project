@@ -270,5 +270,29 @@ class BengkelController extends Controller
             'bengkel' => $bengkel,
             'adminCabang' => $adminCabang,
         ]);
-    }    
+    } 
+    
+    public function destroy(int $id)
+    {
+        if (Auth::user()->role !== 'admin_pusat') {
+            abort(403);
+        }
+
+        $bengkel = Bengkel::findOrFail($id);
+
+        // hapus foto jika ada
+        if ($bengkel->foto) {
+            $fotoPath = public_path('assets/' . $bengkel->foto);
+
+            if (file_exists($fotoPath)) {
+                unlink($fotoPath);
+            }
+        }
+
+        $bengkel->delete();
+
+        return redirect()
+            ->route('admin-pusat.bengkel.index')
+            ->with('success', 'Bengkel berhasil dihapus');
+    }
 }

@@ -71,4 +71,9 @@ class Bengkel extends Model
     {
         return $this->hasMany(SlotReservasi::class);
     }    
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

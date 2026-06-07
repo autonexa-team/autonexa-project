@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Models\Notification;
 
 class ReservasiController extends Controller
 {
@@ -164,6 +165,15 @@ class ReservasiController extends Controller
                 );
             }
 
+            Notification::create([
+                'bengkel_id' => $reservasi->bengkel_id,
+                'type'       => 'reservasi',
+                'title'      => 'Reservasi Baru',
+                'message'    => auth()->user()->name .
+                                ' membuat reservasi baru untuk tanggal ' .
+                                $reservasi->tanggal,
+            ]);
+
             // email notifikasi ke admin pusat (semua admin pusat)
             $adminPusat = User::where('role', 'admin_pusat')->get();
 
@@ -190,6 +200,7 @@ class ReservasiController extends Controller
                 ->with('error', 'Terjadi kesalahan saat membuat reservasi. Silakan coba lagi.')
                 ->withInput();
         }
+        
     }
 
     /**

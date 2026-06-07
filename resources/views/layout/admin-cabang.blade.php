@@ -2,6 +2,11 @@
 <html lang="id">
 @php
     $bengkel = auth()->user()->bengkel()->first();
+    $pendingCount = $bengkel
+        ? \App\Models\Reservasi::where('bengkel_id', $bengkel->id)
+            ->where('status', 'pending')
+            ->count()
+        : 0;
 @endphp
 <head>
     <meta charset="UTF-8">
@@ -88,7 +93,11 @@
                         : 'text-slate-400 group-hover:text-brand' }}"></i>
 
                 <span class="font-medium">Reservasi</span>
-                <span class="ml-auto bg-brand/10 text-brand py-0.5 px-2 rounded-md text-xs font-bold">4</span>
+                @if($pendingCount > 0)
+                    <span class="ml-auto bg-brand/10 text-brand py-0.5 px-2 rounded-md text-xs font-bold">
+                        {{ $pendingCount }}
+                    </span>
+                @endif
             </a>
 
             <!-- layanan -->

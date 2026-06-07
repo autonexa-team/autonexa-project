@@ -86,7 +86,7 @@
                     <span class="status-dot"></span>
                     {{ $sc['label'] }}
                 </span>
-                <span style="font-size:.72rem; color:var(--txt-3);">Update terakhir: {{ $reservasi->updated_at->format('d M H:i') }}</span>
+                <span style="font-size:.72rem; color:var(--txt-3);">Update terakhir: {{ $reservasi->updated_at->timezone('Asia/Jakarta')->format('d M H:i') }} 
             </div>
         </div>
     </div>

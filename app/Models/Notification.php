@@ -19,12 +19,4 @@ class Notification extends Model
         return $this->belongsTo(Bengkel::class);
     }
 
-    Notification::create([
-        'bengkel_id' => $reservasi->bengkel_id,
-        'type'       => 'reservasi',
-        'title'      => 'Reservasi Baru',
-        'message'    => auth()->user()->name .
-                        ' membuat reservasi baru untuk tanggal ' .
-                        $reservasi->tanggal,
-    ]);
 }

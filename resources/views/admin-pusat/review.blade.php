@@ -4,6 +4,9 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin-review.css') }}">
+@endpush
+
+@push('scripts')
 <script src="{{ asset('js/admin-review.js') }}"></script>
 @endpush
 
@@ -147,8 +150,9 @@
         $initials   = strtoupper(substr($review->user->name ?? 'U', 0, 1))
                     . strtoupper(substr(explode(' ', $review->user->name ?? 'U ')[1] ?? '', 0, 1));
     @endphp
-    <!-- masih dummy -->
-    <div class="review-card {{ $ratingClass }}-card">
+    <!-- klik detail review -->
+    <div class="review-card {{ $ratingClass }}-card" 
+        onclick="window.location='{{ route('admin-pusat.review.show', $review->id) }}'"style="cursor:pointer;">
 
         {{-- Avatar --}}
         <div class="review-avatar">{{ $initials }}</div>
@@ -200,24 +204,19 @@
                     Layanan: {{ $review->reservasi->keluhan ?? 'Servis Umum' }}
                 </div>
             @endif
+
+            {{-- Foto --}}
+            @if($review->fotos && $review->fotos->isNotEmpty())
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
+                    @foreach($review->fotos->take(5) as $foto)
+                        <img src="{{ asset('storage/' . $foto->foto) }}"
+                            alt="Foto review"
+                            style="width:60px; height:60px; object-fit:cover; border-radius:6px; border:1px solid #e5e7eb;">
+                    @endforeach
+                </div>
+            @endif
+
         </div>
-
-        {{-- Foto --}}
-        @if(isset($review->foto))
-            <div class="review-photo-wrap">
-                <img
-                    src="{{ asset('storage/' . $review->foto) }}"
-                    alt="Foto review {{ $review->user->name }}"
-                    class="review-photo"
-                    loading="lazy"
-                >
-            </div>
-        @else
-            <div class="review-photo-placeholder">
-                <i class="bi bi-image"></i>
-            </div>
-        @endif
-
     </div>
     @empty
 
@@ -244,6 +243,28 @@
     @endforelse
 </div>
 
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[name="search"]');
+    const reviewList = document.querySelector('.review-list');
 
+    searchInput.addEventListener('input', function() {
+        const params = new URLSearchParams(new FormData(document.getElementById('filterForm')));
+        
+        fetch('{{ route("admin-pusat.review") }}?' + params.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => res.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newList = doc.querySelector('.review-list');
+            if (newList) reviewList.innerHTML = newList.innerHTML;
+        });
+    });
+});
+</script>
+@endpush
 
 @endsection

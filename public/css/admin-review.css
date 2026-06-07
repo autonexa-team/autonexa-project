@@ -679,13 +679,58 @@
 /* ── FOTO ────────────────────────────────────────────────────── */
 .rd-foto-section { margin-bottom: 16px; }
 
+/* Grid foto */
+.rd-foto-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
 .rd-foto {
-    width: 100%;
-    max-height: 260px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 8px;
     border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
     display: block;
+}
+
+.rd-foto:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Lightbox */
+.rd-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.rd-lightbox.active { display: flex; }
+
+.rd-lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 10px;
+    object-fit: contain;
+}
+
+.rd-lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
 }
 
 /* ── META FOOTER ─────────────────────────────────────────────── */

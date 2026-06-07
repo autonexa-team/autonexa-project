@@ -10,7 +10,7 @@ class ReviewController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Review::with(['user', 'bengkel', 'reservasi'])
+        $query = Review::with(['user', 'bengkel', 'reservasi', 'fotos'])
                        ->latest();
 
         /* Filter bengkel */
@@ -28,7 +28,7 @@ class ReviewController extends Controller
             $q = $request->search;
             $query->where(function ($q2) use ($q) {
                 $q2->whereHas('user', fn($u) => $u->where('name', 'like', "%{$q}%"))
-                   ->orWhere('komentar', 'like', "%{$q}%");
+                ->orWhere('komentar', 'like', "%{$q}%");
             });
         }
 
@@ -55,13 +55,27 @@ class ReviewController extends Controller
 
     // ReviewController
     public function show($id) {
-        $review = Review::with(['user', 'bengkel', 'reservasi.mekanik'])->findOrFail($id);
+        $review = Review::with(['user', 'bengkel', 'reservasi', 'fotos'])->findOrFail($id);
+        
+        $rating = $review->rating;
+        $ratingClass = $rating >= 4 ? 'rating-hi' : ($rating >= 3 ? 'rating-mid' : 'rating-low');
+        $ratingLabel = $rating >= 4 ? 'Bagus' : ($rating >= 3 ? 'Cukup' : 'Kurang');
+        $initials = strtoupper(substr($review->user->name ?? 'U', 0, 1))
+                . strtoupper(substr(explode(' ', $review->user->name ?? 'U ')[1] ?? '', 0, 1));
+
         $riwayatReview = Review::with('bengkel')
             ->where('user_id', $review->user_id)
             ->where('id', '!=', $review->id)
             ->latest()->take(3)->get();
-        return view('admin-pusat.review-detail', compact('review', 'riwayatReview'));
-    }  
+
+        $avgRatingUser = $riwayatReview->avg('rating') 
+            ? round(($riwayatReview->sum('rating') + $rating) / ($riwayatReview->count() + 1), 1)
+            : $rating;
+
+        return view('admin-pusat.review-detail', compact(
+            'review', 'riwayatReview', 'rating', 'ratingClass', 'ratingLabel', 'initials', 'avgRatingUser'
+        ));
+    } 
     
     public function indexCabang(Request $request)
     {

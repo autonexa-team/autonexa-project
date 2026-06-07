@@ -87,16 +87,19 @@
                 </div>
 
                 {{-- Foto (jika ada) --}}
-                @if($review->foto)
+                @if($review->fotos && $review->fotos->isNotEmpty())
                     <div class="rd-foto-section">
                         <div class="rd-section-label">
                             <i class="bi bi-images"></i> Foto Ulasan
                         </div>
-                        <img
-                            src="{{ asset('storage/' . $review->foto) }}"
-                            alt="Foto review"
-                            class="rd-foto"
-                        >
+                        <div class="rd-foto-grid">
+                            @foreach($review->fotos as $foto)
+                                <img src="{{ asset('storage/' . $foto->foto) }}"
+                                    alt="Foto review"
+                                    class="rd-foto"
+                                    onclick="openLightbox(this.src)">
+                            @endforeach
+                        </div>
                     </div>
                 @endif
 
@@ -155,10 +158,6 @@
                     <span class="rd-info-value">
                         {{ \Carbon\Carbon::parse($review->reservasi->tanggal)->translatedFormat('l, d M Y') }}
                     </span>
-                </div>
-                <div class="rd-info-row">
-                    <span class="rd-info-label">Mekanik</span>
-                    <span class="rd-info-value">{{ $review->reservasi->mekanik->name ?? '-' }}</span>
                 </div>
                 <div class="rd-info-row">
                     <span class="rd-info-label">Status</span>
@@ -229,7 +228,7 @@
                     </div>
                     <div class="rd-side-stat">
                         <span class="rd-side-stat-num">
-                            {{ number_format($riwayatReview->push((object)['rating'=>$rating])->avg('rating'), 1) }}
+                            {{ number_format($avgRatingUser, 1) }}
                         </span>
                         <span class="rd-side-stat-lbl">Avg Rating</span>
                     </div>
@@ -265,6 +264,25 @@
 
     </div>
 </div>
+
+{{-- Lightbox --}}
+<div class="rd-lightbox" id="rdLightbox" onclick="closeLightbox()">
+    <span class="rd-lightbox-close" onclick="closeLightbox()">&times;</span>
+    <img id="rdLightboxImg" src="" alt="Preview">
+</div>
+
+@push('scripts')
+<script>
+function openLightbox(src) {
+    document.getElementById('rdLightboxImg').src = src;
+    document.getElementById('rdLightbox').classList.add('active');
+}
+function closeLightbox() {
+    document.getElementById('rdLightbox').classList.remove('active');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+@endpush
 
 @endsection
 

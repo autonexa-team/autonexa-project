@@ -254,9 +254,9 @@ $cancelled = $reservasi
                     {{-- Aksi --}}
                     <td>
                         <div class="rv-td-aksi">
-                            <a href="{{ route('admin-pusat.reservasi.show', $res->id) }}"
-                               class="rv-btn-aksi rv-btn-view" title="Lihat Detail">
-                                <i class="bi bi-eye"></i>
+                            <a href="{{ route('admin-pusat.bengkel.show', $res->bengkel_id) }}"
+                                class="rv-btn-aksi rv-btn-view" title="Lihat Bengkel">
+                                    <i class="bi bi-eye"></i>
                             </a>
                         </div>
                     </td>
@@ -284,9 +284,30 @@ $cancelled = $reservasi
     </div>
 
     {{-- Pagination --}}
-    @if(method_exists($reservasi, 'links'))
-    <div class="rv-pagination">
-        {{ $reservasi->links() }}
+    @if($reservasi->hasPages())
+    <div class="rv-pagination" style="display:flex; justify-content:center; gap:8px; padding:16px;">
+        {{-- Previous --}}
+        @if($reservasi->onFirstPage())
+            <span style="padding:8px 14px; border-radius:8px; background:#f1f5f9; color:#94a3b8; font-weight:600;">‹</span>
+        @else
+            <a href="{{ $reservasi->previousPageUrl() }}" style="padding:8px 14px; border-radius:8px; background:#f1f5f9; color:#64748b; font-weight:600; text-decoration:none;">‹</a>
+        @endif
+
+        {{-- Page numbers --}}
+        @foreach($reservasi->getUrlRange(1, $reservasi->lastPage()) as $page => $url)
+            @if($page == $reservasi->currentPage())
+                <span style="padding:8px 14px; border-radius:8px; background:#ff6a00; color:white; font-weight:600;">{{ $page }}</span>
+            @else
+                <a href="{{ $url }}" style="padding:8px 14px; border-radius:8px; background:#f1f5f9; color:#64748b; font-weight:600; text-decoration:none;">{{ $page }}</a>
+            @endif
+        @endforeach
+
+        {{-- Next --}}
+        @if($reservasi->hasMorePages())
+            <a href="{{ $reservasi->nextPageUrl() }}" style="padding:8px 14px; border-radius:8px; background:#f1f5f9; color:#64748b; font-weight:600; text-decoration:none;">›</a>
+        @else
+            <span style="padding:8px 14px; border-radius:8px; background:#f1f5f9; color:#94a3b8; font-weight:600;">›</span>
+        @endif
     </div>
     @endif
 

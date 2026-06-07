@@ -279,6 +279,31 @@
                         </div>
                         <textarea class="rating-textarea" id="ratingText"
                                   placeholder="Tuliskan ulasanmu di sini (opsional)..."></textarea>
+
+                        {{-- INPUT FOTO --}}
+                        <div class="foto-upload-wrap" style="margin: 1rem 0;">
+                            <label style="font-size:.8rem; font-weight:700; color:var(--txt-3); display:block; margin-bottom:.5rem;">
+                                <i class="fas fa-camera" style="color:var(--brand);"></i>
+                                Lampirkan Foto <span style="font-weight:400;">(opsional, maks. 5 foto)</span>
+                            </label>
+
+                            <label for="fotoInput" class="foto-upload-label">
+                                <i class="fas fa-plus"></i>
+                                <span>Pilih Foto</span>
+                                <input type="file" id="fotoInput" multiple accept="image/*" style="display:none;">
+                            </label>
+
+                            <div id="fotoPreviewGrid" style="
+                                display:grid;
+                                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                                gap:.6rem;
+                                margin-top:.75rem;
+                            "></div>
+                            <p id="fotoError" style="color:#ef4444; font-size:.75rem; margin-top:.4rem; display:none;">
+                                Maksimal 5 foto, masing-masing maks. 2MB.
+                            </p>
+                        </div>
+
                         <button class="btn btn--primary btn--full" id="submitRating">
                             <i class="fas fa-paper-plane"></i> Kirim Ulasan
                         </button>
@@ -606,19 +631,118 @@
         });
     });
 
-    document.getElementById('submitRating')?.addEventListener('click', function () {
-        if (!selectedRating) {
-            this.textContent = 'Pilih bintang dulu!';
-            this.style.background = 'var(--c-waiting)';
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Ulasan';
-                this.style.background = '';
-            }, 1800);
-            return;
+    /* ══════════════════════════
+   FOTO UPLOAD PREVIEW
+══════════════════════════ */
+let selectedFiles = [];
+
+document.getElementById('fotoInput')?.addEventListener('change', function () {
+    const MAX     = 5;
+    const MAX_MB  = 2 * 1024 * 1024;
+    const errEl   = document.getElementById('fotoError');
+    const grid    = document.getElementById('fotoPreviewGrid');
+
+    errEl.style.display = 'none';
+
+    // Gabungkan file lama + baru, buang duplikat nama
+    const newFiles = Array.from(this.files);
+    const merged   = [...selectedFiles];
+
+    for (const f of newFiles) {
+        if (merged.length >= MAX) {
+            errEl.textContent   = 'Maksimal 5 foto.';
+            errEl.style.display = 'block';
+            break;
         }
-        document.getElementById('ratingForm').style.display   = 'none';
-        document.getElementById('ratingDone').classList.add('show');
+        if (f.size > MAX_MB) {
+            errEl.textContent   = `File "${f.name}" melebihi 2MB.`;
+            errEl.style.display = 'block';
+            continue;
+        }
+        if (!merged.find(x => x.name === f.name)) merged.push(f);
+    }
+
+    selectedFiles = merged;
+    renderPreviews();
+    this.value = ''; // reset input agar file sama bisa dipilih ulang
+});
+
+function renderPreviews() {
+    const grid = document.getElementById('fotoPreviewGrid');
+    grid.innerHTML = '';
+
+    selectedFiles.forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const item = document.createElement('div');
+            item.className = 'foto-preview-item';
+            item.innerHTML = `
+                <img src="${ev.target.result}" alt="preview">
+                <button class="foto-remove" onclick="removePhoto(${idx})">
+                    <i class="fas fa-times"></i>
+                </button>`;
+            grid.appendChild(item);
+        };
+        reader.readAsDataURL(file);
     });
+}
+
+window.removePhoto = function(idx) {
+    selectedFiles.splice(idx, 1);
+    renderPreviews();
+};
+
+/* ══════════════════════════
+   SUBMIT RATING
+══════════════════════════ */
+document.getElementById('submitRating')?.addEventListener('click', async function () {
+    if (!selectedRating) {
+        this.textContent = 'Pilih bintang dulu!';
+        this.style.background = 'var(--c-waiting)';
+        setTimeout(() => {
+            this.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Ulasan';
+            this.style.background = '';
+        }, 1800);
+        return;
+    }
+
+    // Kirim ke server via FormData
+    const formData = new FormData();
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('rating',       selectedRating);
+    formData.append('komentar',     document.getElementById('ratingText').value);
+    formData.append('reservasi_id', '{{ $reservasi->id }}');
+    formData.append('bengkel_id',   '{{ $reservasi->bengkel_id }}');
+
+    selectedFiles.forEach(file => {
+        formData.append('fotos[]', file);
+    });
+
+    this.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+    this.disabled   = true;
+
+    try {
+        const res = await fetch('{{ route("pelanggan.review.store") }}', {
+            method: 'POST',
+            body:   formData,
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            document.getElementById('ratingForm').style.display = 'none';
+            document.getElementById('ratingDone').classList.add('show');
+        } else {
+            alert(data.message ?? 'Gagal mengirim ulasan.');
+            this.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Ulasan';
+            this.disabled  = false;
+        }
+    } catch (e) {
+        alert('Terjadi kesalahan. Coba lagi.');
+        this.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Ulasan';
+        this.disabled  = false;
+    }
+});
 
     /* ══════════════════════════
        CANCEL MODAL

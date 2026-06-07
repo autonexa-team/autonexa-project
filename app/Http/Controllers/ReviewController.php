@@ -249,4 +249,33 @@ class ReviewController extends Controller
             'periode'
         ));
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'rating'      => 'required|integer|min:1|max:5',
+            'komentar'    => 'nullable|string|max:1000',
+            'fotos'       => 'nullable|array|max:5',
+            'fotos.*'     => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'reservasi_id'=> 'required|exists:reservasis,id',
+            'bengkel_id'  => 'required|exists:bengkels,id',
+        ]);
+
+        $review = Review::create([
+            'user_id'      => auth()->id(),
+            'bengkel_id'   => $request->bengkel_id,
+            'reservasi_id' => $request->reservasi_id,
+            'rating'       => $request->rating,
+            'komentar'     => $request->komentar,
+        ]);
+
+        if ($request->hasFile('fotos')) {
+            foreach ($request->file('fotos') as $foto) {
+                $path = $foto->store('reviews', 'public');
+                $review->fotos()->create(['foto' => $path]);
+            }
+        }
+
+        return response()->json(['message' => 'Berhasil!']);
+    }
 }

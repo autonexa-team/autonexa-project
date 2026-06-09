@@ -161,7 +161,9 @@
 
                     <div class="card-img-wrap">
                         <img
-                            src="{{ $bengkel->foto ? asset('storage/'.$bengkel->foto) : asset('img/bengkel-default.jpg') }}"
+                            src="{{ $bengkel->foto
+                                ? asset('assets/'.$bengkel->foto)
+                                : asset('img/bengkel-default.jpg') }}"
                             class="card-img"
                             alt="{{ $bengkel->nama }}"
                             loading="lazy">
@@ -181,10 +183,10 @@
                         <div class="card-meta">
                             <div class="card-stars">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <i class="bi bi-star{{ $i <= round($bengkel->reviews_avg_rating ?? 0) ? '-fill star-on' : ' star-off' }}"></i>
+                                    <i class="bi bi-star{{ $i <= round($bengkel->review_avg_rating ?? 0) ? '-fill star-on' : ' star-off' }}"></i>
                                 @endfor
                                 <span class="rating-val">
-                                    {{ number_format($bengkel->reviews_avg_rating ?? 0, 1) }}
+                                    {{ number_format($bengkel->review_avg_rating ?? 0, 1) }}
                                 </span>
                                 <span class="review-count">({{ $bengkel->reviews_count ?? 0 }} ulasan)</span>
                             </div>

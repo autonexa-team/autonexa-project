@@ -196,16 +196,21 @@
                 <h3 class="font-bold text-slate-800">Lampiran Foto</h3>
             </div>
             <div class="p-6">
-                @if($review->foto)
+                @if($review->fotos && $review->fotos->count() > 0)
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        @foreach($review->fotos as $foto)
                         <div class="aspect-square rounded-xl overflow-hidden shadow-sm border border-slate-200 group/img relative cursor-pointer hover:shadow-lg hover:ring-2 hover:ring-brand/50 transition-all duration-300">
-                            <img src="{{ asset('storage/' . $review->foto) }}" alt="Foto review" class="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-700 ease-out">
+                            <img src="{{ asset('storage/' . $foto->foto) }}" alt="Foto review" class="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-700 ease-out">
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white">
                                 <i class="fas fa-search-plus text-3xl"></i>
                             </div>
                         </div>
+                        @endforeach
                     </div>
-                    <p class="text-xs text-slate-400 mt-4 font-bold flex items-center"><i class="fas fa-info-circle mr-1 text-slate-300"></i> Klik gambar untuk memperbesar.</p>
+                    <p class="text-xs text-slate-400 mt-4 font-bold flex items-center">
+                        <i class="fas fa-info-circle mr-1 text-slate-300"></i>
+                        {{ $review->fotos->count() }} foto dilampirkan. Klik untuk memperbesar.
+                    </p>
                 @else
                     <div class="flex flex-col items-center justify-center py-8 text-slate-300">
                         <i class="fas fa-image text-4xl mb-2"></i>
@@ -246,5 +251,44 @@
         @endif
     </div>
 </div>
+
+<!-- Lightbox Modal -->
+<div id="lightboxModal"
+     onclick="closeLightbox()"
+     style="display:none; position:fixed; inset:0; z-index:9999;
+            background:rgba(0,0,0,0.85); backdrop-filter:blur(6px);
+            align-items:center; justify-content:center; padding:1rem; cursor:zoom-out;">
+    <div style="position:relative; max-width:90vw; max-height:90vh;">
+        <img id="lightboxImg" src="" alt="Preview"
+             style="max-width:90vw; max-height:85vh; border-radius:12px;
+                    object-fit:contain; box-shadow:0 25px 60px rgba(0,0,0,0.5);">
+        <button onclick="closeLightbox()"
+                style="position:absolute; top:-12px; right:-12px;
+                       width:32px; height:32px; border-radius:50%;
+                       background:#fff; border:none; cursor:pointer;
+                       display:flex; align-items:center; justify-content:center;
+                       font-size:.85rem; color:#333; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+function openLightbox(url) {
+    document.getElementById('lightboxImg').src = url;
+    const modal = document.getElementById('lightboxModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightboxModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+});
+</script>
 
 @endsection

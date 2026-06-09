@@ -41,42 +41,42 @@ document.addEventListener('DOMContentLoaded', function () {
     //     (dijalankan di halaman LIST, bukan detail)
     // ═══════════════════════════════════════════════
 
-    const reviewCards = document.querySelectorAll('.review-card');
+    // const reviewCards = document.querySelectorAll('.review-card');
 
-    if (reviewCards.length > 0) {
-        reviewCards.forEach(card => {
-            // Cursor pointer agar terasa klikable
-            card.style.cursor = 'pointer';
+    // if (reviewCards.length > 0) {
+    //     reviewCards.forEach(card => {
+    //         // Cursor pointer agar terasa klikable
+    //         card.style.cursor = 'pointer';
 
-            // Tambah class transisi hover jika belum ada di CSS
-            card.addEventListener('mouseenter', function () {
-                this.style.transform    = 'translateY(-2px)';
-                this.style.boxShadow    = '0 8px 24px rgba(0,0,0,0.09)';
-                this.style.transition   = 'all 0.18s ease';
-            });
+    //         // Tambah class transisi hover jika belum ada di CSS
+    //         card.addEventListener('mouseenter', function () {
+    //             this.style.transform    = 'translateY(-2px)';
+    //             this.style.boxShadow    = '0 8px 24px rgba(0,0,0,0.09)';
+    //             this.style.transition   = 'all 0.18s ease';
+    //         });
 
-            card.addEventListener('mouseleave', function () {
-                this.style.transform = '';
-                this.style.boxShadow = '';
-            });
+    //         card.addEventListener('mouseleave', function () {
+    //             this.style.transform = '';
+    //             this.style.boxShadow = '';
+    //         });
 
-            card.addEventListener('click', function (e) {
-                // Jangan navigate jika klik di tombol / link di dalam card
-                if (e.target.closest('a, button')) return;
+    //         card.addEventListener('click', function (e) {
+    //             // Jangan navigate jika klik di tombol / link di dalam card
+    //             if (e.target.closest('a, button')) return;
 
-                const reviewId = this.dataset.reviewId;
-                if (!reviewId) return;
+    //             const reviewId = this.dataset.reviewId;
+    //             if (!reviewId) return;
 
-                // Tambah efek ripple klik
-                this.style.opacity = '0.7';
+    //             // Tambah efek ripple klik
+    //             this.style.opacity = '0.7';
 
-                // Navigasi ke halaman detail
-                const baseUrl = document.getElementById('reviewBaseUrl')?.value
-                             || '/admin-pusat/review';
-                window.location.href = `${baseUrl}/${reviewId}`;
-            });
-        });
-    }
+    //             // Navigasi ke halaman detail
+    //             const baseUrl = document.getElementById('reviewBaseUrl')?.value
+    //                          || '/admin-pusat/review';
+    //             window.location.href = `${baseUrl}/${reviewId}`;
+    //         });
+    //     });
+    // }
 
     // ═══════════════════════════════════════════════
     //  2. ANIMASI BAR BINTANG (halaman detail)

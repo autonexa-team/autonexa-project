@@ -9,10 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
     ───────────────────────────────────── */
     if (typeof AOS !== 'undefined') {
         AOS.init({
-            duration: 800,
-            easing: 'ease-out-cubic',
+            duration: 600,       // lebih cepat dari 800
+            easing: 'ease-out-quart',
             once: false,
-            offset: 80,
+            offset: 60,
+            delay: 0,
         });
     }
 

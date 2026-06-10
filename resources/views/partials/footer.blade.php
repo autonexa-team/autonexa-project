@@ -9,7 +9,7 @@
                 <div class="footer-col">
                     <div class="footer-brand-name">
                         
-                        <img src="{{ asset('assets/logo.png') }}" alt="Autonexa Logo" class="logo-img">
+                        <img src="{{ asset('assets/LogoAutoNexa_v2.svg') }}" alt="Autonexa Logo" class="logo-img">
                         AutoNexa
                     </div>                 
                     <p class="footer-desc">

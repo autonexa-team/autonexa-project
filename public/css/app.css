@@ -52,7 +52,7 @@
 }
 
 body {
-    font-family: 'Geist', sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;  /* ← ganti dari Geist */
     background: linear-gradient(135deg, #fff7f2 0%, #ffe9dc 30%, #ffd4bd 60%, #ffffff 100%);
     color: var(--foreground);
     overflow-x: hidden;
@@ -79,11 +79,13 @@ body {
     position: fixed;
     top: 16px;
     left: 0;
+    height: 64px;
     width: 100%;
     z-index: 999;
     display: flex;
     justify-content: center;
-    transition: var(--transition);
+    overflow: visible; /* ← ganti dari visible ke hidden */
+    transition: top 0.4s cubic-bezier(0.22, 1, 0.36, 1); /* ← tambah ini */
 }
 
 .nav-container {
@@ -98,8 +100,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
-    transition: var(--transition);
+    gap: 24px;    
+    height: 100%;
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                padding 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                background 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1); /* ← semua properti yang berubah */    
 }
 
 /* Shrink on scroll */
@@ -142,9 +149,10 @@ body {
 }
 
 .logo-img {
-    height: 32px;
+    height: 40px;      /* kecil tapi proporsional */
     width: auto;
     object-fit: contain;
+    display: block;
 }
 
 
@@ -548,6 +556,8 @@ body {
     .nav-container {
         flex-wrap: wrap;
         padding: 14px 20px;
+        height: 64px;
+        display: flex;
     }
 
     .nav-menu.active {

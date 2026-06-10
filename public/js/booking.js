@@ -105,24 +105,43 @@
     /* Ganti bengkel */
     btnGanti?.addEventListener('click', () => {
         bengkelCards.forEach(c => c.classList.remove('active'));
-        bengkelList.style.display    = 'block';
+        bengkelList.style.display    = 'none';   // ← tetap none, tunggu search
         bengkelPreview.style.display = 'none';
         bengkelIdInput.value         = '';
         bengkelIdForm.value          = '';
         selectedBengkelData          = {};
+
+        // ← TAMBAH INI — sembunyikan layanan & reset
+        const layananWrapper = document.getElementById('layananWrapper');
+        if (layananWrapper) layananWrapper.style.display = 'none';
+        selectedLayanan = null;
+        if (estimasiBox) estimasiBox.style.display = 'none';
+
+        // Tampilkan empty state bengkel
+        const bengkelEmpty = document.getElementById('bengkelEmpty');
+        if (bengkelEmpty) bengkelEmpty.style.display = 'block';
+
         updateRingkasan();
     });
-
+    
     /* Search */
-    searchInput?.addEventListener('input', function () {
-        const q = this.value.toLowerCase();
-        bengkelCards.forEach(card => {
-            const nama   = card.dataset.nama.toLowerCase();
-            const alamat = card.dataset.alamat.toLowerCase();
-            card.style.display = (nama.includes(q) || alamat.includes(q)) ? 'flex' : 'none';
-        });
-    });
+    const bengkelEmpty = document.getElementById('bengkelEmpty');
 
+    searchInput?.addEventListener('input', function () {
+        const q = this.value.trim().toLowerCase();
+        if (q.length > 0) {
+            bengkelList.style.display = 'block';
+            if (bengkelEmpty) bengkelEmpty.style.display = 'none';
+            bengkelCards.forEach(card => {
+                const nama   = card.dataset.nama.toLowerCase();
+                const alamat = card.dataset.alamat.toLowerCase();
+                card.style.display = (nama.includes(q) || alamat.includes(q)) ? 'flex' : 'none';
+            });
+        } else {
+            bengkelList.style.display = 'none';
+            if (bengkelEmpty) bengkelEmpty.style.display = 'block';
+        }
+    });
     /* ================================================================
     BENGKEL TERDEKAT
     ================================================================ */
@@ -354,6 +373,57 @@
             updateRingkasan();
         });
     });
+
+    /* ================================================================
+    LAYANAN DROPDOWN
+    ================================================================ */
+    const btnGantiLayanan = document.getElementById('btnGantiLayanan');
+    const layananDropdown = document.getElementById('layananDropdown');
+
+    btnGantiLayanan?.addEventListener('click', function () {
+        const isOpen = layananDropdown.style.display !== 'none';
+        layananDropdown.style.display = isOpen ? 'none' : 'block';
+        this.classList.toggle('open', !isOpen);
+    });
+
+    document.getElementById('layananDropdown')?.addEventListener('click', function (e) {
+        const card = e.target.closest('.layanan-card');
+        if (!card) return;
+
+        // Update selected layanan
+        selectedLayanan = {
+            id     : card.dataset.id,
+            nama   : card.dataset.nama,
+            durasi : parseInt(card.dataset.durasi) || 0,
+            harga  : parseInt(card.dataset.harga)  || 0,
+        };
+
+        // Update display card
+        const displayCard = document.getElementById('layananDefaultCard');
+        if (displayCard) {
+            displayCard.dataset.id    = card.dataset.id;
+            displayCard.dataset.harga = card.dataset.harga;
+            displayCard.querySelector('.layanan-nama').textContent = card.dataset.nama;
+            displayCard.querySelector('.badge-durasi').innerHTML   =
+                `<i class="bi bi-clock"></i> ~${card.dataset.durasi} menit`;
+            displayCard.querySelector('.badge-harga').innerHTML    =
+                `<i class="bi bi-cash"></i> Mulai Rp ${parseInt(card.dataset.harga).toLocaleString('id-ID')}`;
+        }
+
+        // Set hidden input & update estimasi
+        document.getElementById('layananIdForm').value = selectedLayanan.id;
+        document.getElementById('estNama').textContent   = selectedLayanan.nama;
+        document.getElementById('estDurasi').textContent = `± ${selectedLayanan.durasi} menit`;
+        document.getElementById('estHarga').textContent  = 'Rp ' + selectedLayanan.harga.toLocaleString('id-ID');
+        document.getElementById('estTotal').textContent  = 'Rp ' + selectedLayanan.harga.toLocaleString('id-ID') + '+';
+        if (estimasiBox) estimasiBox.style.display = 'block';
+
+        // Tutup dropdown
+        layananDropdown.style.display = 'none';
+        btnGantiLayanan.classList.remove('open');
+
+        updateRingkasan();
+    });    
 
     /* ================================================================
        FOTO KENDARAAN

@@ -116,11 +116,12 @@ Route::middleware(['auth', 'role:pelanggan'])
         ->name('profile.update');
         
     Route::get('/dashboard', function () {
-    return view('pelanggan.dashboard');
-    })->name('dashboard');
-
+        return view('pelanggan.dashboard');
+    })->name('dashboard');   
+    
     Route::post('/review', [ReviewController::class, 'store'])
-        ->name('review.store');     
+                ->name('review.store');    
+
 });
 
 
@@ -171,13 +172,14 @@ Route::middleware(['auth', 'role:admin_pusat'])
     // $reviews = Review::with(['user','bengkel'])->paginate(10);
     // $totalReview = Review::count();
 
-    Route::post('/pelanggan/review', [ReviewController::class, 'store'])
-     ->name('pelanggan.review.store')
-     ->middleware('auth');
-
     // Route untuk reservasi
     Route::get('/reservasi', [ReservasiController::class, 'indexAdminPusat'])
-        ->name('reservasi');          
+        ->name('reservasi');  
+        
+    Route::get(
+        '/reservasi/{id}',
+        [ReservasiController::class, 'showAdminPusat']
+    )->name('reservasi.show');        
 
     Route::get('/laporan', [LaporanController::class, 'index'])
         ->name('laporan');

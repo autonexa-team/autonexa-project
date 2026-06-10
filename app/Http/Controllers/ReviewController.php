@@ -288,7 +288,7 @@ class ReviewController extends Controller
                 $path = $foto->store('reviews', 'public');
                 $review->fotos()->create(['foto' => $path]);
             }
-        }
+        } 
 
         return response()->json(['message' => 'Berhasil!']);
     }

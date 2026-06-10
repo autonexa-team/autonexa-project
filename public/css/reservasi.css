@@ -584,6 +584,67 @@
     margin-top: 2px;
 }
 
+/* Bengkel empty state */
+.bengkel-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--foreground-soft);
+}
+.bengkel-empty i {
+    font-size: 32px;
+    opacity: 0.3;
+    display: block;
+    margin-bottom: 10px;
+}
+.bengkel-empty p {
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Tombol ganti layanan */
+.btn-ganti-layanan {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--foreground-thin);
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    transition: all 0.2s;
+}
+.btn-ganti-layanan:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-dim);
+}
+.btn-ganti-layanan i {
+    transition: transform 0.2s;
+}
+.btn-ganti-layanan.open i {
+    transform: rotate(180deg);
+}
+
+/* Dropdown layanan */
+.layanan-dropdown {
+    margin-top: 8px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 /* BUTTON SUBMIT */
 .btn-reservasi {
     width: 100%;

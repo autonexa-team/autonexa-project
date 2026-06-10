@@ -62,7 +62,7 @@
                 </div>
 
                 {{-- Daftar Bengkel --}}
-                <div class="bengkel-list" id="bengkelList">
+                <div class="bengkel-list" id="bengkelList" style="display:none;">
                     @foreach($bengkels as $bengkel)
                     @php
                         $kapasitas   = $bengkel->kapasitas ?? 8;
@@ -111,6 +111,12 @@
                     </div>
                     @endforeach
                 </div>
+
+                {{-- Placeholder saat belum search --}}
+                <div class="bengkel-empty" id="bengkelEmpty">
+                    <i class="bi bi-search"></i>
+                    <p>Ketik nama bengkel untuk mencari</p>
+                </div>                
 
                 <input type="hidden" name="bengkel_id" id="bengkelId">
                 @error('bengkel_id')<div class="field-error">{{ $message }}</div>@enderror
@@ -168,6 +174,81 @@
                 </div>
             </div>
         </div>
+
+        {{-- BLOK LAYANAN — hidden by default --}}
+        <div class="form-field layanan-wrapper" id="layananWrapper" style="display:none;">
+            <label class="field-label">
+                <i class="bi bi-wrench-adjustable-circle"></i>
+                Pilih Layanan Utama
+                <span class="label-optional">· pilih satu</span>
+            </label>
+
+            {{-- Layanan terpilih / default --}}
+            <div class="layanan-selected-display" id="layananSelectedDisplay">
+                <div class="layanan-card" id="layananDefaultCard"
+                    data-id="{{ $layanans->first()->id ?? '' }}"
+                    data-nama="{{ $layanans->first()->nama ?? '' }}"
+                    data-durasi="{{ $layanans->first()->durasi ?? '' }}"
+                    data-harga="{{ $layanans->first()->harga ?? 0 }}">
+                    <div class="layanan-radio selected-indicator">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div class="layanan-detail">
+                        <div class="layanan-nama">{{ $layanans->first()->nama ?? 'Pilih layanan' }}</div>
+                        @if($layanans->first()?->deskripsi)
+                            <div class="layanan-desc">{{ $layanans->first()->deskripsi }}</div>
+                        @endif
+                        <div class="layanan-badges">
+                            <span class="badge-durasi">
+                                <i class="bi bi-clock"></i> ~{{ $layanans->first()->durasi ?? '-' }} menit
+                            </span>
+                            <span class="badge-harga">
+                                <i class="bi bi-cash"></i> Mulai Rp {{ number_format($layanans->first()->harga ?? 0, 0, ',', '.') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Tombol ganti layanan --}}
+            <button type="button" class="btn-ganti-layanan" id="btnGantiLayanan">
+                <i class="bi bi-chevron-down" id="iconGantiLayanan"></i>
+                Pilih layanan lain
+            </button>
+
+            {{-- Dropdown list layanan lain --}}
+            <div class="layanan-dropdown" id="layananDropdown" style="display:none;">
+                <div class="layanan-list" id="layananList">
+                    @foreach($layanans as $layanan)
+                    <div class="layanan-card"
+                        data-id="{{ $layanan->id }}"
+                        data-nama="{{ $layanan->nama }}"
+                        data-durasi="{{ $layanan->durasi }}"
+                        data-harga="{{ $layanan->harga }}">
+                        <div class="layanan-radio">
+                            <div class="layanan-radio-dot"></div>
+                        </div>
+                        <div class="layanan-detail">
+                            <div class="layanan-nama">{{ $layanan->nama }}</div>
+                            @if($layanan->deskripsi)
+                                <div class="layanan-desc">{{ $layanan->deskripsi }}</div>
+                            @endif
+                            <div class="layanan-badges">
+                                <span class="badge-durasi">
+                                    <i class="bi bi-clock"></i> ~{{ $layanan->durasi }} menit
+                                </span>
+                                <span class="badge-harga">
+                                    <i class="bi bi-cash"></i> Mulai Rp {{ number_format($layanan->harga, 0, ',', '.') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            @error('layanan_id')<div class="field-error">{{ $message }}</div>@enderror
+        </div>        
 
         {{-- ===== BLOK 3: DETAIL RESERVASI ===== --}}
         <div class="reservasi-block" id="blok-form">

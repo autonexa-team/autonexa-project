@@ -15,6 +15,11 @@
     {{-- AOS Animation --}}
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
+    {{-- Plus Jakarta Sans --}}                                          {{-- ← TAMBAH INI --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
     {{-- App CSS --}}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 

@@ -1,20 +1,36 @@
 <x-mail::message>
-# Reset Password AutoNexa
 
-Halo {{ $userName }},
+<div style="text-align:center;">
 
-Kami menerima permintaan reset password untuk akun:
+    # Reset Password AutoNexa
 
-<strong>{{ $userEmail }}</strong>
+    Halo **{{ $userName }}**,
+
+    Kami menerima permintaan reset password untuk akun:
+
+    <strong>{{ $userEmail }}</strong>
+
+<br>
 
 <x-mail::button :url="$resetUrl">
-Reset Password
+    Reset Password
 </x-mail::button>
 
-Link reset password berlaku selama {{ $expireMin }} menit.
+<br>
 
-Jika kamu tidak meminta reset password, abaikan email ini.
+    Link reset password berlaku selama
+    <strong>{{ $expireMin }} menit</strong>.
+
+<br>
+
+    Jika kamu tidak meminta reset password,
+    abaikan email ini.
+
+<br><br>
 
 Terima kasih,<br>
-AutoNexa
+<strong>AutoNexa</strong>
+
+</div>
+
 </x-mail::message>

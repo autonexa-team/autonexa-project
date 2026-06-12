@@ -16,7 +16,7 @@
 
         {{-- Breadcrumb --}}
         <div class="detail-header__breadcrumb">
-            <a href="{{ route('pelanggan.dashboard') }}">
+            <a href="{{ route('dashboard') }}">
                 <i class="fas fa-home"></i> Beranda
             </a>
             <span class="sep"><i class="fas fa-chevron-right"></i></span>
@@ -722,7 +722,7 @@ document.getElementById('submitRating')?.addEventListener('click', async functio
     this.disabled   = true;
 
     try {
-        const res = await fetch('{{ route("pelanggan.review.store") }}', {
+        const res = await fetch('{{ route("review.store") }}', {
             method: 'POST',
             body:   formData,
         });

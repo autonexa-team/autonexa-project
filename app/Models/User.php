@@ -31,14 +31,14 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'google_id',
-        'role',
-        'phone',
-        'foto_profil'
-    ];
+    'name',
+    'email',
+    'password',
+    'google_id',
+    'role',
+    'phone',
+    'foto',
+];
 
     protected $hidden = [
         'password',

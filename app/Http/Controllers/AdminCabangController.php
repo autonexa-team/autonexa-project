@@ -294,20 +294,38 @@ class AdminCabangController extends Controller
             })->count();
 
         $totalTidakAktif = User::where('role', 'pelanggan')
-            ->whereHas('reservasi', fn($q) => $q->where('bengkel_id', $bengkel->id))
-            ->whereDoesntHave('reservasi', function ($q) use ($bengkel) {
-                $q->where('bengkel_id', $bengkel->id)
-                ->where('tanggal', '>=', now()->subMonths(3)->toDateString()); // ← 'tanggal'
-            })->count();
+        ->whereHas('reservasi', fn($q) => $q->where('bengkel_id', $bengkel->id))
+        ->whereDoesntHave('reservasi', function ($q) use ($bengkel) {
+            $q->where('bengkel_id', $bengkel->id)
+            ->where('tanggal', '>=', now()->subMonths(3)->toDateString());
+        })->count();
 
-        return view('admin-cabang.pelanggan-cabang', compact(
-            'pelanggan',
-            'totalPelanggan',
-            'totalAktif',
-            'totalBaru',
-            'totalTidakAktif',
-            'status'
-        ));
+        $pelangganData = $pelanggan->getCollection()->mapWithKeys(function ($p) {
+            return [
+                $p->id => [
+                    'name' => $p->name,
+                    'custId' => 'CUST-' . str_pad($p->id, 3, '0', STR_PAD_LEFT),
+                    'phone' => $p->phone ?? '-',
+                    'email' => $p->email,
+                    'totalReservasi' => $p->total_reservasi,
+                    'terakhirReservasi' => $p->terakhir_reservasi
+                        ? \Carbon\Carbon::parse($p->terakhir_reservasi)->translatedFormat('d M Y')
+                        : '-',
+                    'terdaftar' => \Carbon\Carbon::parse($p->created_at)->translatedFormat('M Y'),
+                    'riwayatUrl' => route('admin-cabang.reservasi') . '?user_id=' . $p->id,
+                    'waUrl' => 'https://wa.me/' . preg_replace('/[^0-9]/', '', ($p->phone ?? '')),
+                ]
+            ];
+        });
+
+    return view('admin-cabang.pelanggan-cabang', compact(
+        'pelanggan',
+        'pelangganData',
+        'totalPelanggan',
+        'totalAktif',
+        'totalBaru',
+        'totalTidakAktif',
+        'status'
+    ));
     }
-    
 }

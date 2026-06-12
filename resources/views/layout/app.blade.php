@@ -23,6 +23,8 @@
     {{-- App CSS --}}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
+    <script src="https://cdn.tailwindcss.com"></script>
+
     @stack('styles')
 </head>
 

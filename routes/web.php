@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\BengkelController;
@@ -13,13 +15,15 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Pelanggan\ProfileController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Password;
 use App\Models\Review;
 use App\Models\Bengkel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 
 
@@ -92,37 +96,34 @@ Route::get('/bengkel/{id}', [BengkelController::class, 'showPelanggan'])
 
 
 // ── PELANGGAN ─────────────────────────
-Route::middleware(['auth', 'role:pelanggan'])
-    ->prefix('pelanggan')
-    ->name('pelanggan.')
-    ->group(function () {
 
-    Route::post('/booking', [ReservasiController::class, 'store'])
-    ->name('booking.store');  
+        Route::post('/booking', [ReservasiController::class, 'store'])
+            ->name('pelanggan.booking.store');
 
-    Route::get('/reservasi', [ReservasiController::class, 'index'])
-        ->name('reservasi');    
+        Route::get('/reservasi-public', [ReservasiController::class, 'publicReservasi'])
+        ->name('pelanggan.reservasi');
 
-    Route::get('/riwayat', [ReservasiController::class, 'riwayat'])
-        ->name('riwayat');
+        Route::get('/riwayat', [ReservasiController::class, 'riwayat'])
+            ->name('pelanggan.riwayat');
 
-    Route::get('/riwayat/{id}', [ReservasiController::class, 'riwayatDetail'])
-        ->name('riwayat-detail');        
+        Route::get('/riwayat/{id}', [ReservasiController::class, 'riwayatDetail'])
+            ->name('riwayat-detail');
 
-    Route::get('/profile', [ReservasiController::class, 'profile'])
-        ->name('profile'); 
-    
-     Route::put('/profile/update', [ReservasiController::class, 'updateProfile'])
-        ->name('profile.update');
-        
-    Route::get('/dashboard', function () {
-        return view('pelanggan.dashboard');
-    })->name('dashboard');   
-    
-    Route::post('/review', [ReviewController::class, 'store'])
-                ->name('review.store');    
+        Route::get('/profile', [ProfileController::class, 'index'])
+            ->name('pelanggan.profile');
 
-});
+        Route::put('/profile/update', [ProfileController::class, 'update'])
+            ->name('pelanggan.profile.update');
+
+        Route::get('/profile/edit', [ProfileController::class, 'edit'])
+        ->name('pelanggan.profile.edit');
+
+        Route::get('/dashboard', function () {
+            return view('pelanggan.dashboard');
+        })->name('dashboard');
+
+        Route::post('/review', [ReviewController::class, 'store'])
+            ->name('review.store');
 
 
 // ── ADMIN PUSAT ───────────────────────
@@ -214,6 +215,28 @@ Route::middleware(['auth', 'role:admin_pusat'])
         ->name('user.update');    
 
 });
+
+// ── UBAH PASSWORD PELANGGAN PROFILE ────
+    Route::get('/profil/kirim-reset-password', function () {
+
+        $user = Auth::user();
+
+        // Login Google
+        if ($user->google_id) {
+            return redirect('https://myaccount.google.com/security');
+        }
+
+        // Login biasa
+        Password::sendResetLink([
+            'email' => $user->email
+        ]);
+
+        return back()->with(
+            'success',
+            'Link reset password berhasil dikirim ke email Anda.'
+        );
+
+    })->middleware('auth')->name('profil.kirim-reset');
 
 // ── API ENDPOINTS UNTUK RESERVASI ────
     Route::middleware(['auth', 'role:admin_cabang'])

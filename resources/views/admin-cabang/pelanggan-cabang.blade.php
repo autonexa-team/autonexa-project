@@ -95,20 +95,26 @@
             </div>
 
             <!-- Filter Status -->
-            <div class="w-full md:w-auto flex gap-2 overflow-x-auto pb-2 md:pb-0">
-                <a href="?status=semua" 
+            <!-- Semua -->
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'semua']) }}"
                 class="{{ $status === 'semua' ? 'bg-slate-800 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100' }} px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors">
                     Semua
                 </a>
-                <a href="?status=aktif"
+
+                <!-- Aktif -->
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'aktif']) }}"
                 class="{{ $status === 'aktif' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200' }} px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors">
                     Aktif
                 </a>
-                <a href="?status=baru"
+
+                <!-- Baru -->
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'baru']) }}"
                 class="{{ $status === 'baru' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200' }} px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors">
                     Baru
                 </a>
-                <a href="?status=tidak_aktif"
+
+                <!-- Tidak Aktif -->
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'tidak_aktif']) }}"
                 class="{{ $status === 'tidak_aktif' ? 'bg-slate-500 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100' }} px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors">
                     Tidak Aktif
                 </a>
@@ -135,26 +141,38 @@
                 @php
                     $lastReservasi = $p->terakhir_reservasi;
                     $totalRes = $p->total_reservasi;
-                    $isAktif = $totalRes > 1;
-                    $isBaru = \Carbon\Carbon::parse($lastReservasi)->gte(now()->startOfMonth());
-                    $isTidakAktif = \Carbon\Carbon::parse($lastReservasi)->lt(now()->subMonths(3));
 
-                    if ($isAktif) {
-                        $statusLabel = 'Aktif';
-                        $statusClass = 'bg-emerald-100 border-emerald-200 text-emerald-700';
-                        $dotClass = 'bg-emerald-500';
-                        $rowClass = 'border-b border-emerald-50 bg-emerald-50/20 hover:bg-emerald-50/60';
-                    } elseif ($isBaru) {
-                        $statusLabel = 'Baru';
-                        $statusClass = 'bg-blue-50 border-blue-200 text-blue-700';
-                        $dotClass = 'bg-blue-500';
-                        $rowClass = 'border-b border-slate-50 hover:bg-slate-50/80';
-                    } else {
-                        $statusLabel = 'Tidak Aktif';
-                        $statusClass = 'bg-slate-100 border-slate-200 text-slate-500';
-                        $dotClass = 'bg-slate-400';
-                        $rowClass = 'border-b border-slate-50 hover:bg-slate-50/80';
-                    }
+                    $isBaru = \Carbon\Carbon::parse($p->created_at)
+                        ->gte(now()->startOfMonth());
+
+                    $isTidakAktif = $lastReservasi &&
+                        \Carbon\Carbon::parse($lastReservasi)
+                            ->lt(now()->subMonths(3));
+
+                    $isAktif = !$isTidakAktif && $totalRes > 1;
+
+                if ($isTidakAktif) {
+
+                    $statusLabel = 'Tidak Aktif';
+                    $statusClass = 'bg-slate-100 border-slate-200 text-slate-500';
+                    $dotClass = 'bg-slate-400';
+                    $rowClass = 'border-b border-slate-50 hover:bg-slate-50/80';
+
+                } elseif ($isBaru) {
+
+                    $statusLabel = 'Baru';
+                    $statusClass = 'bg-blue-50 border-blue-200 text-blue-700';
+                    $dotClass = 'bg-blue-500';
+                    $rowClass = 'border-b border-blue-50 bg-blue-50/20 hover:bg-blue-50/60';
+
+                } else {
+
+                    $statusLabel = 'Aktif';
+                    $statusClass = 'bg-emerald-100 border-emerald-200 text-emerald-700';
+                    $dotClass = 'bg-emerald-500';
+                    $rowClass = 'border-b border-emerald-50 bg-emerald-50/20 hover:bg-emerald-50/60';
+
+                }
                 @endphp
                 <tr class="{{ $rowClass }} transition-colors group">
                     <td class="p-5 text-slate-500 font-bold text-center">
@@ -193,9 +211,10 @@
                     <td class="p-5 text-center">
                         <div class="flex justify-center items-center gap-2">
                             <div class="tooltip-container relative inline-block">
-                                <button onclick="openModal({{ $p->id }})" 
-                                    class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand hover:border-brand hover:bg-orange-50 transition-colors flex items-center justify-center shadow-sm">
-                                    <i class="fas fa-eye"></i>
+                                <button data-id="{{ $p->id }}"
+                                        onclick="openModal(this.dataset.id)"
+                                        class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand hover:border-brand hover:bg-orange-50 transition-colors flex items-center justify-center shadow-sm">
+                                            <i class="fas fa-eye"></i>
                                 </button>
                                 <span class="tooltip-text absolute bottom-full right-0 mb-2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg whitespace-nowrap shadow-md">Lihat Detail</span>
                             </div>
@@ -229,14 +248,6 @@
             dari {{ $pelanggan->total() }} pelanggan
         </span>
         <div>{{ $pelanggan->links() }}</div>
-        <div class="flex items-center gap-2">
-            <button class="px-4 py-2 rounded-xl border border-slate-200 text-slate-400 text-sm font-bold bg-slate-50 cursor-not-allowed">Prev</button>
-            <button class="w-9 h-9 rounded-xl bg-brand text-white text-sm font-bold shadow-md shadow-brand/20">1</button>
-            <button class="w-9 h-9 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 text-sm font-bold transition-all">2</button>
-            <button class="w-9 h-9 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 text-sm font-bold transition-all">3</button>
-            <span class="text-slate-400 px-1 font-bold">...</span>
-            <button class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 text-sm font-bold transition-all shadow-sm">Next</button>
-        </div>
     </div>
 </div>
 
@@ -280,38 +291,32 @@
 </div>
 
 <script>
-const pelangganData = {
-    @foreach($pelanggan as $p)
-    {{ $p->id }}: {
-        name: @json($p->name),
-        custId: "CUST-{{ str_pad($p->id, 3, '0', STR_PAD_LEFT) }}",
-        phone: @json($p->phone ?? '-'),
-        email: @json($p->email),
-        totalReservasi: {{ $p->total_reservasi }},
-        terakhirReservasi: @json($p->terakhir_reservasi ? \Carbon\Carbon::parse($p->terakhir_reservasi)->translatedFormat('d M Y') : '-'),
-        terdaftar: @json(\Carbon\Carbon::parse($p->created_at)->translatedFormat('M Y')),
-        riwayatUrl: "{{ route('admin-cabang.reservasi') }}?user_id={{ $p->id }}",
-        waUrl: "https://wa.me/{{ preg_replace('/[^0-9]/', '', $p->phone ?? '') }}",
-    },
-    @endforeach
-};
-
 function openModal(userId) {
-    const p = pelangganData[userId];
+    const p = window.pelangganData[userId];
     if (!p) return;
 
-    let statusLabel = 'Tidak Aktif';
-    let statusBg = '#f1f5f9'; let statusColor = '#475569';
-    let statusBorder = '#cbd5e1'; let dotColor = '#94a3b8';
+    let statusLabel = p.status;
 
-    if (p.totalReservasi > 1) {
-        statusLabel = 'Aktif';
-        statusBg = '#d1fae5'; statusColor = '#065f46';
-        statusBorder = '#6ee7b7'; dotColor = '#10b981';
-    } else if (p.totalReservasi === 1) {
-        statusLabel = 'Baru';
-        statusBg = '#dbeafe'; statusColor = '#1e40af';
-        statusBorder = '#93c5fd'; dotColor = '#3b82f6';
+    let statusBg = '#f1f5f9';
+    let statusColor = '#475569';
+    let statusBorder = '#cbd5e1';
+    let dotColor = '#94a3b8';
+
+    if (p.status === 'Aktif') {
+
+        statusBg = '#d1fae5';
+        statusColor = '#065f46';
+        statusBorder = '#6ee7b7';
+        dotColor = '#10b981';
+
+    }
+    else if (p.status === 'Baru') {
+
+        statusBg = '#dbeafe';
+        statusColor = '#1e40af';
+        statusBorder = '#93c5fd';
+        dotColor = '#3b82f6';
+
     }
 
     // Capitalize nama
@@ -412,5 +417,67 @@ document.addEventListener("DOMContentLoaded", () => {
         window.requestAnimationFrame(step);
     });
 });
+</script>
+
+@php
+$pelangganData = $pelanggan->mapWithKeys(function ($p) {
+
+    $lastReservasi = $p->terakhir_reservasi;
+    $totalRes = $p->total_reservasi;
+
+    $isBaru = \Carbon\Carbon::parse($p->created_at)
+    ->gte(now()->startOfMonth());
+
+    $isTidakAktif = $lastReservasi &&
+        \Carbon\Carbon::parse($lastReservasi)
+            ->lt(now()->subMonths(3));
+
+    if ($isTidakAktif) {
+
+        $status = 'Tidak Aktif';
+
+    } elseif ($isBaru) {
+
+        $status = 'Baru';
+
+    } else {
+
+        $status = 'Aktif';
+
+    }
+
+    $phone = preg_replace('/[^0-9]/', '', $p->phone ?? '');
+
+    if (substr($phone, 0, 1) === '0') {
+        $phone = '62' . substr($phone, 1);
+    }
+
+    return [
+        $p->id => [
+            'name' => $p->name,
+            'custId' => 'CUST-' . str_pad($p->id, 3, '0', STR_PAD_LEFT),
+            'phone' => $p->phone ?? '-',
+            'email' => $p->email,
+            'status' => $status,
+            'totalReservasi' => $p->total_reservasi,
+            'terakhirReservasi' => $p->terakhir_reservasi
+                ? \Carbon\Carbon::parse($p->terakhir_reservasi)->translatedFormat('d M Y')
+                : '-',
+            'terdaftar' => \Carbon\Carbon::parse($p->created_at)->translatedFormat('M Y'),
+            'riwayatUrl' => route('admin-cabang.reservasi') . '?user_id=' . $p->id,
+            'waUrl' => 'https://wa.me/' . $phone,
+        ]
+    ];
+})->toArray();
+@endphp
+
+<script id="pelanggan-json" type="application/json">
+@json($pelangganData)
+</script>
+
+<script>
+window.pelangganData = JSON.parse(
+    document.getElementById('pelanggan-json').textContent
+);
 </script>
 @endsection

@@ -126,7 +126,7 @@ Route::get('/bengkel/{id}', [BengkelController::class, 'showPelanggan'])
             ->name('riwayat-detail');
 
     Route::get('/profile', [ReservasiController::class, 'profile'])
-        ->name('profile'); 
+        ->name('pelanggan.profile'); 
     
      Route::put('/profile/update', [ReservasiController::class, 'updateProfile'])
         ->name('profile.update');

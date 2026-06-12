@@ -39,8 +39,7 @@
                                 class="{{ request()->routeIs('pelanggan.bengkel') ? 'active' : '' }}">
                                 Bengkel
                             </a>
-                        </li>
-                        <li><a href="{{ route('login') }}">Login</a></li>
+                        </li>                        
                     </ul>
                 </div>
 

@@ -272,7 +272,7 @@ class ReviewController extends Controller
             'fotos'       => 'nullable|array|max:5',
             'fotos.*'     => 'image|mimes:jpg,jpeg,png,webp|max:2048',
             'reservasi_id'=> 'required|exists:reservasis,id',
-            'bengkel_id'  => 'required|exists:bengkels,id',
+            'bengkel_id'  => 'required|exists:bengkels,id',            
         ]);
 
         $review = Review::create([
@@ -283,13 +283,50 @@ class ReviewController extends Controller
             'komentar'     => $request->komentar,
         ]);
 
+        $fotoUrls = [];
+
         if ($request->hasFile('fotos')) {
             foreach ($request->file('fotos') as $foto) {
                 $path = $foto->store('reviews', 'public');
+                // path yang disimpan: "reviews/namafile.jpg"
                 $review->fotos()->create(['foto' => $path]);
+                // URL untuk ditampilkan langsung
+                $fotoUrls[] = asset('storage/' . $path);
             }
-        } 
+        }
 
-        return response()->json(['message' => 'Berhasil!']);
+        return response()->json([
+            'message' => 'Berhasil!',
+            'fotos'   => $fotoUrls,  
+        ]);
     }
+
+    public function edit(Review $review)
+    {
+        return view('pelanggan.review-edit', compact('review'));
+    }
+
+    public function update(Request $request, Review $review)
+    {
+        $request->validate([
+            'rating'   => 'required|integer|min:1|max:5',
+            'komentar' => 'nullable|string|max:1000',
+        ]);
+
+        $review->update([
+            'rating'   => $request->rating,
+            'komentar' => $request->komentar,
+        ]);
+
+        return redirect()
+            ->route('pelanggan.riwayat-detail', $review->reservasi_id)
+            ->with('success', 'Ulasan berhasil diperbarui.');
+    }
+
+    public function destroy(Review $review)
+    {
+        $review->delete();
+
+        return back()->with('success', 'Ulasan berhasil dihapus.');
+    }    
 }

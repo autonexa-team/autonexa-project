@@ -7,13 +7,14 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\Reservasi;
 
 class BengkelController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth')->except(['pelangganIndex']);
+        $this->middleware('auth')->except(['pelangganIndex', 'showPelanggan']);
     }
 
 
@@ -137,7 +138,19 @@ class BengkelController extends Controller
             $validated['foto'] = 'bengkels/' . $filename;
         }
 
-        Bengkel::create($validated);
+        $bengkel = Bengkel::create($validated);
+
+        $dataSpareparts = \App\Models\Sparepart::all()
+            ->mapWithKeys(function ($sparepart) {
+                return [
+                    $sparepart->id => [
+                        'stok' => 0
+                    ]
+                ];
+            })
+            ->toArray();
+
+        $bengkel->spareparts()->syncWithoutDetaching($dataSpareparts);
 
         return redirect()->route('admin-pusat.bengkel.index')
                         ->with('success', 'Bengkel berhasil ditambahkan');
@@ -242,16 +255,27 @@ class BengkelController extends Controller
     public function showPelanggan(int $id)
     {
         $bengkel = Bengkel::with([
-            'layanan',
-            'reviews.user'
-        ])
-        ->withAvg('reviews', 'rating')
-        ->findOrFail($id);
+                'layanan',
+                'reviews.user'
+            ])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->findOrFail($id);
+
+        // Hitung slot tersisa hari ini
+        $kapasitas = $bengkel->kapasitas ?? 8;
+        $terpakai  = Reservasi::where('bengkel_id', $bengkel->id)
+            ->whereDate('tanggal', now()->toDateString())
+            ->whereIn('status', ['waiting', 'process'])
+            ->count();
+        $slotsHariIni = max($kapasitas - $terpakai, 0);
 
         return view('pelanggan.bengkel-detail', [
-            'bengkel' => $bengkel
+            'bengkel'      => $bengkel,
+            'layanans'     => $bengkel->layanan,
+            'slotsHariIni' => $slotsHariIni,
         ]);
-    }    
+    }   
 
     public function edit(int $id)
     {

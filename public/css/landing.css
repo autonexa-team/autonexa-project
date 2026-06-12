@@ -6,39 +6,40 @@
 
 /* ── CSS VARIABLES ───────────────────────────────────────────── */
 :root {
-    /* Brand senja */
-    --an-br       : #c2410c;        /* senja utama */
-    --an-br-l     : #ea580c;        /* senja terang (hover) */
-    --an-br-d     : #9a3412;        /* senja gelap */
-    --an-br-dim   : rgba(194,65,12,0.09);  /* soft tint */
-    --an-br-ring  : rgba(194,65,12,0.22);
+    /* Brand merah */
+    --an-br       : #D43B3B;
+    --an-br-l     : #E85D5D;
+    --an-br-d     : #B82E2E;
+    --an-br-dim   : rgba(212,59,59,0.08);
+    --an-br-ring  : rgba(212,59,59,0.20);
 
-    /* Accent (highlight di hero) */
-    --an-accent   : #fb923c;        /* kuning-oranye hangat */
+    /* Navy */
+    --an-navy     : #1F2E4D;
+    --an-navy-l   : #2d3f5f;
+
+    /* Accent */
+    --an-accent   : #E85D5D;
 
     /* Background */
-    --an-bg-white : #ffffff;
-    --an-bg-soft  : #faf8f6;        /* warm off-white, bukan abu */
-    --an-bg-soft2 : #f5f0eb;        /* sedikit lebih hangat */
+    --an-bg-white : #FFFDFB;
+    --an-bg-soft  : #FBF5EF;
+    --an-bg-soft2 : #F5EBDF;
 
-    /* Teks */
-    --an-fg       : #111827;
-    --an-fg-2     : #374151;
+    /* Teks — navy menggantikan hitam */
+    --an-fg       : #1F2E4D;
+    --an-fg-2     : #3a4a6b;
     --an-fg-3     : #6b7280;
     --an-fg-4     : #9ca3af;
 
     /* Border */
-    --an-bd       : #e5e7eb;
-    --an-bd-warm  : #e8ddd4;        /* border dengan tint warm */
+    --an-bd       : #ECE2D5;
+    --an-bd-warm  : #ECE2D5;
 
-    /* Radius */
     --an-r        : 14px;
     --an-rm       : 8px;
     --an-rs       : 6px;
-
-    /* Shadow */
-    --an-sh       : 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.06);
-    --an-sh-lg    : 0 8px 32px rgba(0,0,0,0.10);
+    --an-sh       : 0 1px 4px rgba(31,46,77,0.05), 0 4px 12px rgba(31,46,77,0.05);
+    --an-sh-lg    : 0 8px 32px rgba(31,46,77,0.08);
 }
 
 /* ── BASE ────────────────────────────────────────────────────── */
@@ -64,20 +65,21 @@
 .an-tag {
     display: inline-block;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 800;
     color: var(--an-br);
     text-transform: uppercase;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.15em;
     margin-bottom: 10px;
 }
 
 .an-sec-title {
-    font-size: clamp(18px, 2.5vw, 24px);
-    font-weight: 700;
+    font-size: clamp(18px, 2.5vw, 28px);
+    font-weight: 900;
     color: var(--an-fg);
     letter-spacing: -0.4px;
     line-height: 1.3;
     margin-bottom: 12px;
+    text-transform: uppercase;
 }
 
 .an-sec-body {
@@ -96,7 +98,7 @@
 ════════════════════════════════════════════════════════════ */
 .an-hero {
     position: relative;
-    background: var(--an-bg-white);
+    background: var(--an-bg-soft);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -154,16 +156,18 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 7px 12px;
-    background: rgba(194,65,12,0.07);
-    border: 0.5px solid var(--an-br-ring);
-    border-radius: 30px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--an-br);
+    padding: 9px 18px;
+    background: var(--an-br);
+    border: none;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
     text-decoration: none;
     margin-bottom: 26px;
     align-self: flex-start;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .an-ann-badge { display: flex; align-items: center; gap: 5px; }
@@ -201,20 +205,22 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 10px 22px;
-    background: var(--an-fg);
+    padding: 12px 24px;
+    background: var(--an-navy);
     color: #fff;
-    border: none;
+    border: 2px solid var(--an-navy);
     border-radius: var(--an-rm);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     cursor: pointer;
-    transition: background 0.15s, transform 0.15s;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .an-btn-primary:hover {
-    background: var(--an-fg-2);
+    background: var(--an-navy-l);
     color: #fff;
     transform: translateY(-1px);
 }
@@ -223,22 +229,24 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 10px 22px;
+    padding: 12px 24px;
     background: var(--an-bg-white);
-    color: var(--an-fg-2);
-    border: 0.5px solid var(--an-bd);
+    color: var(--an-navy);
+    border: 2px solid var(--an-bd);
     border-radius: var(--an-rm);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 700;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .an-btn-secondary:hover {
-    border-color: var(--an-br-ring);
-    color: var(--an-br);
-    background: var(--an-br-dim);
+    border-color: var(--an-navy);
+    color: var(--an-navy);
+    background: var(--an-bg-soft);
 }
 
 /* ── KANAN: visual cards ── */
@@ -250,16 +258,19 @@
 
 .an-ui-card {
     background: #fff;
-    border: 0.5px solid var(--an-bd-warm);
+    border: 2px solid var(--an-navy);
     border-radius: var(--an-r);
     box-shadow: var(--an-sh);
 }
 
 /* Main card */
-.an-card-main { overflow: hidden; }
+.an-card-main {
+    overflow: hidden;
+    box-shadow: 6px 6px 0 var(--an-br);
+}
 
 .an-card-header-block {
-    background: var(--an-br);
+    background: var(--an-navy);
     padding: 18px 20px;
     display: flex;
     flex-direction: column;
@@ -268,9 +279,9 @@
 
 .an-ch-label {
     font-size: 9px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.70);
-    letter-spacing: 0.10em;
+    font-weight: 800;
+    color: var(--an-br-l);
+    letter-spacing: 0.15em;
     text-transform: uppercase;
 }
 
@@ -312,7 +323,7 @@
 }
 
 .an-chip-brand {
-    background: rgba(194,65,12,0.10);
+    background: rgba(212,59,59,0.10);
     color: var(--an-br);
 }
 
@@ -489,24 +500,24 @@
     display: flex;
     align-items: flex-start;
     gap: 13px;
-    padding: 15px 16px;
+    padding: 18px;
     background: var(--an-bg-soft);
-    border: 0.5px solid var(--an-bd-warm);
+    border: 2px solid var(--an-bd-warm);
     border-radius: var(--an-rm);
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .an-fc:hover {
-    border-color: var(--an-br-ring);
-    box-shadow: 0 2px 12px rgba(194,65,12,0.07);
+    border-color: var(--an-br);
+    box-shadow: 0 2px 12px rgba(212,59,59,0.10);
 }
 
 .an-fc-icon {
     width: 38px;
     height: 38px;
     border-radius: var(--an-rm);
-    background: var(--an-br-dim);
-    color: var(--an-br);
+    background: var(--an-br);
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -550,12 +561,21 @@
 
 .an-bengkel-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(300px, 1fr);
     gap: 12px;
     margin-bottom: 16px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
 
+.an-bengkel-grid::-webkit-scrollbar { display: none; }
+
 .an-bcard {
+    scroll-snap-align: start;
     background: var(--an-bg-white);
     border: 0.5px solid var(--an-bd-warm);
     border-radius: var(--an-r);
@@ -586,6 +606,7 @@
     font-size: 38px;
     color: var(--an-fg-4);
 }
+
 
 .an-bcard-badge {
     position: absolute;
@@ -815,8 +836,8 @@
     margin-bottom: 12px;
 }
 
-.an-li-brand { background: var(--an-br-dim); color: var(--an-br); }
-.an-li-green { background: rgba(22,163,74,0.10); color: #16a34a; }
+.an-li-brand { background: rgba(212,59,59,0.10); color: var(--an-br); }
+.an-lcard-price { color: var(--an-br); }
 
 .an-lcard-name--sm {
     font-size: 13px;
@@ -880,16 +901,16 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--an-br);
+    background: var(--an-navy);
     color: #fff;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 14px;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(194,65,12,0.30);
+    box-shadow: 0 4px 12px rgba(31,46,77,0.30);
 }
 
 .an-step-title {
@@ -911,20 +932,22 @@
 ════════════════════════════════════════════════════════════ */
 .an-cta-strip {
     padding: 36px 32px;
-    background: var(--an-br);
+    background: var(--an-navy);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
     flex-wrap: wrap;
+    border-top: 4px solid var(--an-br);
 }
 
 .an-cta-title {
-    font-size: 17px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 900;
     color: #fff;
     margin-bottom: 4px;
     letter-spacing: -0.2px;
+    text-transform: uppercase;
 }
 
 .an-cta-sub {
@@ -936,31 +959,32 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 10px 24px;
-    background: #fff;
-    color: var(--an-br);
-    border: none;
+    padding: 12px 28px;
+    background: var(--an-br);
+    color: #fff;
+    border: 2px solid #fff;
     border-radius: var(--an-rm);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     text-decoration: none;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: opacity 0.15s, transform 0.15s;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .an-btn-white:hover {
     opacity: 0.92;
     transform: translateY(-1px);
-    color: var(--an-br);
+    color: #fff;
 }
 
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-    .an-bengkel-grid  { grid-template-columns: repeat(2, 1fr); }
+    .an-bengkel-grid { grid-auto-columns: calc((100% - 24px) / 3); }
     .an-layanan-grid  { grid-template-columns: 1fr 1fr; }
     .an-lcard--hero   { grid-column: 1 / -1; min-height: 140px; }
 }
@@ -973,7 +997,7 @@
         display: flex;
     }
     .an-hero__grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr;  /* 2 kolom */
         gap: 0;
         width: 100%;
     }
@@ -1013,7 +1037,7 @@
 
 @media (max-width: 480px) {
     .an-hero__title {
-        font-size: clamp(32px, 9vw, 42px);
+        font-size: clamp(48px, 9vw, 68px);
         letter-spacing: -1px;
     }
     .an-ann-bar {

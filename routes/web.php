@@ -20,6 +20,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AboutController;
+use App\Models\Reservasi;
 
 
 
@@ -32,7 +34,21 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 // ── auth ── //
 Route::get('/', function () {
-    return view('landing.index');
+    $bengkels = Bengkel::with(['layanan' => function($q) {
+            $q->orderBy('harga', 'asc');
+        }])
+        ->withAvg('reviews', 'rating')
+        ->withCount('reviews')
+        ->take(6)
+        ->get();
+
+    $reservasiHariIni = Reservasi::whereDate('tanggal', now()->toDateString())
+        ->whereIn('status', ['waiting', 'process'])
+        ->selectRaw('bengkel_id, count(*) as total')
+        ->groupBy('bengkel_id')
+        ->pluck('total', 'bengkel_id');
+
+    return view('landing.index', compact('bengkels', 'reservasiHariIni'));
 })->name('landing');
 
 Route::get('/about', function () {
@@ -120,7 +136,13 @@ Route::middleware(['auth', 'role:pelanggan'])
     })->name('dashboard');   
     
     Route::post('/review', [ReviewController::class, 'store'])
-                ->name('review.store');    
+        ->name('review.store');
+
+    Route::put('/review/{review}', [ReviewController::class, 'update'])
+        ->name('review.update');
+
+    Route::delete('/review/{review}', [ReviewController::class, 'destroy'])
+        ->name('review.destroy'); 
 
 });
 

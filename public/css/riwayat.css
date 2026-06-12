@@ -10,45 +10,49 @@
 /* ── Variables ────────────────────────────────────────────────── */
 :root {
     /* Brand */
-    --brand          : #f97316;
-    --brand-dark     : #ea6a08;
-    --brand-light    : #fff7ed;
-    --brand-ring     : rgba(249,115,22,.2);
-    --brand-glow     : 0 8px 28px rgba(249,115,22,.3);
+    --brand          : #D43B3B;
+    --brand-dark     : #B82E2E;
+    --brand-light    : #FBEAEA;
+    --brand-ring     : rgba(212,59,59,.18);
+    --brand-glow     : 0 8px 28px rgba(212,59,59,.28);
+
+    /* Navy */
+    --navy           : #1F2E4D;
+    --navy-light     : #2d3f5f;    
 
     /* Surface */
-    --bg             : #faf9f7;
-    --bg-card        : #ffffff;
-    --bg-subtle      : #f4f3f0;
-    --bg-muted       : #eeede9;
+    --bg             : #FBF5EF;
+    --bg-card        : #FFFDFB;
+    --bg-subtle      : #F5EBDF;
+    --bg-muted       : #ECE2D5;
 
     /* Text */
-    --txt            : #1a1a1a;
-    --txt-2          : #555450;
-    --txt-3          : #999693;
-    --txt-4          : #c8c5c0;
+    --txt            : #1F2E4D;
+    --txt-2          : #3a4a6b;
+    --txt-3          : #8a8f9c;
+    --txt-4          : #c5c9d2;
 
     /* Border */
-    --border         : #e8e6e1;
-    --border-md      : #d8d5cf;
+    --border         : #ECE2D5;
+    --border-md      : #ddd0bf;
 
-    /* Status */
-    --c-waiting      : #d97706;  --bg-waiting : #fffbeb;  --bd-waiting : #fde68a;
-    --c-process      : #2563eb;  --bg-process : #eff6ff;  --bd-process : #bfdbfe;
-    --c-done         : #059669;  --bg-done    : #ecfdf5;  --bd-done    : #a7f3d0;
-    --c-cancel       : #dc2626;  --bg-cancel  : #fef2f2;  --bd-cancel  : #fecaca;
+    /* Status — disesuaikan agar tetap kontras dengan navy */
+    --c-waiting      : #b45309;  --bg-waiting : #fef6e8;  --bd-waiting : #f5d49a;
+    --c-process      : #1e40af;  --bg-process : #eef3fc;  --bd-process : #c0d2f5;
+    --c-done         : #15803d;  --bg-done    : #effaf2;  --bd-done    : #b8e8c4;
+    --c-cancel       : #b91c1c;  --bg-cancel  : #fdeeee;  --bd-cancel  : #f3c4c4;
 
     /* Progress */
-    --step-done      : #10b981;
-    --step-active    : #f97316;
-    --step-idle      : #e2e0db;
+    --step-done      : #15803d;
+    --step-active    : #D43B3B;
+    --step-idle      : #ECE2D5;
 
     /* Shadow */
-    --sh-xs  : 0 1px 2px rgba(0,0,0,.05);
-    --sh-sm  : 0 2px 6px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-    --sh-md  : 0 6px 20px rgba(0,0,0,.07), 0 2px 6px rgba(0,0,0,.04);
-    --sh-lg  : 0 16px 40px rgba(0,0,0,.09), 0 4px 12px rgba(0,0,0,.05);
-    --sh-xl  : 0 24px 60px rgba(0,0,0,.11), 0 8px 20px rgba(0,0,0,.06);
+    --sh-xs  : 0 1px 2px rgba(31,46,77,.05);
+    --sh-sm  : 0 2px 6px rgba(31,46,77,.06), 0 1px 2px rgba(31,46,77,.04);
+    --sh-md  : 0 6px 20px rgba(31,46,77,.07), 0 2px 6px rgba(31,46,77,.04);
+    --sh-lg  : 0 16px 40px rgba(31,46,77,.08), 0 4px 12px rgba(31,46,77,.05);
+    --sh-xl  : 0 24px 60px rgba(31,46,77,.10), 0 8px 20px rgba(31,46,77,.06);
 
     /* Shape */
     --r-sm   : 10px;
@@ -154,8 +158,8 @@ body {
 
 .rw-header__kicker {
     font-size: .7rem;
-    font-weight: 700;
-    letter-spacing: .12em;
+    font-weight: 800;
+    letter-spacing: .14em;
     text-transform: uppercase;
     color: var(--brand);
     margin-bottom: .4rem;
@@ -169,21 +173,22 @@ body {
     width: 18px;
     height: 2px;
     background: var(--brand);
-    border-radius: 2px;
+    border-radius: 0;
     display: inline-block;
 }
 
 .rw-header__title {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Plus Jakarta Sans', serif;
     font-size: 2.2rem;
     font-weight: 400;
-    color: var(--txt);
+    color: var(--navy);
     letter-spacing: -0.02em;
     line-height: 1.15;
 }
 
 .rw-header__title em {
-    font-style: italic;
+    font-style: normal; /* hilangkan italic, ganti warna saja */
+    font-weight: 900;
     color: var(--brand);
 }
 
@@ -263,12 +268,12 @@ body {
 .stat-tile:hover .stat-tile__icon { transform: rotate(-6deg) scale(1.1); }
 
 .stat-tile__num {
-    font-family: 'DM Serif Display', serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 2.2rem;
-    font-weight: 400;
-    color: var(--txt);
+    font-weight: 800;
+    color: var(--navy);
     line-height: 1;
-    letter-spacing: -0.02em;
+    letter-spacing: -1px;
     margin-bottom: .25rem;
 }
 
@@ -465,15 +470,16 @@ body {
     display: flex; align-items: center; justify-content: center;
     font-size: 1.1rem;
     color: var(--brand);
-    border: 1.5px solid rgba(249,115,22,.18);
+    border: 1.5px solid rgba(212,59,59,.18);
     flex-shrink: 0;
 }
 
 .bengkel-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.08rem;
-    color: var(--txt);
-    letter-spacing: -0.01em;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.3px;
 }
 
 .bengkel-name .branch {
@@ -887,11 +893,12 @@ body {
 }
 
 .empty-state__title {
-    font-family: 'DM Serif Display', serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 1.5rem;
-    color: var(--txt);
+    font-weight: 800;
+    color: var(--navy);
     margin-bottom: .5rem;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.5px;
 }
 
 .empty-state__sub {

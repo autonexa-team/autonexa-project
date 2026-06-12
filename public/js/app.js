@@ -148,4 +148,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const popoverEls = document.querySelectorAll('[data-bs-toggle="popover"]');
     popoverEls.forEach(el => new bootstrap.Popover(el));
 
+    /* ─────────────────────────────────────
+       9. BENGKEL GRID — Horizontal Scroll with Arrows
+    ───────────────────────────────────── */    
+    const bengkelGrid = document.getElementById('bengkelGrid');
+    const prevBtn = document.getElementById('bengkelPrev');
+    const nextBtn = document.getElementById('bengkelNext');
+
+    if (bengkelGrid && prevBtn && nextBtn) {
+        const scrollAmount = () => bengkelGrid.querySelector('.an-bcard')?.offsetWidth + 12 || 300;
+
+        prevBtn.addEventListener('click', () => {
+            bengkelGrid.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            bengkelGrid.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+        });
+
+        // Disable/enable button berdasarkan posisi scroll
+        function updateArrowState() {
+            const maxScroll = bengkelGrid.scrollWidth - bengkelGrid.clientWidth;
+            prevBtn.disabled = bengkelGrid.scrollLeft <= 5;
+            nextBtn.disabled = bengkelGrid.scrollLeft >= maxScroll - 5;
+            prevBtn.style.opacity = prevBtn.disabled ? '0.4' : '1';
+            nextBtn.style.opacity = nextBtn.disabled ? '0.4' : '1';
+        }
+
+        bengkelGrid.addEventListener('scroll', updateArrowState);
+        updateArrowState();
+    }    
+
 });

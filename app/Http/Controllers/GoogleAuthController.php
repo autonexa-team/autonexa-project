@@ -14,18 +14,36 @@ class GoogleAuthController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
-    public function callback() {
+    public function callback()
+    {
         $googleUser = Socialite::driver('google')->user();
 
-        $user = User::updateOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
-                'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),  
-                'role' => 'pelanggan',
-            ]                               
-        );
+        $user = User::where('email', $googleUser->getEmail())->first();
+
+        if (!$user) {
+
+            $user = User::create([
+                'name'  => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'role'  => 'pelanggan',
+            ]);
+        }
+
         Auth::login($user, true);
-        return redirect()->route('landing');
+
+        switch ($user->role) {
+
+            case 'admin_pusat':
+                return redirect()->route('admin-pusat.dashboard');
+
+            case 'admin_cabang':
+                return redirect()->route('admin-cabang.dashboard');
+
+            case 'pelanggan':
+                return redirect()->route('landing');
+
+            default:
+                return redirect()->route('landing');
+        }
     }
 }

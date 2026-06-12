@@ -37,11 +37,12 @@
             </p>
 
             <div class="an-hero__btns" data-aos="fade-up" data-aos-delay="300">
-                <a href="{{ route('register') }}" class="an-btn-primary">
+                <a href="{{ Auth::check() ? route('pelanggan.reservasi') : route('login') }}"
+                class="an-btn-primary">
                     <i class="bi bi-calendar-plus"></i> Service Sekarang
                 </a>
-                <a href="{{ route('pelanggan.bengkel') }}" class="an-btn-secondary">
-                    <i class="bi bi-info-circle"></i> Pelajari Lebih
+                <a href="{{ route('about') }}" class="an-btn-secondary">
+                    <i class="bi bi-info-circle"></i> Tentang Kami
                 </a>
             </div>
 
@@ -192,37 +193,54 @@
             </p>
         </div>
 
-        <div class="an-bengkel-grid">
-            @php
-            $bengkelList = [
-                ['nama'=>'Bengkel Maju Jaya',  'kota'=>'Sudirman, Jakarta Pusat','rating'=>4.8,'ulasan'=>126,'harga'=>85000,'slot'=>5,'status'=>'ok'],
-                ['nama'=>'Auto Prima Service', 'kota'=>'Dago, Bandung',          'rating'=>4.6,'ulasan'=>95, 'harga'=>90000,'slot'=>2,'status'=>'few'],
-                ['nama'=>'Bintang Motor',      'kota'=>'Ahmad Yani, Surabaya',   'rating'=>4.5,'ulasan'=>78, 'harga'=>75000,'slot'=>6,'status'=>'ok'],
-            ];
-            @endphp
+        <div class="an-bengkel-grid" id="bengkelGrid">
+            @forelse($bengkels as $b)
+                @php
+                    $kapasitas = $b->kapasitas ?? 8;
+                    $terpakai  = $reservasiHariIni[$b->id] ?? 0;
+                    $sisaSlot  = max($kapasitas - $terpakai, 0);
+                    $status    = $sisaSlot > 2 ? 'ok' : 'few';
+                    $hargaMin  = $b->layanan->first()->harga ?? null;
+                @endphp
+                <div class="an-bcard" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                    <div class="an-bcard-img">
+                        @if($b->foto)
+                            <img src="{{ asset('storage/' . $b->foto) }}"
+                                 alt="{{ $b->nama }}"
+                                 style="width:100%;height:100%;object-fit:cover;">
+                        @else
+                            <div class="an-bcard-photo"><i class="bi bi-building"></i></div>
+                        @endif
 
-            @foreach($bengkelList as $b)
-            <div class="an-bcard" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
-                <div class="an-bcard-img">
-                    <div class="an-bcard-photo"><i class="bi bi-building"></i></div>
-                    <div class="an-bcard-badge">mulai Rp {{ number_format($b['harga'],0,',','.') }}</div>
-                </div>
-                <div class="an-bcard-body">
-                    <div class="an-bcard-name">{{ $b['nama'] }}</div>
-                    <div class="an-bcard-sub"><i class="bi bi-geo-alt-fill"></i> {{ $b['kota'] }}</div>
-                    <div class="an-bcard-meta">
-                        <div class="an-rating">
-                            <span class="an-star">★</span>
-                            {{ $b['rating'] }}
-                            <span class="an-ulasan">({{ $b['ulasan'] }})</span>
+                        @if($hargaMin)
+                        <div class="an-bcard-badge">
+                            mulai Rp {{ number_format($hargaMin, 0, ',', '.') }}
                         </div>
-                        <span class="an-slot-pill {{ $b['status']==='ok' ? 'slot-ok' : 'slot-few' }}">
-                            {{ $b['slot'] }} slot {{ $b['status']==='ok' ? 'tersedia' : 'tersisa' }}
-                        </span>
+                        @endif
+                    </div>
+                    <div class="an-bcard-body">
+                        <div class="an-bcard-name">{{ $b->nama }}</div>
+                        <div class="an-bcard-sub">
+                            <i class="bi bi-geo-alt-fill"></i> {{ $b->alamat }}
+                        </div>
+                        <div class="an-bcard-meta">
+                            <div class="an-rating">
+                                <span class="an-star">★</span>
+                                {{ number_format($b->reviews_avg_rating ?? 0, 1) }}
+                                <span class="an-ulasan">({{ $b->reviews_count ?? 0 }})</span>
+                            </div>
+                            <span class="an-slot-pill {{ $status === 'ok' ? 'slot-ok' : 'slot-few' }}">
+                                {{ $sisaSlot }} slot {{ $status === 'ok' ? 'tersedia' : 'tersisa' }}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            @endforeach
+            @empty
+                <div class="ab-partner-empty">
+                    <i class="bi bi-shop"></i>
+                    <p>Belum ada bengkel partner tersedia</p>
+                </div>
+            @endforelse
         </div>
 
         <div class="an-bengkel-footer">
@@ -230,8 +248,8 @@
                 <i class="bi bi-map"></i> Lihat semua bengkel
             </a>
             <div class="an-nav-arrows">
-                <button class="an-arr-btn" aria-label="Sebelumnya"><i class="bi bi-chevron-left"></i></button>
-                <button class="an-arr-btn" aria-label="Berikutnya"><i class="bi bi-chevron-right"></i></button>
+                <button class="an-arr-btn" id="bengkelPrev" aria-label="Sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                <button class="an-arr-btn" id="bengkelNext" aria-label="Berikutnya"><i class="bi bi-chevron-right"></i></button>
             </div>
         </div>
 
@@ -258,9 +276,12 @@
                 <div class="an-lcard-eyebrow">Layanan Populer</div>
                 <div class="an-lcard-name">Ganti Oli &amp; Tune Up</div>
                 <div class="an-lcard-desc">Rutin setiap 3.000–5.000 km untuk performa motor terbaik</div>
-                <a href="{{ route('register') }}" class="an-lcard-btn">
-                    Booking sekarang <i class="bi bi-arrow-right"></i>
+
+                <a href="{{ Auth::check() ? route('pelanggan.reservasi') : route('login') }}"
+                class="an-lcard-btn">
+                    Service Sekarang <i class="bi bi-arrow-right"></i> 
                 </a>
+              
             </div>
             <div class="an-lcard an-lcard--sm" data-aos="fade-up" data-aos-delay="100">
                 <div class="an-lcard-icon an-li-brand"><i class="bi bi-disc"></i></div>

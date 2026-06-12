@@ -24,6 +24,8 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\AboutController;
+use App\Models\Reservasi;
 
 
 
@@ -36,7 +38,21 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 // ── auth ── //
 Route::get('/', function () {
-    return view('landing.index');
+    $bengkels = Bengkel::with(['layanan' => function($q) {
+            $q->orderBy('harga', 'asc');
+        }])
+        ->withAvg('reviews', 'rating')
+        ->withCount('reviews')
+        ->take(6)
+        ->get();
+
+    $reservasiHariIni = Reservasi::whereDate('tanggal', now()->toDateString())
+        ->whereIn('status', ['waiting', 'process'])
+        ->selectRaw('bengkel_id, count(*) as total')
+        ->groupBy('bengkel_id')
+        ->pluck('total', 'bengkel_id');
+
+    return view('landing.index', compact('bengkels', 'reservasiHariIni'));
 })->name('landing');
 
 Route::get('/about', function () {
@@ -109,8 +125,24 @@ Route::get('/bengkel/{id}', [BengkelController::class, 'showPelanggan'])
         Route::get('/riwayat/{id}', [ReservasiController::class, 'riwayatDetail'])
             ->name('riwayat-detail');
 
-        Route::get('/profile', [ProfileController::class, 'index'])
-            ->name('pelanggan.profile');
+    Route::get('/profile', [ReservasiController::class, 'profile'])
+        ->name('profile'); 
+    
+     Route::put('/profile/update', [ReservasiController::class, 'updateProfile'])
+        ->name('profile.update');
+        
+    Route::get('/dashboard', function () {
+        return view('pelanggan.dashboard');
+    })->name('dashboard');   
+    
+    Route::post('/review', [ReviewController::class, 'store'])
+        ->name('review.store');
+
+    Route::put('/review/{review}', [ReviewController::class, 'update'])
+        ->name('review.update');
+
+    Route::delete('/review/{review}', [ReviewController::class, 'destroy'])
+        ->name('review.destroy'); 
 
         Route::put('/profile/update', [ProfileController::class, 'update'])
             ->name('pelanggan.profile.update');

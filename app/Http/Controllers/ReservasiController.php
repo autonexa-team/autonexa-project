@@ -697,7 +697,7 @@ class ReservasiController extends Controller
     {
         $user = Auth::user();
 
-        $reservasi = Reservasi::with(['bengkel', 'layanan'])
+        $reservasi = Reservasi::with(['bengkel', 'layanan', 'review.fotos'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 

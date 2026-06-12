@@ -997,3 +997,244 @@ body {
     margin-top: .4rem;
     display: none;
 }
+
+/* ── REVIEW DISPLAY (sudah ada review) ──────────────────────── */
+.re-stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 10px;
+}
+
+.re-star      { font-size: 22px; line-height: 1; }
+.re-star--on  { color: #f59e0b; }
+.re-star--off { color: #e5e7eb; }
+
+.re-rating-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--txt-3, #6b7280);
+    margin-left: 8px;
+}
+
+.re-comment {
+    font-size: 14px;
+    color: var(--txt, #111827);
+    line-height: 1.7;
+    border-left: 3px solid var(--brand, #c2410c);
+    padding: 10px 14px;
+    background: var(--bg-subtle, #f9fafb);
+    border-radius: 0 8px 8px 0;
+    margin: 0 0 12px;
+    font-style: italic;
+}
+
+.re-no-comment {
+    font-size: 13px;
+    color: var(--txt-3, #6b7280);
+    margin-bottom: 12px;
+    font-style: italic;
+}
+
+.re-meta {
+    font-size: 11px;
+    color: var(--txt-4, #9ca3af);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 16px;
+}
+
+.re-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* ── EDIT FORM ───────────────────────────────────────────────── */
+
+/* Animasi masuk */
+#reviewEditForm {
+    animation: reEditIn 0.22s ease both;
+}
+
+@keyframes reEditIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.re-edit-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--txt, #111827);
+    padding-bottom: 12px;
+    border-bottom: 1.5px solid var(--border, #f0f0f0);
+    margin-bottom: 18px;
+}
+
+.re-edit-header i { color: var(--brand, #c2410c); font-size: 14px; }
+
+.re-edit-group { margin-bottom: 16px; }
+.re-edit-group:last-of-type { margin-bottom: 0; }
+
+.re-edit-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--txt-2, #374151);
+    margin-bottom: 8px;
+}
+
+.re-required { color: #ef4444; margin-left: 1px; }
+
+.re-optional {
+    font-weight: 400;
+    color: var(--txt-3, #6b7280);
+    font-size: 11px;
+    margin-left: 3px;
+}
+
+/* ── Bintang interaktif ──────────────────────────────────────── */
+.re-edit-stars {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 5px;
+}
+
+.re-edit-star {
+    font-size: 30px;
+    color: #e5e7eb;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 3px;
+    transition: color 0.12s, transform 0.12s;
+    line-height: 1;
+    outline: none;
+}
+
+.re-edit-star:hover,
+.re-edit-star--on  { color: #f59e0b; }
+
+.re-edit-star:focus-visible {
+    outline: 2px solid var(--brand, #c2410c);
+    border-radius: 4px;
+}
+
+.re-edit-star:hover  { transform: scale(1.18); }
+.re-edit-star:active { transform: scale(1.08); }
+
+.re-edit-rating-lbl {
+    display: block;
+    font-size: 11px;
+    color: var(--txt-3, #6b7280);
+    font-weight: 500;
+    min-height: 16px;
+    transition: color 0.15s;
+}
+
+/* ── Textarea ────────────────────────────────────────────────── */
+.re-edit-textarea {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1.5px solid var(--border, #e5e7eb);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--txt, #111827);
+    background: var(--bg-input, #f9fafb);
+    font-family: inherit;
+    resize: vertical;
+    min-height: 96px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    line-height: 1.65;
+    display: block;
+}
+
+.re-edit-textarea:focus {
+    border-color: var(--brand, #c2410c);
+    box-shadow: 0 0 0 3px rgba(194,65,12,0.10);
+    background: #fff;
+}
+
+.re-edit-textarea::placeholder { color: #b0b7c3; }
+
+/* ── Char count row ──────────────────────────────────────────── */
+.re-char-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.re-edit-hint  { font-size: 11px; color: var(--txt-4, #9ca3af); }
+
+.re-char-count {
+    font-size: 11px;
+    color: var(--txt-4, #9ca3af);
+    font-variant-numeric: tabular-nums;
+    transition: color 0.15s;
+}
+
+.re-char-count--warn { color: #d97706; }
+.re-char-count--full { color: #ef4444; font-weight: 700; }
+
+/* ── Footer tombol ───────────────────────────────────────────── */
+.re-edit-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1.5px solid var(--border, #f0f0f0);
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+
+/* ── Konfirmasi hapus ────────────────────────────────────────── */
+.re-delete-confirm {
+    display: none;
+    background: #fff2f2;
+    border: 1.5px solid #fecaca;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #7f1d1d;
+    line-height: 1.55;
+}
+
+.re-delete-confirm.show { display: block; }
+
+.re-delete-confirm-btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* ── Foto grid review ────────────────────────────────────────── */
+.rv-foto-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: .55rem;
+    margin-top: .75rem;
+}
+
+.rv-foto-item img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1.5px solid var(--border, #f3f4f6);
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    display: block;
+}
+
+.rv-foto-item img:hover {
+    opacity: 0.88;
+    transform: scale(1.03);
+}

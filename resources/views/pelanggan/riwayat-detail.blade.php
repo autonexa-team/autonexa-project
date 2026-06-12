@@ -16,9 +16,7 @@
 
         {{-- Breadcrumb --}}
         <div class="detail-header__breadcrumb">
-            <a href="{{ route('dashboard') }}">
-                <i class="fas fa-home"></i> Beranda
-            </a>
+            <a href="{{ route('landing') }}"><i class="fas fa-home"></i> Beranda</a>
             <span class="sep"><i class="fas fa-chevron-right"></i></span>
             <a href="{{ route('pelanggan.riwayat') }}">Riwayat Reservasi</a>
             <span class="sep"><i class="fas fa-chevron-right"></i></span>
@@ -265,49 +263,183 @@
                     </div>
                 </div>
                 <div class="sec-card__body">
+                    @if($reservasi->status === 'selesai')
+                        @if(!$reservasi->review)
+                            <div id="ratingForm">
+                                <p style="font-size:.85rem; color:var(--txt-3); margin-bottom:1rem; line-height:1.6;">
+                                    Bagaimana pengalaman servis kendaraanmu di AutoNexa Cabang Bandung?
+                                </p>
+                                <div class="rating-stars" id="starGroup">
+                                    <button class="star-btn" data-val="1">★</button>
+                                    <button class="star-btn" data-val="2">★</button>
+                                    <button class="star-btn" data-val="3">★</button>
+                                    <button class="star-btn" data-val="4">★</button>
+                                    <button class="star-btn" data-val="5">★</button>
+                                </div>
+                                <textarea class="rating-textarea" id="ratingText"
+                                        placeholder="Tuliskan ulasanmu di sini (opsional)..."></textarea>
 
-                    <div id="ratingForm">
-                        <p style="font-size:.85rem; color:var(--txt-3); margin-bottom:1rem; line-height:1.6;">
-                            Bagaimana pengalaman servis kendaraanmu di AutoNexa Cabang Bandung?
-                        </p>
-                        <div class="rating-stars" id="starGroup">
-                            <button class="star-btn" data-val="1">★</button>
-                            <button class="star-btn" data-val="2">★</button>
-                            <button class="star-btn" data-val="3">★</button>
-                            <button class="star-btn" data-val="4">★</button>
-                            <button class="star-btn" data-val="5">★</button>
+                                {{-- INPUT FOTO --}}
+                                <div class="foto-upload-wrap" style="margin: 1rem 0;">
+                                    <label style="font-size:.8rem; font-weight:700; color:var(--txt-3); display:block; margin-bottom:.5rem;">
+                                        <i class="fas fa-camera" style="color:var(--brand);"></i>
+                                        Lampirkan Foto <span style="font-weight:400;">(opsional, maks. 5 foto)</span>
+                                    </label>
+
+                                    <label for="fotoInput" class="foto-upload-label">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Pilih Foto</span>
+                                        <input type="file" id="fotoInput" multiple accept="image/*" style="display:none;">
+                                    </label>
+
+                                    <div id="fotoPreviewGrid" style="
+                                        display:grid;
+                                        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                                        gap:.6rem;
+                                        margin-top:.75rem;
+                                    "></div>
+                                    <p id="fotoError" style="color:#ef4444; font-size:.75rem; margin-top:.4rem; display:none;">
+                                        Maksimal 5 foto, masing-masing maks. 2MB.
+                                    </p>
+                                </div>
+
+                                <button class="btn btn--primary btn--full" id="submitRating">
+                                    <i class="fas fa-paper-plane"></i> Kirim Ulasan
+                                </button>
+                            </div>
+                    @else                    
+                    {{-- REVIEW SUDAH ADA --}}
+                    <div class="review-exist" id="reviewDisplay">
+                    
+                        {{-- Rating visual --}}
+                        <div class="re-stars">
+                            @for($i = 1; $i <= 5; $i++)
+                                <span class="re-star {{ $i <= $reservasi->review->rating ? 're-star--on' : 're-star--off' }}">★</span>
+                            @endfor
+                            <span class="re-rating-num">{{ $reservasi->review->rating }}.0 / 5</span>
                         </div>
-                        <textarea class="rating-textarea" id="ratingText"
-                                  placeholder="Tuliskan ulasanmu di sini (opsional)..."></textarea>
+                    
+                        {{-- Komentar --}}
+                        @if($reservasi->review->komentar)
+                            <blockquote class="re-comment">
+                                "{{ $reservasi->review->komentar }}"
+                            </blockquote>
+                        @else
+                            <p class="re-no-comment">Tidak ada komentar.</p>
+                        @endif
 
-                        {{-- INPUT FOTO --}}
-                        <div class="foto-upload-wrap" style="margin: 1rem 0;">
-                            <label style="font-size:.8rem; font-weight:700; color:var(--txt-3); display:block; margin-bottom:.5rem;">
-                                <i class="fas fa-camera" style="color:var(--brand);"></i>
-                                Lampirkan Foto <span style="font-weight:400;">(opsional, maks. 5 foto)</span>
-                            </label>
-
-                            <label for="fotoInput" class="foto-upload-label">
-                                <i class="fas fa-plus"></i>
-                                <span>Pilih Foto</span>
-                                <input type="file" id="fotoInput" multiple accept="image/*" style="display:none;">
-                            </label>
-
-                            <div id="fotoPreviewGrid" style="
-                                display:grid;
-                                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-                                gap:.6rem;
-                                margin-top:.75rem;
-                            "></div>
-                            <p id="fotoError" style="color:#ef4444; font-size:.75rem; margin-top:.4rem; display:none;">
-                                Maksimal 5 foto, masing-masing maks. 2MB.
-                            </p>
+                        {{-- Foto review --}}
+                        @if($reservasi->review->fotos && $reservasi->review->fotos->count() > 0)
+                        <div class="rv-foto-grid" style="margin-bottom:.75rem;">
+                            @foreach($reservasi->review->fotos as $foto)
+                            <div class="rv-foto-item">
+                                <img
+                                    src="{{ asset('storage/' . $foto->foto) }}"
+                                    alt="Foto ulasan"
+                                    onclick="window.open('{{ asset('storage/' . $foto->foto) }}', '_blank')"
+                                >
+                            </div>
+                            @endforeach
                         </div>
-
-                        <button class="btn btn--primary btn--full" id="submitRating">
-                            <i class="fas fa-paper-plane"></i> Kirim Ulasan
-                        </button>
+                        @endif                        
+                    
+                        {{-- Tanggal review --}}
+                        <div class="re-meta">
+                            <i class="fas fa-clock"></i>
+                            Diulas {{ $reservasi->review->created_at->translatedFormat('d F Y, H:i') }} WIB
+                        </div>
+                    
+                        {{-- Tombol aksi --}}
+                        <div class="re-actions">
+                            <button type="button" class="btn btn--outline btn--sm" id="btnEditReview">
+                                <i class="fas fa-pen"></i> Edit Ulasan
+                            </button>
+                            <form
+                                action="{{ route('pelanggan.review.destroy', $reservasi->review->id) }}"
+                                method="POST"
+                                id="formHapusReview"
+                                style="display:inline;"
+                            >
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn--danger btn--sm" id="btnHapusReview">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </form>
+                        </div>
+                    
                     </div>
+                    
+                    {{-- FORM EDIT — tersembunyi awalnya --}}
+                    <div id="reviewEditForm" style="display:none;">
+                    
+                        <div class="re-edit-header">
+                            <i class="fas fa-pen-to-square"></i>
+                            <span>Edit Ulasan Kamu</span>
+                        </div>
+                    
+                        <form
+                            action="{{ route('pelanggan.review.update', $reservasi->review->id) }}"
+                            method="POST"
+                            id="formEditReview"
+                        >
+                            @csrf
+                            @method('PUT')
+                    
+                            {{-- Rating bintang interaktif --}}
+                            <div class="re-edit-group">
+                                <label class="re-edit-label">Rating <span class="re-required">*</span></label>
+                                <div class="re-edit-stars" id="editStarGroup">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <button
+                                            type="button"
+                                            class="re-edit-star {{ $i <= $reservasi->review->rating ? 're-edit-star--on' : '' }}"
+                                            data-val="{{ $i }}"
+                                        >★</button>
+                                    @endfor
+                                </div>
+                                <input
+                                    type="hidden"
+                                    name="rating"
+                                    id="editRatingInput"
+                                    value="{{ $reservasi->review->rating }}"
+                                >
+                                <span class="re-edit-rating-lbl" id="editRatingLbl">
+                                    {{ $reservasi->review->rating }} / 5 bintang
+                                </span>
+                            </div>
+                    
+                            {{-- Komentar --}}
+                            <div class="re-edit-group">
+                                <label class="re-edit-label" for="editKomentar">Komentar <span class="re-optional">(opsional)</span></label>
+                                <textarea
+                                    name="komentar"
+                                    id="editKomentar"
+                                    class="re-edit-textarea"
+                                    rows="4"
+                                    maxlength="500"
+                                    placeholder="Ceritakan pengalamanmu servis di sini..."
+                                >{{ $reservasi->review->komentar }}</textarea>
+                                <div class="re-char-row">
+                                    <span class="re-edit-hint">Maksimal 500 karakter</span>
+                                    <span class="re-char-count" id="editCharCount">{{ strlen($reservasi->review->komentar ?? '') }} / 500</span>
+                                </div>
+                            </div>
+                    
+                            {{-- Tombol --}}
+                            <div class="re-edit-footer">
+                                <button type="button" class="btn btn--ghost btn--sm" id="btnCancelEdit">
+                                    <i class="fas fa-arrow-left"></i> Batal
+                                </button>
+                                <button type="submit" class="btn btn--primary btn--sm" id="btnSimpanEdit">
+                                    <i class="fas fa-floppy-disk"></i> Simpan Perubahan
+                                </button>
+                            </div>
+                    
+                        </form>
+                    </div>                       
+                        @endif                    
+                    @endif
 
                     <div class="rating-submitted" id="ratingDone">
                         <span style="font-size:1.5rem;">🎉</span>
@@ -692,57 +824,80 @@ window.removePhoto = function(idx) {
     renderPreviews();
 };
 
-/* ══════════════════════════
-   SUBMIT RATING
-══════════════════════════ */
-document.getElementById('submitRating')?.addEventListener('click', async function () {
-    if (!selectedRating) {
-        this.textContent = 'Pilih bintang dulu!';
-        this.style.background = 'var(--c-waiting)';
-        setTimeout(() => {
-            this.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Ulasan';
-            this.style.background = '';
-        }, 1800);
-        return;
-    }
+    /* ══════════════════════════
+    SUBMIT RATING
+    ══════════════════════════ */
+    document.getElementById('submitRating')?.addEventListener('click', async function () {
+        if (!selectedRating) {
+            this.textContent = 'Pilih bintang dulu!';
+            this.style.background = 'var(--c-waiting)';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Ulasan';
+                this.style.background = '';
+            }, 1800);
+            return;
+        }
 
-    // Kirim ke server via FormData
-    const formData = new FormData();
-    formData.append('_token', '{{ csrf_token() }}');
-    formData.append('rating',       selectedRating);
-    formData.append('komentar',     document.getElementById('ratingText').value);
-    formData.append('reservasi_id', '{{ $reservasi->id }}');
-    formData.append('bengkel_id',   '{{ $reservasi->bengkel_id }}');
+        // Kirim ke server via FormData
+        const formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('rating',       selectedRating);
+        formData.append('komentar',     document.getElementById('ratingText').value);
+        formData.append('reservasi_id', '{{ $reservasi->id }}');
+        formData.append('bengkel_id',   '{{ $reservasi->bengkel_id }}');
 
-    selectedFiles.forEach(file => {
-        formData.append('fotos[]', file);
-    });
-
-    this.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
-    this.disabled   = true;
-
-    try {
-        const res = await fetch('{{ route("review.store") }}', {
-            method: 'POST',
-            body:   formData,
+        selectedFiles.forEach(file => {
+            formData.append('fotos[]', file);
         });
 
-        const data = await res.json();
+        this.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+        this.disabled   = true;
 
-        if (res.ok) {
-            document.getElementById('ratingForm').style.display = 'none';
-            document.getElementById('ratingDone').classList.add('show');
-        } else {
-            alert(data.message ?? 'Gagal mengirim ulasan.');
+        try {
+            const res = await fetch('{{ route("pelanggan.review.store") }}', {
+                method: 'POST',
+                body:   formData,
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                document.getElementById('ratingForm').style.display = 'none';
+
+                // ── Render foto dari response server ──────────────
+                const doneEl = document.getElementById('ratingDone');
+
+                if (data.fotos && data.fotos.length > 0) {
+                    const grid = document.createElement('div');
+                    grid.className = 'rv-foto-grid';
+
+                    data.fotos.forEach(url => {
+                        const wrap = document.createElement('div');
+                        wrap.className = 'rv-foto-item';
+
+                        const img = document.createElement('img');
+                        img.src   = url;
+                        img.alt   = 'Foto ulasan';
+                        img.onclick = () => window.open(url, '_blank');
+
+                        wrap.appendChild(img);
+                        grid.appendChild(wrap);
+                    });
+
+                    // Sisipkan grid foto ke dalam ratingDone
+                    doneEl.appendChild(grid);
+                }
+
+                doneEl.classList.add('show');
+            } else {
+                throw new Error(data.message || 'Gagal mengirim ulasan.');
+            }
+        } catch (e) {
+            alert('Terjadi kesalahan. Coba lagi.');
             this.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Ulasan';
             this.disabled  = false;
         }
-    } catch (e) {
-        alert('Terjadi kesalahan. Coba lagi.');
-        this.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Ulasan';
-        this.disabled  = false;
-    }
-});
+    });
 
     /* ══════════════════════════
        CANCEL MODAL
@@ -796,7 +951,7 @@ document.getElementById('submitRating')?.addEventListener('click', async functio
                 }, 2000);
             }
         } catch (e) { /* user cancelled */ }
-    });
+    });  
 
     /* ══════════════════════════
        INIT
@@ -804,14 +959,9 @@ document.getElementById('submitRating')?.addEventListener('click', async functio
     renderSteps();
     renderTimeline();
 
-    // Show / hide rating card based on status
-    // Tampilkan hanya jika selesai; sembunyikan jika sedang proses
-    if (RESERVATION.status !== 'done') {
-        const ratingCard = document.getElementById('ratingCard');
-        if (ratingCard) ratingCard.style.display = 'none';
-    }
-
 })();
 </script>
+<!-- untuk script edit ulasan -->
+<script src="{{ asset('js/review-edit.js') }}"></script>
 
 @endsection

@@ -121,6 +121,8 @@ class AdminCabangController extends Controller
                    ->update(['admin_id' => $user->id]);
         }
 
+        dd('masuk update', $user->id);
+
         return back()->with('success', "Data {$user->name} berhasil diperbarui.");
     }
 

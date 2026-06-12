@@ -58,8 +58,7 @@
                     @endauth
  
                     @guest
-                        <a href="{{ route('login') }}" class="btn-login">Masuk</a>
-                        <a href="{{ route('register') }}" class="btn-daftar">Daftar</a>
+                        <a href="{{ route('login') }}" class="btn-login">Masuk</a>                        
                     @endguest
                 </li>
             </ul>

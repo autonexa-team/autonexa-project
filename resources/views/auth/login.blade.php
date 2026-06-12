@@ -12,13 +12,21 @@
 <body class="auth-body">
 
 <div class="auth-container">
+
+    {{-- ===== PANEL KIRI (navy, dekoratif — selaras hero landing) ===== --}}
     <div class="auth-left d-none d-lg-flex">
+        <div class="an-orb an-orb-1" style="top:-80px; right:-60px;"></div>
+        <div class="an-orb an-orb-2" style="bottom:-40px; left:-40px;"></div>
+
         <div class="auth-left-content">
-            <a href="{{ route('landing') }}" class="auth-brand-sm d-flex align-items-center gap-2">
+            <!-- <a href="{{ route('landing') }}" class="auth-brand-sm">
                 <img src="{{ asset('assets/logo.png') }}" alt="Logo" class="logo-lg">
-            </a>
-            <h2>Autonexa</h2>
+            </a> -->
+
+            <span class="an-tag" style="color:var(--an-br-l);">Autonexa Platform</span>
+            <h2>Reservasi service motor jadi lebih mudah</h2>
             <p>Reservasi online, pantau proses, dan dapatkan informasi service dengan mudah.</p>
+
             <div class="auth-features">
                 <div class="auth-feature-item">
                     <i class="bi bi-check-circle-fill"></i> Booking mudah & cepat
@@ -30,22 +38,44 @@
                     <i class="bi bi-check-circle-fill"></i> Notifikasi otomatis
                 </div>
             </div>
+
+            {{-- Mini stat strip — gaya an-stats-3 --}}
+            <div class="auth-mini-stats">
+                <div class="auth-mini-stat">
+                    <div class="auth-mini-stat__num">24+</div>
+                    <div class="auth-mini-stat__label">Bengkel</div>
+                </div>
+                <div class="auth-mini-stat">
+                    <div class="auth-mini-stat__num">4.8</div>
+                    <div class="auth-mini-stat__label">Rating</div>
+                </div>
+                <div class="auth-mini-stat">
+                    <div class="auth-mini-stat__num">1.2k</div>
+                    <div class="auth-mini-stat__label">Pengguna</div>
+                </div>
+            </div>
         </div>
     </div>
 
+    {{-- ===== PANEL KANAN (form) ===== --}}
     <div class="auth-right">
         <div class="auth-card">
+
             <div class="auth-header">
                 <h4>Selamat Datang</h4>
-                <p>Masuk ke akun Anda</p>
+                <p>Masuk ke akun Anda untuk melanjutkan</p>
             </div>
 
             @if(session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
+                <div class="auth-alert auth-alert-danger">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
             @endif
 
             <form method="POST" action="{{ route('login.process') }}">
                 @csrf
+
                 <div class="mb-3">
                     <label class="form-label">Email</label>
                     <div class="input-group">
@@ -55,6 +85,7 @@
                         @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <div class="d-flex justify-content-between">
                         <label class="form-label">Password</label>
@@ -71,37 +102,31 @@
                         @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" name="remember" class="form-check-input" id="remember">
                     <label class="form-check-label" for="remember">Ingat saya</label>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 btn-auth">
+
+                <button type="submit" class="btn btn-auth-primary w-100 btn-auth">
                     <i class="bi bi-box-arrow-in-right me-2"></i>Masuk
                 </button>
             </form>
 
-            <!-- Separator -->
-            <div class="d-flex align-items-center my-4">
-                <hr class="flex-grow-1">
-                <span class="px-3 text-muted small">atau masuk dengan</span>
-                <hr class="flex-grow-1">
-            </div>
+            <div class="auth-divider"><span>atau masuk dengan</span></div>
 
-            <!-- Google Login -->
-            <a href="{{ url('/auth/google/redirect') }}"
-            class="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2">
+            <a href="{{ url('/auth/google/redirect') }}" class="btn-auth-outline w-100">
                 <i class="bi bi-google"></i>
                 Login dengan Google
-            </a>            
+            </a>
 
-            <!-- <div class="auth-divider"><span>atau</span></div> -->
-
-            <p class="text-center mb-0">
+            <p class="text-center auth-footer-text">
                 Belum punya akun?
                 <a href="{{ route('register') }}" class="text-primary fw-semibold">Daftar sekarang</a>
             </p>
         </div>
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

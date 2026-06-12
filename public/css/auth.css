@@ -1,40 +1,77 @@
 /* ================================================================
    auth.css — Login · Register · Lupa Password
-   Autonexa | Theme: --primary #ff6a00
+   Autonexa | Diselaraskan dengan design system home.css (--an-*)
+   Brand: Merah (#D43B3B) · Navy (#1F2E4D) · Warm white background
 ================================================================ */
+
+/* ── VARIABLES (fallback jika home.css tidak ikut dimuat) ── */
+:root {
+    --an-br       : #D43B3B;
+    --an-br-l     : #E85D5D;
+    --an-br-d     : #B82E2E;
+    --an-br-dim   : rgba(212,59,59,0.08);
+    --an-br-ring  : rgba(212,59,59,0.20);
+
+    --an-navy     : #17253e;
+    --an-navy-l   : #2d3f5f;
+
+    --an-accent   : #E85D5D;
+
+    --an-bg-white : #FFFDFB;
+    --an-bg-soft  : #FBF5EF;
+    --an-bg-soft2 : #F5EBDF;
+
+    --an-fg       : #1F2E4D;
+    --an-fg-2     : #3a4a6b;
+    --an-fg-3     : #6b7280;
+    --an-fg-4     : #9ca3af;
+
+    --an-bd       : #ECE2D5;
+    --an-bd-warm  : #ECE2D5;
+
+    --an-r        : 14px;
+    --an-rm       : 8px;
+    --an-rs       : 6px;
+    --an-sh       : 0 1px 4px rgba(31,46,77,0.05), 0 4px 12px rgba(31,46,77,0.05);
+    --an-sh-lg    : 0 8px 32px rgba(31,46,77,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
 
 /* ── BODY ── */
 .auth-body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background: #f8fafc;
+    background: var(--an-bg-soft);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    color: var(--an-fg);
 }
 
 /* ── CONTAINER UTAMA ── */
 .auth-container {
     display: flex;
     width: 100%;
-    max-width: 900px;
-    min-height: 520px;
-    border-radius: 20px;
+    max-width: 920px;
+    min-height: 540px;
+    border-radius: var(--an-r);
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+    box-shadow: var(--an-sh-lg);
     margin: 24px auto;
+    border: 0.5px solid var(--an-bd-warm);
 }
 
 /* ================================================================
-   PANEL KIRI (gelap, dekoratif)
+   PANEL KIRI (navy, dekoratif — selaras .an-hero / .an-card-header-block)
 ================================================================ */
 .auth-left {
-    width: 340px;
+    width: 360px;
     flex-shrink: 0;
-    background: #0f172a;
-    padding: 40px 36px;
+    background: var(--an-navy);
+    padding: 44px 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -42,29 +79,22 @@
     overflow: hidden;
 }
 
-/* Lingkaran dekorasi */
-.auth-left::before {
-    content: '';
-    position: absolute;
-    width: 220px;
-    height: 220px;
+/* Orb dekorasi — pakai class an-orb tapi override posisi via inline style di blade */
+.auth-left .an-orb {
     border-radius: 50%;
-    background: rgba(255, 106, 0, 0.10);
-    top: -60px;
-    right: -60px;
     pointer-events: none;
+    filter: blur(60px);
+    position: absolute;
 }
-
-.auth-left::after {
-    content: '';
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: rgba(255, 106, 0, 0.06);
-    bottom: -30px;
-    right: 60px;
-    pointer-events: none;
+.auth-left .an-orb-1 {
+    width: 240px; height: 240px;
+    background: var(--an-br);
+    opacity: 0.18;
+}
+.auth-left .an-orb-2 {
+    width: 160px; height: 160px;
+    background: var(--an-accent);
+    opacity: 0.10;
 }
 
 .auth-left-content {
@@ -75,33 +105,27 @@
     gap: 14px;
 }
 
-/* Logo bulat */
-.auth-brand-logo {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: rgba(255, 106, 0, 0.18);
-    border: 1px solid rgba(255, 106, 0, 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #ff6a00;
-    margin-bottom: 4px;
+.auth-left-content .an-tag {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: -4px;
 }
 
 .auth-left-content h2 {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 800;
     color: #ffffff;
-    line-height: 1.3;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
     margin: 0;
 }
 
 .auth-left-content p {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.45);
-    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.62);
+    line-height: 1.75;
     margin: 0;
 }
 
@@ -110,7 +134,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .auth-feature-item {
@@ -118,13 +142,44 @@
     align-items: center;
     gap: 10px;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.78);
 }
 
 .auth-feature-item i {
     font-size: 15px;
-    color: #ff6a00;
+    color: var(--an-br-l);
     flex-shrink: 0;
+}
+
+/* Mini stats — selaras .an-stats-3 tapi versi dark */
+.auth-mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 0.5px solid rgba(255,255,255,0.12);
+}
+
+.auth-mini-stat {
+    text-align: left;
+    border-right: 0.5px solid rgba(255,255,255,0.12);
+    padding-right: 12px;
+}
+.auth-mini-stat:last-child { border-right: none; padding-right: 0; }
+
+.auth-mini-stat__num {
+    font-size: 19px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.4px;
+}
+
+.auth-mini-stat__label {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 /* ================================================================
@@ -132,11 +187,11 @@
 ================================================================ */
 .auth-right {
     flex: 1;
-    background: #ffffff;
+    background: var(--an-bg-white);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 36px 40px;
+    padding: 40px 44px;
 }
 
 .auth-card {
@@ -151,75 +206,74 @@
     gap: 6px;
     font-size: 13px;
     font-weight: 700;
-    color: #ff6a00;
+    color: var(--an-br);
     text-decoration: none;
     margin-bottom: 18px;
 }
 
-.auth-brand-sm i {
-    font-size: 16px;
-}
+.auth-brand-sm i { font-size: 16px; }
 
 /* ── HEADER FORM ── */
 .auth-header {
-    margin-bottom: 22px;
+    margin-bottom: 24px;
+    text-align: center;
 }
 
 .auth-header h4 {
-    font-size: 22px;
-    font-weight: 700;
-    color: #0f172a;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--an-fg);
+    letter-spacing: -0.4px;
     margin: 0 0 4px;
 }
 
 .auth-header p {
     font-size: 13px;
-    color: rgba(15, 23, 42, 0.5);
+    color: var(--an-fg-3);
     margin: 0;
 }
+
+.auth-header img { margin-bottom: 10px; }
 
 /* Ikon khusus halaman lupa password */
 .auth-icon-wrap {
     width: 52px;
     height: 52px;
-    border-radius: 14px;
-    background: rgba(255, 106, 0, 0.1);
-    border: 1px solid rgba(255, 106, 0, 0.2);
+    border-radius: var(--an-rm);
+    background: var(--an-br-dim);
+    border: 0.5px solid var(--an-br-ring);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 22px;
-    color: #ff6a00;
-    margin-bottom: 14px;
+    color: var(--an-br);
+    margin: 0 auto 14px;
 }
 
 /* ── INPUT GROUP ── */
 .input-group-text {
-    background: #fafafa;
-    border-color: #e5e7eb;
-    color: rgba(15, 23, 42, 0.4);
+    background: var(--an-bg-soft);
+    border-color: var(--an-bd-warm);
+    color: var(--an-fg-4);
 }
 
 .form-control {
-    border-color: #e5e7eb;
+    border-color: var(--an-bd-warm);
     font-size: 14px;
-    color: #0f172a;
+    color: var(--an-fg);
     padding: 9px 12px;
     transition: border-color 0.2s, box-shadow 0.2s;
+    background: var(--an-bg-white);
 }
 
-.form-control::placeholder {
-    color: #aaa;
-}
+.form-control::placeholder { color: var(--an-fg-4); }
 
 .form-control:focus {
-    border-color: #ff6a00;
-    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.12);
+    border-color: var(--an-br);
+    box-shadow: 0 0 0 3px var(--an-br-dim);
 }
 
-.form-control.is-invalid {
-    border-color: #ef4444;
-}
+.form-control.is-invalid { border-color: #ef4444; }
 
 .form-control.is-invalid:focus {
     border-color: #ef4444;
@@ -230,50 +284,75 @@
 .form-label {
     font-size: 13px;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--an-fg);
     margin-bottom: 6px;
 }
 
-/* ── TOMBOL SUBMIT ── */
+/* ── TOMBOL SUBMIT (primary, gaya .an-btn-primary) ── */
 .btn-auth {
-    padding: 10px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 10px;
-    transition: all 0.2s;
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: var(--an-rm);
+    transition: all 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.btn-primary.btn-auth {
-    background: #ff6a00;
-    border-color: #ff6a00;
+.btn-auth-primary {
+    background: var(--an-navy);
+    border: 2px solid var(--an-navy);
     color: #ffffff;
 }
 
-.btn-primary.btn-auth:hover {
-    background: #ff8c42;
-    border-color: #ff8c42;
+.btn-auth-primary:hover {
+    background: var(--an-navy-l);
+    border-color: var(--an-navy-l);
+    color: #fff;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(255, 106, 0, 0.3);
 }
 
-.btn-primary.btn-auth:active {
-    transform: translateY(0);
+.btn-auth-primary:active { transform: translateY(0); }
+
+/* ── TOMBOL OUTLINE (google login, gaya .an-btn-secondary) ── */
+.btn-auth-outline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: var(--an-rm);
+    background: var(--an-bg-white);
+    color: var(--an-navy);
+    border: 2px solid var(--an-bd-warm);
+    text-decoration: none;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-auth-outline:hover {
+    border-color: var(--an-navy);
+    background: var(--an-bg-soft);
+    color: var(--an-navy);
 }
 
 /* Tombol toggle password */
 .btn-outline-secondary {
-    border-color: #e5e7eb;
-    color: rgba(15, 23, 42, 0.4);
-    background: #fafafa;
+    border-color: var(--an-bd-warm);
+    color: var(--an-fg-4);
+    background: var(--an-bg-soft);
 }
 
 .btn-outline-secondary:hover {
-    background: #f0f0f0;
-    color: #0f172a;
-    border-color: #e5e7eb;
+    background: var(--an-bg-soft2);
+    color: var(--an-fg);
+    border-color: var(--an-bd-warm);
 }
 
 /* ── DIVIDER ── */
@@ -281,51 +360,54 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin: 16px 0;
-    color: rgba(15, 23, 42, 0.35);
-    font-size: 12px;
+    margin: 20px 0;
+    color: var(--an-fg-4);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
 }
 
 .auth-divider::before,
 .auth-divider::after {
     content: '';
     flex: 1;
-    height: 1px;
-    background: #e5e7eb;
+    height: 0.5px;
+    background: var(--an-bd-warm);
 }
 
 /* ── CHECKBOX REMEMBER ── */
 .form-check-input:checked {
-    background-color: #ff6a00;
-    border-color: #ff6a00;
+    background-color: var(--an-br);
+    border-color: var(--an-br);
 }
 
 .form-check-input:focus {
-    border-color: #ff6a00;
-    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.12);
+    border-color: var(--an-br);
+    box-shadow: 0 0 0 3px var(--an-br-dim);
 }
 
 .form-check-label {
     font-size: 13px;
-    color: rgba(15, 23, 42, 0.6);
+    color: var(--an-fg-3);
 }
 
-/* ── LINK LUPA PASSWORD ── */
+/* ── LINK & ACCENT ── */
 .text-primary {
-    color: #ff6a00 !important;
+    color: var(--an-br) !important;
 }
 
 .text-primary:hover {
-    color: #ff8c42 !important;
+    color: var(--an-br-l) !important;
 }
 
-.small.text-primary {
-    font-size: 12px;
-}
+.small.text-primary { font-size: 12px; }
+
+.fw-semibold.text-primary { font-weight: 600; }
 
 /* ── ALERT BOOTSTRAP OVERRIDE ── */
 .alert {
-    border-radius: 10px;
+    border-radius: var(--an-rm);
     font-size: 13px;
     padding: 10px 14px;
     margin-bottom: 16px;
@@ -338,13 +420,13 @@
     border-left: 3px solid #ef4444;
 }
 
-/* ── CUSTOM ALERT (khusus lupa password) ── */
+/* ── CUSTOM ALERT (info / success / danger) ── */
 .auth-alert {
     display: flex;
     align-items: flex-start;
     gap: 9px;
     padding: 10px 14px;
-    border-radius: 10px;
+    border-radius: var(--an-rm);
     font-size: 13px;
     margin-bottom: 16px;
     line-height: 1.5;
@@ -359,48 +441,40 @@
 .auth-alert-success {
     background: #f0fdf4;
     color: #166534;
-    border: 1px solid #bbf7d0;
+    border: 0.5px solid #bbf7d0;
 }
-
-.auth-alert-success i {
-    color: #16a34a;
-}
+.auth-alert-success i { color: #16a34a; }
 
 .auth-alert-danger {
     background: #fef2f2;
     color: #b91c1c;
-    border: 1px solid #fecaca;
+    border: 0.5px solid #fecaca;
 }
+.auth-alert-danger i { color: #ef4444; }
 
-.auth-alert-danger i {
-    color: #ef4444;
-}
-
-/* ── INFO BOX (lupa password) ── */
+/* ── INFO BOX (lupa password) — selaras .an-chip-brand ── */
 .auth-info-box {
     display: flex;
     align-items: flex-start;
     gap: 9px;
     padding: 10px 14px;
-    border-radius: 10px;
-    background: rgba(255, 106, 0, 0.06);
-    border: 1px solid rgba(255, 106, 0, 0.18);
+    border-radius: var(--an-rm);
+    background: var(--an-br-dim);
+    border: 0.5px solid var(--an-br-ring);
     font-size: 12px;
-    color: #c2410c;
+    color: var(--an-br-d);
     line-height: 1.6;
     margin-bottom: 18px;
 }
 
 .auth-info-box i {
     font-size: 14px;
-    color: #ff6a00;
+    color: var(--an-br);
     flex-shrink: 0;
     margin-top: 1px;
 }
 
-.auth-info-box strong {
-    color: #9a3412;
-}
+.auth-info-box strong { color: var(--an-fg); }
 
 /* ── LINK KEMBALI (lupa password) ── */
 .auth-back-link {
@@ -410,7 +484,7 @@
 
 .auth-back-link a {
     font-size: 13px;
-    color: rgba(15, 23, 42, 0.5);
+    color: var(--an-fg-3);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -418,47 +492,27 @@
     transition: color 0.2s;
 }
 
-.auth-back-link a:hover {
-    color: #ff6a00;
-}
+.auth-back-link a:hover { color: var(--an-br); }
 
-/* ── FOOTER LINK (daftar / masuk) ── */
-.fw-semibold.text-primary {
-    font-weight: 600;
+/* ── FOOTER TEXT ── */
+.auth-footer-text {
+    margin: 18px 0 0;
+    font-size: 13px;
+    color: var(--an-fg-3);
 }
-
 
 /* ================================================================
    LOGO
 ================================================================ */
-/* LOGO SYSTEM */
-.logo-sm {
-    height: 32px;
-}
+.logo-sm { height: 32px; }
+.logo-md { height: 100px; }
+.logo-lg { height: 56px; }
 
-.logo-md {
-    height: 100px;
-}
-
-.logo-lg {
-    height: 60px;
-}
-
-/* BRAND */
 .auth-brand-sm {
     display: flex;
     align-items: center;
     gap: 10px;
     text-decoration: none;
-}
-
-/* CENTER HEADER */
-.auth-header {
-    text-align: center;
-}
-
-.auth-header img {
-    margin-bottom: 10px;
 }
 
 /* ================================================================
@@ -467,18 +521,20 @@
 @media (max-width: 991px) {
     .auth-container {
         max-width: 480px;
-        border-radius: 16px;
+        border-radius: var(--an-r);
         flex-direction: column;
     }
 
     .auth-left {
         width: 100%;
-        padding: 24px 28px;
+        padding: 28px 28px;
         border-radius: 0;
     }
 
+    .auth-mini-stats { margin-top: 16px; padding-top: 16px; }
+
     .auth-right {
-        padding: 28px 24px;
+        padding: 32px 28px;
     }
 }
 
@@ -490,15 +546,19 @@
 
     .auth-container {
         margin: 0;
-        border-radius: 14px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+        border-radius: var(--an-rm);
+        box-shadow: var(--an-sh);
     }
+
+    .auth-left { padding: 24px; }
 
     .auth-right {
         padding: 24px 20px;
     }
 
     .auth-header h4 {
-        font-size: 19px;
+        font-size: 20px;
     }
+
+    .auth-mini-stats { grid-template-columns: repeat(3, 1fr); }
 }

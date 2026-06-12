@@ -148,7 +148,7 @@
                         : '';
                 @endphp
 
-                <div class="bengkel-card"
+                <div class="bengkel-card {{ $loop->index >= 4 ? 'bengkel-card--extra' : '' }}"
                     data-id="{{ $bengkel->id }}"
                     data-nama="{{ strtolower($bengkel->nama) }}"
                     data-alamat="{{ strtolower($bengkel->alamat) }}"
@@ -429,7 +429,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const cards  = document.querySelectorAll('.bengkel-card');
         let visible  = 0;
 
-        cards.forEach(card => {
+        // Apakah user sedang melakukan pencarian/filter aktif?
+        const isSearching = q.length > 0 || filter !== 'semua';
+
+        cards.forEach((card, index) => {
             const nama    = card.dataset.nama    || '';
             const alamat  = card.dataset.alamat  || '';
             const layanan = card.dataset.layanan || '';
@@ -444,7 +447,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 matchFilter = layanan.includes(filterKeywords[filter]);
             }
 
-            const show = matchQ && matchFilter;
+            let show = matchQ && matchFilter;
+
+            // Jika tidak sedang searching/filter, batasi hanya 4 card pertama
+            if (!isSearching) {
+                show = index < 4;
+            }
+
             card.style.display = show ? '' : 'none';
             if (show) visible++;
         });
@@ -469,6 +478,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         cards.forEach(card => grid.appendChild(card));
     });
+
+    filterCards();
+
 
 });
 </script>

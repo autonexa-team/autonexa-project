@@ -4,25 +4,26 @@
 :root {
 
     /* ─── Brand ─── */
-    --primary      : #cc4d09;
-    --primary-light: #e45b14;
-    --primary-dim  : rgba(204,77,9,.08);
-    --primary-ring : rgba(204,77,9,.18);
+    --primary      : #D43B3B;
+    --primary-light: #E85D5D;
+    --primary-dim  : rgba(212,59,59,.08);
+    --primary-ring : rgba(212,59,59,.18);
 
     /* ─── Background ─── */
-    --bg         : #ffffff;
-    --bg-off     : #f8f8f8;
-    --bg-subtle  : #f5f4f1;
+    --bg         : #FFFDFB;
+    --bg-off     : #FBF5EF;
+    --bg-subtle  : #F5EBDF;
+    --footer-bg     : #04183c;  
 
     /* ─── Text ─── */
-    --foreground        : #18181b;
-    --foreground-thin      : #52525b;
-    --foreground-soft      : #71717a;
-    --foreground-dim      : #a1a1aa;
+    --foreground        : #1F2E4D;   /* navy menggantikan hitam */
+    --foreground-thin   : #3a4a6b;
+    --foreground-soft   : #6b7280;
+    --foreground-dim    : #9ca3af;
 
     /* ─── Border ─── */
-    --border     : #e4e4e7;
-    --border-sm  : #efefef;
+    --border     : #ECE2D5;
+    --border-sm  : #ECE2D5;
 
     /* ─── Radius ─── */
     --radius-sm  : 12px;
@@ -52,8 +53,8 @@
 }
 
 body {
-    font-family: "Plus Jakarta Sans", sans-serif;  /* ← ganti dari Geist */
-    background: linear-gradient(135deg, #fff7f2 0%, #ffe9dc 30%, #ffd4bd 60%, #ffffff 100%);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    background: linear-gradient(135deg, #FFFDFB 0%, #FBF5EF 40%, #F5EBDF 100%);
     color: var(--foreground);
     overflow-x: hidden;
     line-height: 1.6;
@@ -62,12 +63,12 @@ body {
 /* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar        { width: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: rgba(217,79,10,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb  { background: rgba(212,59,59,0.3); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
 /* ─── SELECTION ─── */
 ::selection {
-    background: rgba(217, 79, 10, 0.15);
+    background: rgba(212,59,59,0.15);
     color: var(--primary);
 }
  
@@ -93,7 +94,7 @@ body {
     max-width: none;
     padding: 14px 28px;
     border-radius: var(--radius-lg);
-    background: var(--nav-glass);
+    background: rgba(255, 253, 251, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -558,7 +559,12 @@ body {
         padding: 14px 20px;
         height: 64px;
         display: flex;
+        background: #FFFDFB;
     }
+    
+    .nav-autonexa:has(.nav-menu.active) {
+        height: auto; /* ← biarkan navbar membesar sesuai konten menu */
+    }    
 
     .nav-menu.active {
         display: flex;
@@ -567,7 +573,13 @@ body {
         padding: 12px 0 4px;
         border-top: 1px solid rgba(26,26,26,0.08);
         gap: 2px;
+        background: #FFFDFB;
     }
+
+    .nav-container:has(.nav-menu.active) {
+        height: auto;
+        align-items: flex-start;
+    }    
 
     .nav-autonexa.shrink .nav-container {
         width: 92%;
@@ -1189,13 +1201,11 @@ body {
 }
 
 
-
-
 /* ══════════════════════════════════════════
    FOOTER
 ══════════════════════════════════════════ */
 .footer-main {
-    background: var(--foreground);
+    background: var(--footer-bg);
     color: rgba(255,255,255,0.6);
     padding: 60px 0 28px;
 }
@@ -1217,18 +1227,20 @@ body {
     font-size: 1.25rem;
     font-weight: 800;
     color: #fff;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: -0.3px;
 }
 
-.footer-brand-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--primary);
-    flex-shrink: 0;
+.footer-brand-name .logo-img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    /* invert logo agar terlihat di background gelap, jika logo aslinya berwarna gelap */
+    filter: brightness(0) invert(1);
 }
 
 .footer-desc {
@@ -1236,6 +1248,7 @@ body {
     color: rgba(255,255,255,0.45);
     line-height: 1.75;
     margin-bottom: 24px;
+    max-width: 280px;
 }
 
 .footer-social {
@@ -1246,29 +1259,29 @@ body {
 .social-btn {
     width: 36px;
     height: 36px;
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--an-rm);
+    border: 1px solid rgba(255,255,255,0.12);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255,255,255,0.45);
+    color: rgba(255,255,255,0.5);
     font-size: 15px;
     text-decoration: none;
-    transition: var(--transition);
+    transition: all 0.2s;
 }
 
 .social-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary-glow);
-    background: rgba(217,79,10,0.08);
+    border-color: var(--an-br);
+    color: #fff;
+    background: var(--an-br);
 }
 
 .footer-heading {
     font-size: 0.78rem;
-    font-weight: 700;
+    font-weight: 800;
     color: #fff;
     text-transform: uppercase;
-    letter-spacing: 1.8px;
+    letter-spacing: 2px;
     margin-bottom: 18px;
 }
 
@@ -1279,18 +1292,18 @@ body {
 }
 
 .footer-links li {
-    margin-bottom: 11px;
+    margin-bottom: 12px;
     font-size: 0.88rem;
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 9px;
     color: rgba(255,255,255,0.45);
 }
 
 .footer-links li i {
     margin-top: 2px;
     font-size: 13px;
-    color: var(--primary);
+    color: var(--an-br);
     flex-shrink: 0;
 }
 
@@ -1301,18 +1314,18 @@ body {
 }
 
 .footer-links a:hover {
-    color: var(--primary-glow);
+    color: var(--an-br-l);
 }
 
 .footer-divider {
     border: none;
-    border-top: 1px solid rgba(255,255,255,0.07);
+    border-top: 1px solid rgba(255,255,255,0.08);
     margin-bottom: 24px;
 }
 
 .footer-copy {
     font-size: 0.8rem;
-    color: rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.3);
     text-align: center;
     margin: 0;
 }

@@ -243,6 +243,10 @@
         <div class="ab-section-hdr--center reveal">
             <span class="ab-section-label">Tim Kami</span>
             <h2 class="ab-section-title">Orang-orang di Balik AutoNexa</h2>
+            <p class="ab-section-desc">
+                Tim kecil dengan semangat besar untuk membangun platform
+                reservasi bengkel terbaik di Indonesia.
+            </p>
         </div>
 
         <div class="ab-team-grid">
@@ -250,34 +254,29 @@
                 $team = [
                     [
                         'nama' => "Dita Muta'aliy Soihda",
-                        'jabatan' => '162023026',
-                        'info' => 'Tim AutoNexa',
+                        'nim' => '162023026',
+                        'role' => 'Frontend Developer',
                         'foto' => 'team-1.jpg'
                     ],
-
                     [
                         'nama' => 'Sukma Oktavia',
-                        'jabatan' => '162023016',
-                        'info' => 'Tim AutoNexa',
+                        'nim' => '162023016',
+                        'role' => 'Backend Developer',
                         'foto' => 'team-2.jpg'
                     ],
-
                     [
                         'nama' => 'Auliya Az Zahrah Salsabilah',
-                        'jabatan' => '162023026',
-                        'info' => 'Tim AutoNexa',
+                        'nim' => '162023026',
+                        'role' => 'UI/UX Designer',
                         'foto' => 'team-3.jpg'
                     ],
-
                     [
                         'nama' => 'Dhina Nur Rizki Ramadani',
-                        'jabatan' => '162023029',
-                        'info' => 'Tim AutoNexa',
+                        'nim' => '162023029',
+                        'role' => 'Quality Assurance',
                         'foto' => 'team-4.jpg'
                     ],
                 ];
-                $avatarColors = ['#fff4ec', '#eff6ff', '#ecfdf5', '#f5f3ff'];
-                $txtColors    = ['#f97316', '#2563eb', '#059669', '#7c3aed'];
             @endphp
 
             @foreach($team as $i => $anggota)
@@ -285,28 +284,27 @@
                 $initials = collect(explode(' ', $anggota['nama']))
                     ->map(fn($w) => strtoupper($w[0]))->take(2)->join('');
                 $fotoPath = public_path('images/' . $anggota['foto']);
-                $ci = $i % 4;
             @endphp
             <div class="ab-team-card reveal d{{ ($i % 4) + 1 }}">
-                <div class="ab-team-avatar"
-                     style="background:{{ $avatarColors[$ci] }}; color:{{ $txtColors[$ci] }};">
+                <div class="ab-team-photo-wrap">
                     @if(file_exists($fotoPath))
                         <img src="{{ asset('images/' . $anggota['foto']) }}"
-                             alt="{{ $anggota['nama'] }}">
+                             alt="{{ $anggota['nama'] }}" class="ab-team-photo">
                     @else
-                        {{ $initials }}
+                        <div class="ab-team-initials">{{ $initials }}</div>
                     @endif
+                    <div class="ab-team-nim">{{ $anggota['nim'] }}</div>
                 </div>
-                <div class="ab-team-name">{{ $anggota['nama'] }}</div>
-                <div class="ab-team-role">{{ $anggota['jabatan'] }}</div>
-                <div class="ab-team-info">{{ $anggota['info'] }}</div>
+                <div class="ab-team-body">
+                    <div class="ab-team-name">{{ $anggota['nama'] }}</div>
+                    <div class="ab-team-role">{{ $anggota['role'] }}</div>
+                </div>
             </div>
             @endforeach
         </div>
 
     </div>
 </section>
-
 
 {{-- ════════════════════════════════════════
      BENGKEL PARTNER
@@ -323,66 +321,50 @@
             </p>
         </div>
 
-        <div class="ab-partner-grid">
-            @forelse($bengkels ?? [] as $bengkel)
-            <div class="ab-partner-card reveal">
-                @if($bengkel->foto)
-                    <img src="{{ asset('storage/' . $bengkel->foto) }}"
-                         alt="{{ $bengkel->nama }}" class="ab-partner-cover">
-                @else
-                    <div class="ab-partner-placeholder">🔧</div>
-                @endif
+        @if(isset($bengkels) && $bengkels->count() > 0)
+        <div class="ab-partner-marquee">
+            <div class="ab-partner-track">
+                {{-- Render dua kali untuk loop seamless --}}
+                @for($loopIdx = 0; $loopIdx < 2; $loopIdx++)
+                    @foreach($bengkels as $bengkel)
+                    <div class="ab-partner-card">
+                        @if($bengkel->foto)
+                            <img src="{{ asset('storage/' . $bengkel->foto) }}"
+                                 alt="{{ $bengkel->nama }}" class="ab-partner-cover">
+                        @else
+                            <div class="ab-partner-placeholder">🔧</div>
+                        @endif
 
-                <div class="ab-partner-body">
-                    <div class="ab-partner-name">{{ $bengkel->nama }}</div>
-                    <div class="ab-partner-addr">
-                        <i class="fas fa-map-marker-alt"></i>
-                        {{ $bengkel->alamat }}
+                        <div class="ab-partner-body">
+                            <div class="ab-partner-name">{{ $bengkel->nama }}</div>
+                            <div class="ab-partner-addr">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ $bengkel->alamat }}
+                            </div>
+                            <div class="ab-partner-stars">
+                                @php $avg = round($bengkel->reviews_avg_rating ?? 0); @endphp
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star ab-star {{ $i <= $avg ? 'on' : '' }}"></i>
+                                @endfor
+                                <span class="ab-partner-score">
+                                    ({{ number_format($bengkel->reviews_avg_rating ?? 0, 1) }})
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="ab-partner-stars">
-                        @php $avg = round($bengkel->reviews_avg_rating ?? 0); @endphp
-                        @for($i = 1; $i <= 5; $i++)
-                            <i class="fas fa-star ab-star {{ $i <= $avg ? 'on' : '' }}"></i>
-                        @endfor
-                        <span class="ab-partner-score">
-                            ({{ number_format($bengkel->reviews_avg_rating ?? 0, 1) }})
-                        </span>
-                    </div>
-                </div>
+                    @endforeach
+                @endfor
             </div>
-            @empty
-            <div class="ab-partner-empty">
-                <i class="fas fa-store"></i>
-                <p>Bengkel partner segera hadir</p>
-            </div>
-            @endforelse
         </div>
+        @else
+        <div class="ab-partner-empty">
+            <i class="fas fa-store"></i>
+            <p>Bengkel partner segera hadir</p>
+        </div>
+        @endif
 
     </div>
 </section>
-
-
-{{-- ════════════════════════════════════════
-     CTA
-════════════════════════════════════════ --}}
-<div class="ab-cta reveal">
-    <h3 class="ab-cta__title">Siap Servis Kendaraan Anda?</h3>
-    <p class="ab-cta__desc">
-        Bergabung dengan lebih dari 10.000 pelanggan yang sudah mempercayakan
-        servis kendaraan mereka kepada AutoNexa.
-    </p>
-    <div class="ab-cta__btns">
-        <a href="{{ route('register') }}" class="btn-primary-ab">
-            <i class="fas fa-calendar-plus"></i>
-            Mulai Reservasi Gratis
-        </a>
-        <a href="{{ route('pelanggan.bengkel') }}" class="btn-outline-ab">
-            <i class="fas fa-store"></i>
-            Lihat Bengkel
-        </a>
-    </div>
-</div>
-
 @endsection
 
 @push('scripts')

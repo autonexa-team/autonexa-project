@@ -13,14 +13,20 @@
 
 <div class="auth-container">
 
-    {{-- Panel kiri --}}
+    {{-- ===== PANEL KIRI (navy, dekoratif — selaras hero landing) ===== --}}
     <div class="auth-left d-none d-lg-flex">
+        <div class="an-orb an-orb-1" style="top:-80px; right:-60px;"></div>
+        <div class="an-orb an-orb-2" style="bottom:-40px; left:-40px;"></div>
+
         <div class="auth-left-content">
-            <a href="{{ route('landing') }}" class="auth-brand-sm d-flex align-items-center gap-2">
+            <!-- <a href="{{ route('landing') }}" class="auth-brand-sm">
                 <img src="{{ asset('assets/logo.png') }}" alt="Logo" class="logo-lg">
-            </a>
-            <h2>Reset Password</h2>
+            </a> -->
+
+            <span class="an-tag" style="color:var(--an-br-l);">Autonexa Platform</span>
+            <h2>Reset password akun Anda</h2>
             <p>Masukkan email terdaftar dan kami akan kirimkan tautan untuk membuat password baru.</p>
+
             <div class="auth-features">
                 <div class="auth-feature-item">
                     <i class="bi bi-1-circle-fill"></i> Masukkan email terdaftar
@@ -32,12 +38,33 @@
                     <i class="bi bi-3-circle-fill"></i> Buat password baru
                 </div>
             </div>
+
+            {{-- Mini stat strip — gaya an-stats-3 --}}
+            <div class="auth-mini-stats">
+                <div class="auth-mini-stat">
+                    <div class="auth-mini-stat__num">24+</div>
+                    <div class="auth-mini-stat__label">Bengkel</div>
+                </div>
+                <div class="auth-mini-stat">
+                    <div class="auth-mini-stat__num">4.8</div>
+                    <div class="auth-mini-stat__label">Rating</div>
+                </div>
+                <div class="auth-mini-stat">
+                    <div class="auth-mini-stat__num">1.2k</div>
+                    <div class="auth-mini-stat__label">Pengguna</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    {{-- Panel kanan --}}
+    {{-- ===== PANEL KANAN (form) ===== --}}
     <div class="auth-right">
         <div class="auth-card">
+
+            <div class="auth-icon-wrap">
+                <i class="bi bi-key"></i>
+            </div>
+
             <div class="auth-header">
                 <h4>Lupa Password?</h4>
                 <p>Tenang, kami bantu reset password akun kamu.</p>
@@ -88,7 +115,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 btn-auth">
+                <button type="submit" class="btn btn-auth-primary w-100 btn-auth">
                     <i class="bi bi-send me-2"></i>Kirim Link Reset
                 </button>
             </form>

@@ -345,7 +345,7 @@
                 @if($bengkel->foto)
                 <div class="foto-existing" id="fotoExisting">
                     <div class="foto-existing-wrap">
-                        <img src="{{ asset('assets/' . $bengkel->foto) }}"
+                        <img src="{{ asset('storage/' . $bengkel->foto) }}"
                              alt="Foto {{ $bengkel->nama }}"
                              class="foto-existing-img">
                     </div>

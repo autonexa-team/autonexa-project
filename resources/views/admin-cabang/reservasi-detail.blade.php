@@ -799,13 +799,13 @@
             const res = await fetch(`/admin-cabang/reservasi/${RESERVASI_ID}/sparepart`, {
                 method : 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
-                body   : JSON.stringify({ nama: selectedSparepart.nama, harga, qty, keterangan })
+                body: JSON.stringify({ sparepart_id: selectedSparepart.id, qty, keterangan })
             });
             
             const data = await res.json();
             
             if (!res.ok) {
-                const errorMsg = data.message || data.errors?.nama?.[0] || 'Tidak dapat menyimpan sparepart.';
+                const errorMsg = data.message || data.errors?.sparepart_id?.[0] || 'Tidak dapat menyimpan sparepart.';
                 throw new Error(errorMsg);
             }
 

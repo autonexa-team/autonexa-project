@@ -82,10 +82,10 @@
             </a>
 
             <a href="{{ route('admin-pusat.reservasi') }}"
-               class="nav-item {{ request()->routeIs('admin-pusat.reservasi') ? 'active' : '' }}">
-                <i class="bi bi-people"></i>
+            class="nav-item {{ request()->routeIs('admin-pusat.reservasi') ? 'active' : '' }}">
+                <i class="bi bi-calendar-check"></i>
                 <span>Reservasi</span>
-            </a>            
+            </a>          
 
             <div class="nav-section-label">Analitik</div>
 

@@ -112,21 +112,28 @@ Route::get('/bengkel/{id}', [BengkelController::class, 'showPelanggan'])
 
 
 // ── PELANGGAN ─────────────────────────
+Route::middleware(['auth', 'role:pelanggan'])
+    ->prefix('pelanggan')
+    ->name('pelanggan.')
+    ->group(function () {
+        
+    Route::post('/booking', [ReservasiController::class, 'store'])
+    ->name('booking.store');
 
-        Route::post('/booking', [ReservasiController::class, 'store'])
-            ->name('pelanggan.booking.store');
+    Route::get('/reservasi', [ReservasiController::class, 'index'])
+        ->name('reservasi');
 
-        Route::get('/reservasi-public', [ReservasiController::class, 'publicReservasi'])
-        ->name('pelanggan.reservasi');
+    Route::patch('/reservasi/{id}/batalkan', [ReservasiController::class, 'batalkanPelanggan'])
+        ->name('reservasi.batalkan');        
 
-        Route::get('/riwayat', [ReservasiController::class, 'riwayat'])
-            ->name('pelanggan.riwayat');
+    Route::get('/riwayat', [ReservasiController::class, 'riwayat'])
+        ->name('riwayat');
 
-        Route::get('/riwayat/{id}', [ReservasiController::class, 'riwayatDetail'])
-            ->name('riwayat-detail');
+    Route::get('/riwayat/{id}', [ReservasiController::class, 'riwayatDetail'])
+        ->name('riwayat-detail');
 
     Route::get('/profile', [ReservasiController::class, 'profile'])
-        ->name('pelanggan.profile'); 
+        ->name('profile'); 
     
      Route::put('/profile/update', [ReservasiController::class, 'updateProfile'])
         ->name('profile.update');
@@ -144,19 +151,19 @@ Route::get('/bengkel/{id}', [BengkelController::class, 'showPelanggan'])
     Route::delete('/review/{review}', [ReviewController::class, 'destroy'])
         ->name('review.destroy'); 
 
-        Route::put('/profile/update', [ProfileController::class, 'update'])
-            ->name('pelanggan.profile.update');
+    Route::put('/profile/update', [ProfileController::class, 'update'])
+        ->name('pelanggan.profile.update');
 
-        Route::get('/profile/edit', [ProfileController::class, 'edit'])
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])
         ->name('pelanggan.profile.edit');
 
-        Route::get('/dashboard', function () {
-            return view('pelanggan.dashboard');
-        })->name('dashboard');
+    Route::get('/dashboard', function () {
+         return view('pelanggan.dashboard');
+    })->name('dashboard');
 
-        Route::post('/review', [ReviewController::class, 'store'])
-            ->name('review.store');
-
+    Route::post('/review', [ReviewController::class, 'store'])
+        ->name('review.store');
+});
 
 // ── ADMIN PUSAT ───────────────────────
 Route::middleware(['auth', 'role:admin_pusat'])

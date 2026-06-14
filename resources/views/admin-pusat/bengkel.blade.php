@@ -84,7 +84,7 @@
         {{-- Thumbnail --}}
         <div class="card-thumb" style="--warna: {{ $b->warna ?? '#ff6a00' }}">
             @if($b->foto)
-                <img src="{{ asset('assets/' . $b->foto) }}" alt="{{ $b->nama }}" class="card-thumb-img">
+                <img src="{{ asset('storage/' . $b->foto) }}" alt="{{ $b->nama }}" class="card-thumb-img">
             @else
                 <div class="card-thumb-initials" style="color:var(--warna);">
                     {{ strtoupper(implode('', array_map(fn($w) => $w[0], explode(' ', $b->nama)))) }}

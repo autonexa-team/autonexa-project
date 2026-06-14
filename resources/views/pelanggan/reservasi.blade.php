@@ -85,7 +85,7 @@
                         data-lng="{{ $bengkel->longitude ?? '' }}"
                         data-penuh="{{ $penuh ? '1' : '0' }}">
                         <img src="{{ $bengkel->foto ? asset('storage/'.$bengkel->foto) : asset('img/bengkel-default.jpg') }}"
-                             class="bengkel-thumb" alt="{{ $bengkel->nama }}">
+                            class="bengkel-thumb" alt="{{ $bengkel->nama }}">
                         <div class="bengkel-info">
                             <div class="bengkel-nama">{{ $bengkel->nama }}</div>
                             <div class="bengkel-alamat">{{ $bengkel->alamat }}</div>
@@ -173,82 +173,7 @@
 
                 </div>
             </div>
-        </div>
-
-        {{-- BLOK LAYANAN — hidden by default --}}
-        <div class="form-field layanan-wrapper" id="layananWrapper" style="display:none;">
-            <label class="field-label">
-                <i class="bi bi-wrench-adjustable-circle"></i>
-                Pilih Layanan Utama
-                <span class="label-optional">· pilih satu</span>
-            </label>
-
-            {{-- Layanan terpilih / default --}}
-            <div class="layanan-selected-display" id="layananSelectedDisplay">
-                <div class="layanan-card" id="layananDefaultCard"
-                    data-id="{{ $layanans->first()->id ?? '' }}"
-                    data-nama="{{ $layanans->first()->nama ?? '' }}"
-                    data-durasi="{{ $layanans->first()->durasi ?? '' }}"
-                    data-harga="{{ $layanans->first()->harga ?? 0 }}">
-                    <div class="layanan-radio selected-indicator">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </div>
-                    <div class="layanan-detail">
-                        <div class="layanan-nama">{{ $layanans->first()->nama ?? 'Pilih layanan' }}</div>
-                        @if($layanans->first()?->deskripsi)
-                            <div class="layanan-desc">{{ $layanans->first()->deskripsi }}</div>
-                        @endif
-                        <div class="layanan-badges">
-                            <span class="badge-durasi">
-                                <i class="bi bi-clock"></i> ~{{ $layanans->first()->durasi ?? '-' }} menit
-                            </span>
-                            <span class="badge-harga">
-                                <i class="bi bi-cash"></i> Mulai Rp {{ number_format($layanans->first()->harga ?? 0, 0, ',', '.') }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Tombol ganti layanan --}}
-            <button type="button" class="btn-ganti-layanan" id="btnGantiLayanan">
-                <i class="bi bi-chevron-down" id="iconGantiLayanan"></i>
-                Pilih layanan lain
-            </button>
-
-            {{-- Dropdown list layanan lain --}}
-            <div class="layanan-dropdown" id="layananDropdown" style="display:none;">
-                <div class="layanan-list" id="layananList">
-                    @foreach($layanans as $layanan)
-                    <div class="layanan-card"
-                        data-id="{{ $layanan->id }}"
-                        data-nama="{{ $layanan->nama }}"
-                        data-durasi="{{ $layanan->durasi }}"
-                        data-harga="{{ $layanan->harga }}">
-                        <div class="layanan-radio">
-                            <div class="layanan-radio-dot"></div>
-                        </div>
-                        <div class="layanan-detail">
-                            <div class="layanan-nama">{{ $layanan->nama }}</div>
-                            @if($layanan->deskripsi)
-                                <div class="layanan-desc">{{ $layanan->deskripsi }}</div>
-                            @endif
-                            <div class="layanan-badges">
-                                <span class="badge-durasi">
-                                    <i class="bi bi-clock"></i> ~{{ $layanan->durasi }} menit
-                                </span>
-                                <span class="badge-harga">
-                                    <i class="bi bi-cash"></i> Mulai Rp {{ number_format($layanan->harga, 0, ',', '.') }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            @error('layanan_id')<div class="field-error">{{ $message }}</div>@enderror
-        </div>        
+        </div>    
 
         {{-- ===== BLOK 3: DETAIL RESERVASI ===== --}}
         <div class="reservasi-block" id="blok-form">
@@ -318,41 +243,45 @@
                     </div>
 
                     {{-- ===== PILIH LAYANAN UTAMA (1 saja) ===== --}}
+                    {{-- ===== PILIH LAYANAN UTAMA ===== --}}
                     <div class="form-field" style="margin-bottom:8px;">
                         <label class="field-label">
                             <i class="bi bi-wrench-adjustable-circle"></i>
                             Pilih Layanan Utama
                             <span class="label-optional">· pilih satu</span>
                         </label>
-                        <div class="layanan-list" id="layananList">
-                            @foreach($layanans as $layanan)
-                            <div class="layanan-card {{ old('layanan_id') == $layanan->id ? 'selected' : '' }}"
-                                data-id="{{ $layanan->id }}"
-                                data-nama="{{ $layanan->nama }}"
-                                data-durasi="{{ $layanan->durasi }}"
-                                data-harga="{{ $layanan->harga }}">
-                                <div class="layanan-radio">
-                                    <div class="layanan-radio-dot"></div>
-                                </div>
-                                <div class="layanan-detail">
-                                    <div class="layanan-nama">{{ $layanan->nama }}</div>
-                                    @if($layanan->deskripsi)
-                                        <div class="layanan-desc">{{ $layanan->deskripsi }}</div>
-                                    @endif
-                                    <div class="layanan-badges">
-                                        <span class="badge-durasi">
-                                            <i class="bi bi-clock"></i>
-                                            ~{{ $layanan->durasi }} menit
-                                        </span>
-                                        <span class="badge-harga">
-                                            <i class="bi bi-cash"></i>
-                                            Mulai Rp {{ number_format($layanan->harga, 0, ',', '.') }}
-                                        </span>
-                                    </div>
+
+                        {{-- Dropdown trigger --}}
+                        <div class="layanan-dropdown-trigger" id="layananTrigger"
+                            onclick="toggleLayananDropdown()"
+                            style="display:flex; align-items:center; justify-content:space-between;
+                                    border:1.5px solid #e2e8f0; border-radius:10px; padding:12px 16px;
+                                    cursor:pointer; background:#fff; user-select:none;">
+                            <span id="layananTriggerText" style="color:#94a3b8; font-size:.9rem;">
+                                — Pilih bengkel terlebih dahulu —
+                            </span>
+                            <i class="bi bi-chevron-down" id="layananChevron" style="transition:.2s;"></i>
+                        </div>
+
+                        {{-- Dropdown list --}}
+                        <div id="layananDropdownList" style="
+                            display:none; border:1.5px solid #e2e8f0; border-top:none;
+                            border-radius:0 0 10px 10px; background:#fff;
+                            max-height:320px; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,.08);">
+                            <div id="layananOptions">
+                                <div style="padding:16px; text-align:center; color:#94a3b8; font-size:.85rem;">
+                                    Pilih bengkel terlebih dahulu
                                 </div>
                             </div>
-                            @endforeach
                         </div>
+
+                        {{-- Info layanan terpilih --}}
+                        <div id="layananSelectedInfo" style="display:none; margin-top:.75rem;
+                            background:#fff7ed; border:1.5px solid #fed7aa; border-radius:10px; padding:12px 16px;">
+                            <div style="font-weight:700; color:#c2410c; font-size:.9rem;" id="layananSelectedNama"></div>
+                            <div style="font-size:.78rem; color:#9a3412; margin-top:.25rem;" id="layananSelectedMeta"></div>
+                        </div>
+
                         @error('layanan_id')<div class="field-error">{{ $message }}</div>@enderror
                     </div>
 
@@ -484,51 +413,14 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-{{-- Data slot per jam dari controller --}}
 <script>
-window.slotData     = @json($slotPerJam ?? []);
-window.kapasitasBengkel = @json($bengkels->pluck('kapasitas', 'id') ?? []);
-window.isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+{{-- Data untuk booking.js — harus sebelum booking.js dimuat --}}
+window.slotData          = @json($slotPerJam ?? []);
+window.kapasitasBengkel  = @json($bengkels->pluck('kapasitas', 'id') ?? []);
+window.layananPerBengkel = @json($layananPerBengkel ?? []);  {{-- ← pindah ke sini --}}
+window.isAuthenticated   = {{ auth()->check() ? 'true' : 'false' }};
 window.loginModalElement = document.getElementById('loginModal');
 </script>
 
 <script src="{{ asset('js/booking.js') }}"></script>
-
-{{-- ===== SYNC total_biaya ke hidden field saat layanan dipilih ===== --}}
-<script>
-(function () {
-    // Dijalankan setelah booking.js selesai dimuat
-    // Pantau perubahan pada layananIdForm (diisi oleh booking.js saat klik layanan-card)
-    const layananIdInput  = document.getElementById('layananIdForm');
-    const totalBiayaInput = document.getElementById('totalBiayaForm');
-
-    // Fungsi sync: baca harga dari card yang sedang selected
-    function syncTotalBiaya() {
-        const selectedCard = document.querySelector('.layanan-card.selected');
-        if (selectedCard) {
-            const harga = parseInt(selectedCard.dataset.harga) || 0;
-            if (totalBiayaInput) totalBiayaInput.value = harga;
-        } else {
-            if (totalBiayaInput) totalBiayaInput.value = 0;
-        }
-    }
-
-    // Delegasi event pada container layanan agar berjalan setelah booking.js
-    const layananList = document.getElementById('layananList');
-    if (layananList) {
-        layananList.addEventListener('click', function () {
-            // Tunggu booking.js selesai menambahkan class 'selected'
-            setTimeout(syncTotalBiaya, 0);
-        });
-    }
-
-    // Saat form di-submit, pastikan nilai sudah terisi
-    const form = document.getElementById('formBooking');
-    if (form) {
-        form.addEventListener('submit', function () {
-            syncTotalBiaya();
-        });
-    }
-})();
-</script>
 @endpush

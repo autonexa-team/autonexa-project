@@ -919,15 +919,36 @@ window.removePhoto = function(idx) {
         if (e.target === modal) modal.style.display = 'none';
     });
 
-    cancelYes?.addEventListener('click', function () {
+    cancelYes?.addEventListener('click', async function () {
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membatalkan...';
         this.disabled  = true;
 
-        setTimeout(() => {
-            modal.style.display = 'none';
-            // Redirect ke riwayat setelah pembatalan
-            window.location.href = '{{ route("pelanggan.riwayat") }}';
-        }, 1600);
+        try {
+            const res = await fetch('{{ route("pelanggan.reservasi.batalkan", $reservasi->id) }}', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                }
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                modal.style.display = 'none';
+                // Reload halaman agar status terupdate
+                window.location.reload();
+            } else {
+                alert(data.message || 'Gagal membatalkan reservasi.');
+                this.innerHTML = '<i class="fas fa-times-circle"></i> Ya, Batalkan';
+                this.disabled  = false;
+            }
+        } catch (e) {
+            alert('Terjadi kesalahan. Coba lagi.');
+            this.innerHTML = '<i class="fas fa-times-circle"></i> Ya, Batalkan';
+            this.disabled  = false;
+        }
     });
 
     /* ══════════════════════════

@@ -162,7 +162,7 @@
                     <div class="card-img-wrap">
                         <img
                             src="{{ $bengkel->foto
-                                ? asset('assets/'.$bengkel->foto)
+                                ? asset('storage/'.$bengkel->foto)
                                 : asset('img/bengkel-default.jpg') }}"
                             class="card-img"
                             alt="{{ $bengkel->nama }}"

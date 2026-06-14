@@ -99,6 +99,9 @@
             }
 
             updateRingkasan();
+
+            // Update layanan dropdown saat bengkel dipilih
+            updateLayananOptions(selectedBengkelData.id);
         });
     });
 
@@ -112,10 +115,12 @@
         selectedBengkelData          = {};
 
         // ← TAMBAH INI — sembunyikan layanan & reset
-        const layananWrapper = document.getElementById('layananWrapper');
-        if (layananWrapper) layananWrapper.style.display = 'none';
-        selectedLayanan = null;
-        if (estimasiBox) estimasiBox.style.display = 'none';
+        updateLayananOptions(null);
+        const trigger = document.getElementById('layananTriggerText');
+        if (trigger) {
+            trigger.textContent = '— Pilih bengkel terlebih dahulu —';
+            trigger.style.color = '#94a3b8';
+        }
 
         // Tampilkan empty state bengkel
         const bengkelEmpty = document.getElementById('bengkelEmpty');
@@ -200,13 +205,51 @@
 
                     /* Render ulang */
                     cards.forEach(card => {
-                        bengkelList.appendChild(card);
+                        const jarak = parseFloat(card.dataset.distance);
+                        card.querySelector('.jarak-label')?.remove();
+
+                        // ← TAMBAH INI: sembunyikan bengkel > 5 km
+                        if (jarak > 5) {
+                            card.style.display = 'none';
+                            return;
+                        } else {
+                            card.style.display = 'flex';
+                        }
+
+                        if (jarak < 999999) {
+                            const label = document.createElement('div');
+                            label.className = 'jarak-label';
+                            label.style.cssText = 'font-size:11px;color:#f97316;font-weight:600;margin-top:4px;';
+                            label.textContent = jarak < 1
+                                ? `${Math.round(jarak * 1000)} m dari lokasi Anda`
+                                : `${jarak.toFixed(1)} km dari lokasi Anda`;
+                            card.querySelector('.bengkel-info')?.appendChild(label);
+                        }
+                    });
+
+                    // Tampilkan list dan sembunyikan empty state
+                    bengkelList.style.display = 'block';
+                    const bengkelEmpty = document.getElementById('bengkelEmpty');
+                    if (bengkelEmpty) bengkelEmpty.style.display = 'none';
+
+                    // Tambahkan label jarak pada setiap card
+                    cards.forEach(card => {
+                        const jarak = parseFloat(card.dataset.distance);
+                        card.querySelector('.jarak-label')?.remove();
+
+                        if (jarak < 999999) {
+                            const label = document.createElement('div');
+                            label.className = 'jarak-label';
+                            label.style.cssText = 'font-size:11px;color:#f97316;font-weight:600;margin-top:4px;';
+                            label.textContent = jarak < 1
+                                ? `${Math.round(jarak * 1000)} m dari lokasi Anda`
+                                : `${jarak.toFixed(1)} km dari lokasi Anda`;
+                            card.querySelector('.bengkel-info')?.appendChild(label);
+                        }
                     });
 
                     btnTerdekat.disabled = false;
-
-                    btnTerdekat.innerHTML =
-                        '<i class="bi bi-geo-alt-fill"></i> Bengkel Terdekat';
+                    btnTerdekat.innerHTML = '<i class="bi bi-geo-alt-fill"></i> Bengkel Terdekat';
 
                 },
 
@@ -347,83 +390,130 @@
     /* ================================================================
        LAYANAN — pilih satu + tampilkan estimasi
     ================================================================ */
-    layananCards.forEach(card => {
-        card.addEventListener('click', function () {
-            layananCards.forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected');
-
-            selectedLayanan = {
-                id     : this.dataset.id,
-                nama   : this.dataset.nama,
-                durasi : parseInt(this.dataset.durasi) || 0,
-                harga  : parseInt(this.dataset.harga)  || 0,
-            };
-
-            document.getElementById('layananIdForm').value = selectedLayanan.id;
-
-            /* Update estimasi box */
-            document.getElementById('estNama').textContent   = selectedLayanan.nama;
-            document.getElementById('estDurasi').textContent = `± ${selectedLayanan.durasi} menit`;
-            document.getElementById('estHarga').textContent  =
-                'Rp ' + selectedLayanan.harga.toLocaleString('id-ID');
-            document.getElementById('estTotal').textContent  =
-                'Rp ' + selectedLayanan.harga.toLocaleString('id-ID') + '+';
-            estimasiBox.style.display = 'block';
-
-            updateRingkasan();
-        });
-    });
-
     /* ================================================================
-    LAYANAN DROPDOWN
+    LAYANAN DROPDOWN — filter per bengkel
     ================================================================ */
-    const btnGantiLayanan = document.getElementById('btnGantiLayanan');
-    const layananDropdown = document.getElementById('layananDropdown');
+    let isLayananDropdownOpen = false;
 
-    btnGantiLayanan?.addEventListener('click', function () {
-        const isOpen = layananDropdown.style.display !== 'none';
-        layananDropdown.style.display = isOpen ? 'none' : 'block';
-        this.classList.toggle('open', !isOpen);
-    });
-
-    document.getElementById('layananDropdown')?.addEventListener('click', function (e) {
-        const card = e.target.closest('.layanan-card');
-        if (!card) return;
-
-        // Update selected layanan
-        selectedLayanan = {
-            id     : card.dataset.id,
-            nama   : card.dataset.nama,
-            durasi : parseInt(card.dataset.durasi) || 0,
-            harga  : parseInt(card.dataset.harga)  || 0,
-        };
-
-        // Update display card
-        const displayCard = document.getElementById('layananDefaultCard');
-        if (displayCard) {
-            displayCard.dataset.id    = card.dataset.id;
-            displayCard.dataset.harga = card.dataset.harga;
-            displayCard.querySelector('.layanan-nama').textContent = card.dataset.nama;
-            displayCard.querySelector('.badge-durasi').innerHTML   =
-                `<i class="bi bi-clock"></i> ~${card.dataset.durasi} menit`;
-            displayCard.querySelector('.badge-harga').innerHTML    =
-                `<i class="bi bi-cash"></i> Mulai Rp ${parseInt(card.dataset.harga).toLocaleString('id-ID')}`;
+    window.toggleLayananDropdown = function () {
+        // Hanya bisa dibuka kalau bengkel sudah dipilih
+        if (!bengkelIdInput.value) {
+            const trigger = document.getElementById('layananTriggerText');
+            if (trigger) trigger.style.color = '#ef4444';
+            setTimeout(() => {
+                if (trigger) trigger.style.color = '#94a3b8';
+            }, 1500);
+            return;
         }
 
-        // Set hidden input & update estimasi
-        document.getElementById('layananIdForm').value = selectedLayanan.id;
-        document.getElementById('estNama').textContent   = selectedLayanan.nama;
-        document.getElementById('estDurasi').textContent = `± ${selectedLayanan.durasi} menit`;
-        document.getElementById('estHarga').textContent  = 'Rp ' + selectedLayanan.harga.toLocaleString('id-ID');
-        document.getElementById('estTotal').textContent  = 'Rp ' + selectedLayanan.harga.toLocaleString('id-ID') + '+';
-        if (estimasiBox) estimasiBox.style.display = 'block';
+        const list    = document.getElementById('layananDropdownList');
+        const chevron = document.getElementById('layananChevron');
+        if (!list) return;
+
+        isLayananDropdownOpen = !isLayananDropdownOpen;
+        list.style.display    = isLayananDropdownOpen ? 'block' : 'none';
+        if (chevron) chevron.style.transform = isLayananDropdownOpen ? 'rotate(180deg)' : '';
+    };
+
+    function updateLayananOptions(bengkelId) {
+        const options  = document.getElementById('layananOptions');
+        const trigger  = document.getElementById('layananTriggerText');
+        const list     = document.getElementById('layananDropdownList');
+        const chevron  = document.getElementById('layananChevron');
+        if (!options) return;
+
+        const layanans = window.layananPerBengkel?.[bengkelId] ?? [];
+
+        // Reset
+        selectedLayanan = null;
+        const layananIdForm = document.getElementById('layananIdForm');
+        if (layananIdForm) layananIdForm.value = '';
+        const layananSelectedInfo = document.getElementById('layananSelectedInfo');
+        if (layananSelectedInfo) layananSelectedInfo.style.display = 'none';
+        if (trigger) { trigger.textContent = '— Pilih layanan —'; trigger.style.color = '#94a3b8'; }
+        if (estimasiBox) estimasiBox.style.display = 'none';
 
         // Tutup dropdown
-        layananDropdown.style.display = 'none';
-        btnGantiLayanan.classList.remove('open');
+        isLayananDropdownOpen = false;
+        if (list) list.style.display = 'none';
+        if (chevron) chevron.style.transform = '';
+
+        if (layanans.length === 0) {
+            options.innerHTML = `<div style="padding:16px; text-align:center; color:#94a3b8; font-size:.85rem;">
+                Bengkel ini belum mengaktifkan layanan</div>`;
+            return;
+        }
+
+        options.innerHTML = layanans.map((l, idx) => `
+            <div onclick="pilihLayanan(${l.id}, '${l.nama.replace(/'/g,"\\'")}', ${l.durasi}, ${l.harga})"
+                style="padding:14px 16px; cursor:pointer; border-bottom:1px solid #f1f5f9;
+                        display:flex; justify-content:space-between; align-items:center;
+                        transition:background .15s;"
+                onmouseover="this.style.background='#fff7ed'"
+                onmouseout="this.style.background=''">
+                <div>
+                    <div style="font-weight:700; font-size:.88rem; color:#1e293b;">${l.nama}</div>
+                    <div style="font-size:.75rem; color:#64748b; margin-top:.2rem;">
+                        ~${l.durasi} menit &nbsp;·&nbsp; Mulai Rp ${parseInt(l.harga).toLocaleString('id-ID')}
+                    </div>
+                    ${l.deskripsi ? `<div style="font-size:.72rem; color:#94a3b8; margin-top:.15rem;">${l.deskripsi}</div>` : ''}
+                </div>
+                <i class="bi bi-chevron-right" style="color:#cbd5e1; font-size:.75rem;"></i>
+            </div>`).join('');
+    }
+
+    window.pilihLayanan = function (id, nama, durasi, harga) {
+        selectedLayanan = { id, nama, durasi: parseInt(durasi), harga: parseInt(harga) };
+
+        const layananIdForm = document.getElementById('layananIdForm');
+        const totalBiayaForm = document.getElementById('totalBiayaForm');
+        if (layananIdForm) layananIdForm.value = id;
+        if (totalBiayaForm) totalBiayaForm.value = parseInt(harga);
+
+        // Update trigger text
+        const trigger = document.getElementById('layananTriggerText');
+        if (trigger) { trigger.textContent = nama; trigger.style.color = '#c2410c'; }
+
+        // Tutup dropdown
+        isLayananDropdownOpen = false;
+        const list = document.getElementById('layananDropdownList');
+        const chevron = document.getElementById('layananChevron');
+        if (list) list.style.display = 'none';
+        if (chevron) chevron.style.transform = '';
+
+        // Tampilkan info terpilih
+        const selectedInfo = document.getElementById('layananSelectedInfo');
+        const selectedNama = document.getElementById('layananSelectedNama');
+        const selectedMeta = document.getElementById('layananSelectedMeta');
+        if (selectedInfo) selectedInfo.style.display = 'block';
+        if (selectedNama) selectedNama.textContent = nama;
+        if (selectedMeta) selectedMeta.textContent = `~${durasi} menit  ·  Mulai Rp ${parseInt(harga).toLocaleString('id-ID')}`;
+
+        // Update estimasi box
+        const estNama   = document.getElementById('estNama');
+        const estDurasi = document.getElementById('estDurasi');
+        const estHarga  = document.getElementById('estHarga');
+        const estTotal  = document.getElementById('estTotal');
+        if (estNama)   estNama.textContent   = nama;
+        if (estDurasi) estDurasi.textContent = `± ${durasi} menit`;
+        if (estHarga)  estHarga.textContent  = 'Rp ' + parseInt(harga).toLocaleString('id-ID');
+        if (estTotal)  estTotal.textContent  = 'Rp ' + parseInt(harga).toLocaleString('id-ID') + '+';
+        if (estimasiBox) estimasiBox.style.display = 'block';
 
         updateRingkasan();
-    });    
+    };
+
+    // Tutup dropdown saat klik di luar
+    document.addEventListener('click', function (e) {
+        const trigger = document.getElementById('layananTrigger');
+        const list    = document.getElementById('layananDropdownList');
+        if (list && trigger && !trigger.contains(e.target) && !list.contains(e.target)) {
+            isLayananDropdownOpen = false;
+            list.style.display    = 'none';
+            const chevron = document.getElementById('layananChevron');
+            if (chevron) chevron.style.transform = '';
+        }
+    });
 
     /* ================================================================
        FOTO KENDARAAN
@@ -578,8 +668,15 @@
         const kendaraanVal = document.querySelector('input[name="kendaraan"]')?.value ?? '';
         const platHidden      = document.getElementById('platHidden');
         const kendaraanHidden = document.getElementById('kendaraanHidden');
+        const layananIdForm  = document.getElementById('layananIdForm');
+        const totalBiayaForm = document.getElementById('totalBiayaForm');        
         if (platHidden)      platHidden.value      = platVal;
         if (kendaraanHidden) kendaraanHidden.value = kendaraanVal;
+
+        // Sync total biaya dari layanan terpilih        
+        if (totalBiayaForm && selectedLayanan) {
+            totalBiayaForm.value = parseInt(selectedLayanan.harga); // ← tambah ini
+        }        
 
         /* Validasi */
         if (!bengkelIdForm.value) {

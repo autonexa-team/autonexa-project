@@ -1,6 +1,5 @@
 /**
  * admin-reservasi.js
- * Letakkan di: public/js/admin-reservasi.js
  *
  * Fitur:
  * 1. Search real-time (nama, bengkel, keluhan)

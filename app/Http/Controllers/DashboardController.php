@@ -74,49 +74,84 @@ class DashboardController extends Controller
                 // CHART: PENDAPATAN BULANAN 
                 $rawBulanan = DB::table('reservasis')
                     ->where('status', 'selesai')
-                    ->whereYear('updated_at', now()->year)
-                    ->selectRaw('MONTH(updated_at) as bulan, SUM(total_biaya)/1000000 as total')
-                    ->groupBy('bulan')->orderBy('bulan')
-                    ->pluck('total', 'bulan')->toArray();
-
+                    ->whereYear('created_at', now()->year)   // ← ganti updated_at → created_at
+                    ->selectRaw('MONTH(created_at) as bulan, SUM(total_biaya)/1000 as total')
+                    ->groupBy('bulan')
+                    ->orderBy('bulan')
+                    ->pluck('total', 'bulan')
+                    ->toArray();
+    
                 $pendapatanBulanan = [];
+                $targetBulanan     = [];
                 for ($m = 1; $m <= 12; $m++) {
                     $pendapatanBulanan[] = round($rawBulanan[$m] ?? 0, 1);
+                    $targetBulanan[]     = 1200;  // sesuaikan target per bulan
                 }
                 $pendapatanLabBulanan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 
                 // CHART: PENDAPATAN MINGGUAN 
                 $rawMingguan = DB::table('reservasis')
                     ->where('status', 'selesai')
-                    ->whereYear('updated_at', now()->year)
-                    ->selectRaw('WEEK(updated_at) as periode, SUM(total_biaya)/1000000 as total')
+                    ->whereYear('created_at', now()->year)
+                    ->selectRaw('WEEK(created_at) as periode, SUM(total_biaya)/1000 as total')
                     ->groupBy('periode')->orderBy('periode')
                     ->pluck('total', 'periode')->toArray();
 
                 $pendapatanMingguan    = [];
+                $targetMingguan        = []; 
                 $pendapatanLabMingguan = [];
                 foreach ($rawMingguan as $minggu => $total) {
                     $pendapatanLabMingguan[] = 'M' . $minggu;
-                    $pendapatanMingguan[]    = round($total, 1);
+                    $pendapatanMingguan[]    = round($total, 1);             
+                    $targetMingguan[]        = 200;       
                 }
+
+                // Fallback jika kosong
                 if (empty($pendapatanMingguan)) {
                     $pendapatanMingguan    = [0];
-                    $pendapatanLabMingguan = ['M1'];
+                    $pendapatanLabMingguan = ['M1'];     
+                    $targetMingguan        = [200];               
                 }
 
                 // CHART: PENDAPATAN TAHUNAN 
                 $rawTahunan = DB::table('reservasis')
                     ->where('status', 'selesai')
-                    ->selectRaw('YEAR(updated_at) as periode, SUM(total_biaya)/1000000 as total')
+                    ->whereYear('created_at', now()->year)
+                    ->selectRaw('YEAR(created_at) as periode, SUM(total_biaya)/1000 as total')
                     ->groupBy('periode')->orderBy('periode')
                     ->pluck('total', 'periode')->toArray();
 
                 $pendapatanTahunan    = array_values(array_map(fn($v) => round($v, 1), $rawTahunan));
+                $targetTahunan        = array_fill(0, count($pendapatanTahunan), 500); 
                 $pendapatanLabTahunan = array_map('strval', array_keys($rawTahunan));
                 if (empty($pendapatanTahunan)) {
                     $pendapatanTahunan    = [0];
+                    $targetTahunan        = [500];
                     $pendapatanLabTahunan = [(string) now()->year];
                 }
+
+                // TREND PENDAPATAN — tambahkan kalkulasi
+                $pendapatanBulanIni  = DB::table('reservasis')
+                    ->where('status', 'selesai')
+                    ->whereMonth('updated_at', now()->month)
+                    ->sum('total_biaya');
+                $pendapatanBulanLalu = DB::table('reservasis')
+                    ->where('status', 'selesai')
+                    ->whereMonth('updated_at', now()->subMonth()->month)
+                    ->sum('total_biaya');
+                $trendPendapatan = $pendapatanBulanLalu > 0
+                    ? round((($pendapatanBulanIni - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100)
+                    : 0;    
+                    
+                // TREND PELANGGAN
+                $pelangganBulanIni  = DB::table('users')->where('role','pelanggan')
+                    ->whereMonth('created_at', now()->month)->count();
+                $pelangganBulanLalu = DB::table('users')->where('role','pelanggan')
+                    ->whereMonth('created_at', now()->subMonth()->month)->count();
+                $trendPelanggan = $pelangganBulanLalu > 0
+                    ? round((($pelangganBulanIni - $pelangganBulanLalu) / $pelangganBulanLalu) * 100)
+                    : 0;
+                    
 
                 // CHART: PERFORMA BENGKEL 
                 $perfomaBengkel = DB::table('bengkels')
@@ -150,10 +185,13 @@ class DashboardController extends Controller
                     'bengkelLabels',
                     'bengkelData',
                     'pendapatanBulanan',
+                    'targetBulanan',
                     'pendapatanLabBulanan',
                     'pendapatanMingguan',
+                    'targetMingguan',
                     'pendapatanLabMingguan',
                     'pendapatanTahunan',
+                    'targetTahunan',
                     'pendapatanLabTahunan',
                 ));
             })(),

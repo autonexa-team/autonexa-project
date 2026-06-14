@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Reservasi;
+use Illuminate\Support\Facades\Storage;
 
 class BengkelController extends Controller
 {
@@ -124,18 +125,8 @@ class BengkelController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            
-            // Pastikan folder assets/bengkels ada
-            $assetsPath = public_path('assets/bengkels');
-            if (!is_dir($assetsPath)) {
-                mkdir($assetsPath, 0755, true);
-            }
-            
-            // Pindahkan file ke folder assets/bengkels
-            $file->move($assetsPath, $filename);
-            $validated['foto'] = 'bengkels/' . $filename;
+            $path = $request->file('foto')->store('bengkels', 'public');
+            $validated['foto'] = $path;
         }
 
         $bengkel = Bengkel::create($validated);
@@ -212,10 +203,7 @@ class BengkelController extends Controller
         // 📸 Handle hapus foto jika flag dikirim
         if ($request->input('hapus_foto') === '1' || $request->input('hapus_foto') == 1) {
             if ($bengkel->foto) {
-                $oldFotoPath = public_path('assets/' . $bengkel->foto);
-                if (file_exists($oldFotoPath)) {
-                    unlink($oldFotoPath);
-                }
+                Storage::disk('public')->delete($bengkel->foto);
                 $validated['foto'] = null;
             }
         }
@@ -224,24 +212,11 @@ class BengkelController extends Controller
         if ($request->hasFile('foto')) {
             // Hapus foto lama jika ada
             if ($bengkel->foto) {
-                $oldFotoPath = public_path('assets/' . $bengkel->foto);
-                if (file_exists($oldFotoPath)) {
-                    unlink($oldFotoPath);
-                }
+                Storage::disk('public')->delete($bengkel->foto);
             }
-
-            $file = $request->file('foto');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            
-            // Pastikan folder assets/bengkels ada
-            $assetsPath = public_path('assets/bengkels');
-            if (!is_dir($assetsPath)) {
-                mkdir($assetsPath, 0755, true);
-            }
-            
-            // Pindahkan file ke folder assets/bengkels
-            $file->move($assetsPath, $filename);
-            $validated['foto'] = 'bengkels/' . $filename;
+            // Upload baru ke storage
+            $path = $request->file('foto')->store('bengkels', 'public');
+            $validated['foto'] = $path;
         }
 
         // update ke database
@@ -306,12 +281,9 @@ class BengkelController extends Controller
 
         // hapus foto jika ada
         if ($bengkel->foto) {
-            $fotoPath = public_path('assets/' . $bengkel->foto);
-
-            if (file_exists($fotoPath)) {
-                unlink($fotoPath);
-            }
+            Storage::disk('public')->delete($bengkel->foto);
         }
+
 
         $bengkel->delete();
 

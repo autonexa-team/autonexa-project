@@ -239,13 +239,38 @@
 
 /* Penting: wrapper agar canvas responsif */
 .chart-wrap {
-    position: relative;
-    width: 100%;
+    position : relative;
+    width    : 100%;
+    min-height: 200px;
 }
 
 .chart-wrap canvas {
-    display: block;
-    width: 100% !important;
+    display: block !important;
+    width   : 100% !important;
+}
+
+/* Fix tab button aktif */
+.chart-tab {
+    padding      : 5px 14px;
+    border-radius: 6px;
+    border       : 1px solid var(--border, #e5e7eb);
+    background   : transparent;
+    font-size    : 12px;
+    font-weight  : 600;
+    color        : var(--foreground-t, #6b7280);
+    cursor       : pointer;
+    transition   : all 0.15s;
+}
+
+.chart-tab.active {
+    background   : var(--primary, #ff6a00);
+    border-color : var(--primary, #ff6a00);
+    color        : #ffffff;
+}
+
+.chart-tab:hover:not(.active) {
+    border-color : var(--primary, #ff6a00);
+    color        : var(--primary, #ff6a00);
 }
 
 /* ── DONUT CENTER LABEL ── */

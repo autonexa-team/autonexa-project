@@ -97,14 +97,14 @@
  
                             <li>
                                 <a class="dropdown-item nav-dd-item"
-                                   href="{{ route('pelanggan.profile') ?? '#' }}">
+                                   href="{{ Route::has('pelanggan.profile') ? route('pelanggan.profile') : '#' }}"
                                     <i class="bi bi-person-circle"></i>
                                     Profil Saya
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item nav-dd-item"
-                                   href="{{ route('pelanggan.riwayat') }}">
+                                   href="{{ Route::has('pelanggan.riwayat') ? route('pelanggan.riwayat') : '#' }}">
                                     <i class="bi bi-calendar-check"></i>
                                     Reservasi Saya
                                 </a>

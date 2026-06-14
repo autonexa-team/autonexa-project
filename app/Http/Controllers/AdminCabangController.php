@@ -10,6 +10,7 @@ use App\Models\Layanan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Storage;
 
 class AdminCabangController extends Controller
 {
@@ -121,8 +122,6 @@ class AdminCabangController extends Controller
                    ->update(['admin_id' => $user->id]);
         }
 
-        dd('masuk update', $user->id);
-
         return back()->with('success', "Data {$user->name} berhasil diperbarui.");
     }
 
@@ -169,7 +168,6 @@ class AdminCabangController extends Controller
         }
 
         // Proses update slot reservasi
-
         if ($request->has('slot')) {
             // menghapus slot lama
             $bengkel->slotReservasi()->delete();

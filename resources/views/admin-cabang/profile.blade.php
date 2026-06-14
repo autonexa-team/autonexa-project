@@ -349,15 +349,21 @@
                     <div class="flex flex-col md:flex-row gap-6 items-start">
                         <!-- Current Photo / Preview -->
                         <div class="w-full md:w-1/3 aspect-video md:aspect-square bg-slate-100 rounded-xl overflow-hidden border-2 border-dashed border-slate-300 flex items-center justify-center relative group shadow-inner">
-                            <img src="{{ $bengkel?->foto ? asset('assets/' . $bengkel->foto) : 'https://via.placeholder.com/600x400?text=Foto+Bengkel' }}" alt="Bengkel Cabang" class="w-full h-full object-cover z-0">
+                            <img src="{{ $bengkel?->foto ? asset('storage/' . $bengkel->foto) : 'https://via.placeholder.com/600x400?text=Foto+Bengkel' }}" 
+                                alt="Bengkel Cabang" 
+                                class="w-full h-full object-cover z-0"
+                                id="fotoPreview">
                             
                             <!-- Overlay Hover -->
                             <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
-                                <button type="button" class="bg-white text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-bold shadow-md transition-colors flex items-center">
+                                <button type="button" onclick="hapusFoto()" class="bg-white text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-bold shadow-md transition-colors flex items-center">
                                     <i class="fas fa-trash-alt mr-2"></i> Hapus
                                 </button>
                             </div>
                         </div>
+
+                        {{-- Flag hapus foto --}}
+                        <input type="hidden" name="hapus_foto" id="hapusFotoInput" value="0">
 
                         <!-- Upload Control -->
                         <div class="flex-1 w-full">
@@ -386,5 +392,25 @@
         </div>
     </div>
 </form>
+
+<script>
+function hapusFoto() {
+    if (!confirm('Hapus foto bengkel?')) return;
+    document.getElementById('hapusFotoInput').value = '1';
+    document.getElementById('fotoPreview').src = 'https://via.placeholder.com/600x400?text=Foto+Bengkel';
+}
+
+// Preview foto sebelum upload
+document.querySelector('input[name="foto"]').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById('fotoPreview').src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 
 @endsection

@@ -7,203 +7,280 @@
 (function () {
     'use strict';
 
-    const d = window.dashboardData || {};
+    /* ── Ambil data dari blade ── */
+    const D = window.dashboardData || {};
 
-    /* ── Global defaults ── */
-    Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
-    Chart.defaults.font.size   = 12;
-    Chart.defaults.color       = '#6b7280';
+    /* ── Warna brand ── */
+    const BRAND   = '#ff6a00';
+    const BRAND_A = 'rgba(255,106,0,0.12)';
+    const GRAY    = '#e5e7eb';
+    const NAVY    = '#1F2E4D';
+    const TEXT    = '#6b7280';
+    const GRID    = 'rgba(0,0,0,0.05)';
 
-    const ORANGE      = '#ff6a00';
-    const ORANGE_FADE = 'rgba(255,106,0,0.13)';
-    const GRAY        = '#d1d5db';
-    const GRID        = 'rgba(0,0,0,0.045)';
-    const TOOLTIP_BG  = '#1f2937';
-    const STATUS_COLORS = ['#ff6a00', '#2563eb', '#16a34a', '#dc2626'];
-
-    /* Shared tooltip config */
-    function tooltipBase(extra) {
-        return Object.assign({
-            backgroundColor: TOOLTIP_BG,
-            padding: 10,
-            cornerRadius: 8,
-            titleColor: '#e5e7eb',
-            bodyColor: '#d1d5db',
-        }, extra || {});
-    }
-
-    /* Shared scale presets */
-    const scaleX = (opts) => Object.assign({
-        grid: { display: false },
-        border: { display: false },
-        ticks: { color: '#9ca3af' },
-    }, opts || {});
-
-    const scaleY = (opts) => Object.assign({
-        grid: { color: GRID },
-        border: { display: false },
-        ticks: { color: '#9ca3af', maxTicksLimit: 5 },
-        beginAtZero: true,
-    }, opts || {});
+    /* ── Global Chart.js defaults ── */
+    Chart.defaults.font.family  = "'Plus Jakarta Sans', 'Geist', system-ui, sans-serif";
+    Chart.defaults.font.size    = 12;
+    Chart.defaults.color        = TEXT;
+    Chart.defaults.plugins.legend.display = false;
 
     /* ================================================================
-       1. GRAFIK PENDAPATAN — Line (toggle: mingguan/bulanan/tahunan)
+       HELPER: buat gradient fill untuk line chart
     ================================================================ */
-    const ctxPendapatan = document.getElementById('chartPendapatan');
-    let chartPendapatan = null;
+    function makeGradient(ctx, color1, color2) {
+        const grad = ctx.createLinearGradient(0, 0, 0, 260);
+        grad.addColorStop(0,   color1);
+        grad.addColorStop(1,   color2);
+        return grad;
+    }
 
-    const periodData = {
-        mingguan: {
-            labels : d.pendapatanLabMingguan || ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12','M13','M14'],
-            data   : d.pendapatanMingguan    || [12,18,14,22,19,25,28,21,30,26,33,35,29,38],
-            target : d.targetMingguan        || [20,20,20,25,25,25,30,30,30,35,35,35,35,40],
+    /* ================================================================
+       HELPER: opsi axis standar
+    ================================================================ */
+    function xAxis(labels) {
+        return {
+            grid : { display: false },
+            ticks: { color: TEXT, maxRotation: 0 },
+        };
+    }
+
+    function yAxis(unit) {
+        return {
+            grid : { color: GRID, drawBorder: false },
+            ticks: {
+                color: TEXT,
+                callback: v => unit ? `${v} ${unit}` : v,
+            },
+            beginAtZero: true,
+        };
+    }
+
+    /* ================================================================
+       1. GRAFIK PENDAPATAN (Line + Area toggle)
+    ================================================================ */
+    const ctxP = document.getElementById('chartPendapatan');
+    if (!ctxP) return;
+
+    /* State periode aktif */
+    let periodAktif = 'bulanan';
+
+    /* Data per periode */
+    const periodeMap = {
+        mingguan : {
+            labels : D.pendapatanLabMingguan || [],
+            data   : D.pendapatanMingguan    || [],
+            target : D.targetMingguan        || [],
         },
-        bulanan: {
-            labels : d.pendapatanLabBulanan  || ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-            data   : d.pendapatanBulanan     || [42,55,48,72,81,94,88,110,102,125,118,140],
-            target : d.targetBulanan         || [50,60,65,75,85,95,100,115,110,130,125,150],
+        bulanan  : {
+            labels : D.pendapatanLabBulanan  || [],
+            data   : D.pendapatanBulanan     || [],
+            target : D.targetBulanan         || [],
         },
-        tahunan: {
-            labels : d.pendapatanLabTahunan  || ['2021','2022','2023','2024','2025'],
-            data   : d.pendapatanTahunan     || [480,620,750,890,1050],
-            target : d.targetTahunan         || [500,650,800,950,1100],
+        tahunan  : {
+            labels : D.pendapatanLabTahunan  || [],
+            data   : D.pendapatanTahunan     || [],
+            target : D.targetTahunan         || [],
         },
     };
 
-    function buildPendapatanChart(period) {
-        const pd = periodData[period] || periodData.bulanan;
-        if (chartPendapatan) chartPendapatan.destroy();
+    /* Fallback — pastikan ada data supaya grafik tidak kosong */
+    Object.keys(periodeMap).forEach(key => {
+        const p = periodeMap[key];
+        if (!p.data.length) {
+            p.data   = [0];
+            p.target = [0];
+            if (!p.labels.length) p.labels = ['-'];
+        }
+    });
 
-        chartPendapatan = new Chart(ctxPendapatan, {
-            type: 'line',
-            data: {
-                labels: pd.labels,
-                datasets: [
-                    {
-                        label: 'Pendapatan (jt Rp)',
-                        data: pd.data,
-                        borderColor: ORANGE,
-                        backgroundColor: ORANGE_FADE,
-                        borderWidth: 2.5,
-                        pointBackgroundColor: ORANGE,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 7,
-                        fill: true,
-                        tension: 0.4,
+    /* Cek apakah semua nilai 0 (tampilkan notice) */
+    function semua0(arr) { return arr.every(v => Number(v) === 0); }
+
+    /* Buat chart pendapatan */
+    const grad = makeGradient(
+        ctxP.getContext('2d'),
+        'rgba(255,106,0,0.18)',
+        'rgba(255,106,0,0)'
+    );
+
+    const chartPendapatan = new Chart(ctxP, {
+        type: 'line',
+        data: {
+            labels  : periodeMap.bulanan.labels,
+            datasets: [
+                {
+                    label          : 'Pendapatan (Rp juta)',
+                    data           : periodeMap.bulanan.data,
+                    borderColor    : BRAND,
+                    backgroundColor: grad,
+                    borderWidth    : 2.5,
+                    pointRadius    : 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: BRAND,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    tension        : 0.4,
+                    fill           : true,
+                    order          : 1,
+                },
+                {
+                    label          : 'Target',
+                    data           : periodeMap.bulanan.target,
+                    borderColor    : GRAY,
+                    backgroundColor: 'transparent',
+                    borderWidth    : 1.5,
+                    borderDash     : [6, 4],
+                    pointRadius    : 0,
+                    tension        : 0,
+                    fill           : false,
+                    order          : 2,
+                },
+            ],
+        },
+        options: {
+            responsive         : true,
+            maintainAspectRatio: false,
+            interaction        : { mode: 'index', intersect: false },
+            plugins: {
+                legend : { display: false },
+                tooltip: {
+                    backgroundColor: '#1a1a1a',
+                    titleColor     : '#fff',
+                    bodyColor      : 'rgba(255,255,255,0.75)',
+                    padding        : 10,
+                    cornerRadius   : 8,
+                    callbacks: {
+                        label: ctx =>
+                            ` ${ctx.dataset.label}: Rp ${ctx.parsed.y} rb`,
                     },
-                    {
-                        label: 'Target (jt Rp)',
-                        data: pd.target,
-                        borderColor: GRAY,
-                        backgroundColor: 'transparent',
-                        borderWidth: 1.5,
-                        borderDash: [5, 4],
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        fill: false,
-                        tension: 0.4,
+                },
+            },
+            scales: {
+                x: xAxis(),
+                y: {
+                    ...yAxis('rb'),
+                    ticks: {
+                        color: TEXT,
+                        callback: v => `${v} rb`,
                     },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: tooltipBase({
-                        callbacks: {
-                            label: ctx => ` ${ctx.dataset.label}: Rp ${ctx.parsed.y.toLocaleString('id-ID')} jt`,
-                        },
-                    }),
-                },
-                scales: {
-                    x: scaleX(),
-                    y: scaleY({
-                        ticks: {
-                            color: '#9ca3af',
-                            maxTicksLimit: 5,
-                            callback: v => `${v} jt`,
-                        },
-                    }),
                 },
             },
-        });
-    }
+        },
+    });
 
-    if (ctxPendapatan) {
-        buildPendapatanChart('bulanan');
-
-        /* Tab switcher */
-        document.querySelectorAll('.chart-tab').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                buildPendapatanChart(this.dataset.period);
-            });
-        });
-    }
-
-    /* ================================================================
-       2. STATUS RESERVASI — Donut dengan total di tengah
-    ================================================================ */
-    const ctxStatus = document.getElementById('chartStatus');
-    if (ctxStatus) {
-        const statusLabels = d.statusLabels || ['Selesai','Dikonfirmasi','Dikerjakan','Dibatalkan'];
-        const statusData   = d.statusData   || [40, 25, 22, 13];
-        const total        = statusData.reduce((a, b) => a + b, 0);
-
-        /* Set angka total di tengah */
-        const totalEl = document.getElementById('donutTotalNum');
-        if (totalEl) totalEl.textContent = total.toLocaleString('id-ID');
-
-        new Chart(ctxStatus, {
-            type: 'doughnut',
-            data: {
-                labels: statusLabels,
-                datasets: [{
-                    data: statusData,
-                    backgroundColor: STATUS_COLORS,
-                    borderWidth: 2,
-                    borderColor: '#fff',
-                    hoverBorderWidth: 3,
-                    hoverOffset: 8,
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '70%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: tooltipBase({
-                        callbacks: {
-                            label: ctx => {
-                                const pct = ((ctx.parsed / total) * 100).toFixed(1);
-                                return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
-                            },
-                        },
-                    }),
-                },
-            },
-        });
-
-        /* Build custom legend */
-        const legendEl = document.getElementById('legendStatus');
-        if (legendEl) {
-            legendEl.innerHTML = statusLabels.map((lbl, i) => {
-                const pct = total ? ((statusData[i] / total) * 100).toFixed(1) : '0.0';
-                return `<span class="legend-item">
-                    <span class="legend-dot" style="background:${STATUS_COLORS[i]};"></span>
-                    ${lbl}
-                    <span class="legend-value">${pct}%</span>
-                </span>`;
-            }).join('');
+    /* Tampilkan notice jika semua data 0 */
+    function updateEmptyNotice(data) {
+        let notice = document.getElementById('chartEmptyNotice');
+        if (semua0(data)) {
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.id = 'chartEmptyNotice';
+                notice.style.cssText = `
+                    position:absolute;inset:0;display:flex;flex-direction:column;
+                    align-items:center;justify-content:center;
+                    font-size:13px;color:#9ca3af;pointer-events:none;gap:6px;
+                `;
+                notice.innerHTML = `
+                    <i class="bi bi-bar-chart" style="font-size:28px;opacity:.3;"></i>
+                    <span>Belum ada data pendapatan</span>
+                    <span style="font-size:11px;">Data akan muncul setelah ada reservasi yang selesai</span>
+                `;
+                ctxP.parentElement.style.position = 'relative';
+                ctxP.parentElement.appendChild(notice);
+            }
+            notice.style.display = 'flex';
+        } else if (notice) {
+            notice.style.display = 'none';
         }
     }
 
+    updateEmptyNotice(periodeMap.bulanan.data);
+
+    /* Toggle periode */
+    document.querySelectorAll('.chart-tab').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            periodAktif = this.dataset.period;
+            const p     = periodeMap[periodAktif];
+
+            chartPendapatan.data.labels         = p.labels;
+            chartPendapatan.data.datasets[0].data = p.data;
+            chartPendapatan.data.datasets[1].data = p.target;
+            chartPendapatan.update('active');
+
+            updateEmptyNotice(p.data);
+        });
+    });
+
+    /* ================================================================
+       2. GRAFIK PERFORMA BENGKEL (Horizontal Bar)
+    ================================================================ */
+    const ctxB = document.getElementById('chartBengkel');
+    if (!ctxB) return;
+
+    const bengkelLabels = D.bengkelLabels || ['Belum ada data'];
+    const bengkelData   = D.bengkelData   || [0];
+
+    /* Warna bar: highlight tertinggi */
+    const maxVal  = Math.max(...bengkelData, 1);
+    const barColors = bengkelData.map((v, i) =>
+        i === 0 ? BRAND : `rgba(255,106,0,${0.25 + (v / maxVal) * 0.55})`
+    );
+
+    new Chart(ctxB, {
+        type: 'bar',
+        data: {
+            labels  : bengkelLabels,
+            datasets: [{
+                label          : 'Reservasi',
+                data           : bengkelData,
+                backgroundColor: barColors,
+                borderRadius   : 6,
+                borderSkipped  : false,
+                barThickness   : 22,
+            }],
+        },
+        options: {
+            indexAxis          : 'y',          /* ← horizontal bar */
+            responsive         : true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend : { display: false },
+                tooltip: {
+                    backgroundColor: '#1a1a1a',
+                    titleColor     : '#fff',
+                    bodyColor      : 'rgba(255,255,255,0.75)',
+                    padding        : 10,
+                    cornerRadius   : 8,
+                    callbacks: {
+                        label: ctx => ` ${ctx.parsed.x} reservasi`,
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    grid      : { color: GRID, drawBorder: false },
+                    ticks     : { color: TEXT, precision: 0 },
+                    beginAtZero: true,
+                },
+                y: {
+                    grid : { display: false },
+                    ticks: {
+                        color    : TEXT,
+                        font     : { weight: '600' },
+                        /* Truncate nama panjang */
+                        callback : v => {
+                            const lbl = bengkelLabels[v] || v;
+                            return lbl.length > 18 ? lbl.substring(0, 18) + '…' : lbl;
+                        },
+                    },
+                },
+            },
+        },
+    });
+    
     /* ================================================================
        3. TREN RESERVASI — Grouped Bar
     ================================================================ */

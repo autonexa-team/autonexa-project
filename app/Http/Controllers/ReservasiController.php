@@ -28,6 +28,18 @@ class ReservasiController extends Controller
         $bengkels = Bengkel::withAvg('reviews', 'rating')->get();
         $layanans = Layanan::all();
 
+        $layananPerBengkel = $bengkels->mapWithKeys(function ($bengkel) {
+            return [
+                $bengkel->id => $bengkel->layanan->map(fn($l) => [
+                    'id'        => $l->id,
+                    'nama'      => $l->nama,
+                    'durasi'    => $l->durasi,
+                    'harga'     => $l->harga,
+                    'deskripsi' => $l->deskripsi ?? '',
+                ])
+            ];
+        });        
+
         // Hitung jumlah reservasi hari ini per bengkel (untuk tampil slot sisa)
         $today = Carbon::today()->toDateString();
         $reservasiHariIni = Reservasi::query()
@@ -49,7 +61,7 @@ class ReservasiController extends Controller
             ->map(fn($rows) => $rows->pluck('total', 'waktu'))
             ->toArray();
 
-        return view('pelanggan.reservasi', compact('bengkels', 'layanans', 'reservasiHariIni', 'slotPerJam'));
+        return view('pelanggan.reservasi', compact('bengkels', 'layanans', 'reservasiHariIni', 'slotPerJam', 'layananPerBengkel'));
     }
 
     public function indexAdminPusat(Request $request)
@@ -468,7 +480,7 @@ class ReservasiController extends Controller
                 ], 401);
             }
 
-            $reservasi = Reservasi::with(['user', 'bengkel'])
+            $reservasi = Reservasi::with(['user', 'bengkel', 'layanan', 'spareparts'])
                 ->findOrFail($id);
 
             // Verify ownership
@@ -871,21 +883,41 @@ class ReservasiController extends Controller
             }
 
             $validated = $request->validate([
-                'nama'        => 'required|string|max:255',
-                'harga'       => 'required|numeric|min:1',
-                'qty'         => 'required|integer|min:1',
-                'keterangan'  => 'nullable|string|max:500',
+                'sparepart_id' => 'required|exists:sparepart,id',
+                'qty'          => 'required|integer|min:1',
+                'keterangan'   => 'nullable|string|max:500',
             ]);
 
-            // Ensure harga is integer
-            $validated['harga'] = (int) $validated['harga'];
+            // Ambil data sparepart + stok bengkel untuk item ini
+            $pivot = $bengkel->spareparts()
+                ->where('sparepart.id', $validated['sparepart_id'])
+                ->first();
 
-            $sp = $reservasi->spareparts()->create($validated);
+            if (!$pivot || $pivot->pivot->stok < $validated['qty']) {
+                return response()->json(['message' => 'Stok tidak cukup'], 422);
+            }
 
-            // Update total biaya reservasi
-            $reservasi->total_biaya = ($reservasi->layanan->harga ?? 0)
-                + $reservasi->spareparts()->sum(DB::raw('harga * qty'));
-            $reservasi->save();
+            $sp = null;
+
+            DB::transaction(function () use (&$sp, $reservasi, $bengkel, $pivot, $validated) {
+                $sp = $reservasi->spareparts()->create([
+                    'sparepart_id' => $pivot->id,
+                    'nama'         => $pivot->nama,
+                    'harga'        => $pivot->harga,
+                    'qty'          => $validated['qty'],
+                    'keterangan'   => $validated['keterangan'] ?? null,
+                ]);
+
+                // Kurangi stok bengkel sesuai qty yang dipakai
+                $bengkel->spareparts()->updateExistingPivot($pivot->id, [
+                    'stok' => $pivot->pivot->stok - $validated['qty'],
+                ]);
+
+                // Update total biaya reservasi
+                $reservasi->total_biaya = ($reservasi->layanan->harga ?? 0)
+                    + $reservasi->spareparts()->sum(DB::raw('harga * qty'));
+                $reservasi->save();
+            });
 
             return response()->json(['data' => $sp], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -995,6 +1027,29 @@ class ReservasiController extends Controller
             ], 500);
         }
     }
+
+    public function batalkanPelanggan(int $id)
+    {
+        $user = Auth::user();
+
+        $reservasi = Reservasi::with(['user', 'bengkel', 'layanan', 'spareparts'])
+            ->where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'dikonfirmasi'])
+            ->findOrFail($id);
+
+        $reservasi->update(['status' => 'dibatalkan']);
+
+        // Kirim email notifikasi ke pelanggan
+        if ($reservasi->user && $reservasi->user->email) {
+            Mail::to($reservasi->user->email)
+                ->send(new ReservasiStatusMail($reservasi));
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reservasi berhasil dibatalkan.'
+        ]);
+    }   
 
     // public function showAdminPusat($id)
     // {

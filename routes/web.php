@@ -151,11 +151,11 @@ Route::middleware(['auth', 'role:pelanggan'])
     Route::delete('/review/{review}', [ReviewController::class, 'destroy'])
         ->name('review.destroy'); 
 
-    Route::put('/profile/update', [ProfileController::class, 'update'])
-        ->name('pelanggan.profile.update');
+    // Route::put('/profile/update', [ProfileController::class, 'update'])
+    //     ->name('pelanggan.profile.update');
 
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])
-        ->name('pelanggan.profile.edit');
+    // Route::get('/profile/edit', [ProfileController::class, 'edit'])
+    //     ->name('pelanggan.profile.edit');
 
     Route::get('/dashboard', function () {
          return view('pelanggan.dashboard');

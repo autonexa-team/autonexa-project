@@ -103,12 +103,6 @@
                         Ubah Password
                     </a>
 
-                    <a href="{{ route('pelanggan.profile.edit') }}"
-                    class="bg-orange-500 text-white px-3 py-2 rounded-xl font-semibold flex items-center gap-2 whitespace-nowrap">
-
-                        <i class="fas fa-pen"></i>
-                        Edit Profil
-                    </a>   
                 </div>
             </div>
         </div>
@@ -290,9 +284,7 @@
                                             @else
                                                 <span class="status-badge badge-batal"><i class="fas fa-times-circle"></i> Dibatalkan</span>
                                             @endif
-                                            <a href="{{ route('riwayat-detail', $res->id) }}" class="btn-detail">
-                                                Detail <i class="fas fa-chevron-right"></i>
-                                            </a>
+<!-- harusnya ada riwayat detail -->
                                     </div>
                                     @endforeach
                                 </div>

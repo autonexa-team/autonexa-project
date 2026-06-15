@@ -264,7 +264,7 @@ class BengkelController extends Controller
 
         // Hitung slot tersisa hari ini
         $kapasitas = $bengkel->kapasitas ?? 8;
-        $terpakai  = Reservasi::where('bengkel_id', $bengkel->id)
+        $terpakai = Reservasi::query()->where('bengkel_id', $bengkel->id)
             ->whereDate('tanggal', now()->toDateString())
             ->whereIn('status', ['waiting', 'process'])
             ->count();

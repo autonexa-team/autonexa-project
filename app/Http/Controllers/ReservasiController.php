@@ -169,7 +169,7 @@ class ReservasiController extends Controller
                 'bengkel_id' => $reservasi->bengkel_id,
                 'type'       => 'reservasi',
                 'title'      => 'Reservasi Baru',
-                'message'    => auth()->user()->name .
+                'message' => $user->name .
                                 ' membuat reservasi baru untuk tanggal ' .
                                 $reservasi->tanggal,
             ]);
@@ -265,7 +265,9 @@ class ReservasiController extends Controller
         $selesai          = (clone $statQuery)->where('status', 'selesai')->count();
 
         // setelah filter, ambil dsta pelanggan
-        $pelangganDipilih = $request->filled('user_id') ? User::find($request->user_id) : null;
+        $pelangganDipilih = $request->filled('user_id')
+            ? User::query()->where('id', (int) $request->user_id)->first()
+            : null;
 
         return view('admin-cabang.reservasi', compact(
             'reservasi',
@@ -321,7 +323,7 @@ class ReservasiController extends Controller
             ->get();
             
         if ($layanan->isEmpty()) {
-            $layanan = Layanan::where('status', 'aktif')->get();
+            $layanan = Layanan::query()->where('status', 'aktif')->get();
         }
 
         return response()->json($layanan->map(fn($l) => [
@@ -671,18 +673,10 @@ class ReservasiController extends Controller
             ->get();
 
         $stats = [
-            'total_reservasi' => Reservasi::where('user_id', $user->id)->count(),
-
-            'reservasi_selesai' => Reservasi::where('user_id', $user->id)
-                ->where('status', 'selesai')
-                ->count(),
-
-            'reservasi_aktif' => Reservasi::where('user_id', $user->id)
-                ->where('status', 'diproses')
-                ->count(),
-
-            'total_review' => Review::where('user_id', $user->id)
-                ->count(),
+            'total_reservasi'   => Reservasi::query()->where('user_id', $user->id)->count(),
+            'reservasi_selesai' => Reservasi::query()->where('user_id', $user->id)->where('status', 'selesai')->count(),
+            'reservasi_aktif'   => Reservasi::query()->where('user_id', $user->id)->where('status', 'diproses')->count(),
+            'total_review'      => Review::query()->where('user_id', $user->id)->count(),
         ];
 
         return view('pelanggan.profile', compact(
